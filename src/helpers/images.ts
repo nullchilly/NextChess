@@ -4,7 +4,6 @@ export const getPieceSrc = (color: PieceColor, piece: PieceType) => {
   return `assets/${color}_${piece}.svg`;
 };
 
-<<<<<<< HEAD
 export function getYoutubeThumbnail(videoUrl: string) {
   // Extract the video ID from the URL
   const videoId = videoUrl.split("v=")[1];
@@ -17,8 +16,8 @@ export function getYoutubeThumbnail(videoUrl: string) {
 
   // You can fetch the image using your preferred method, for example, with Fetch API
   return thumbnailUrl;
-=======
+}
+
 export const getImageSrc = (src: string) => {
   return `assets/${src}.svg`;
->>>>>>> 2ae1555 (add profile page)
 }

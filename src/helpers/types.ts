@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React from "react";
 
 export type VideosProps = {
@@ -21,7 +20,6 @@ export type VideoType = {
   tag?: string[];
   id: string;
 };
-=======
 export enum UserNetworkType{
     FACEBOOK="FACEBOOK"
 }
@@ -51,4 +49,3 @@ export type UserProfile = {
     userNetworkLinks: UserNetworkLink[];
     ratings: Rating[]
 }
->>>>>>> 2ae1555 (add profile page)
