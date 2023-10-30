@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from 'next/image';
 import {GameType, Rating, UserNetworkLink, UserNetworkType, UserProfile} from "@/helpers/types";
-import {getImageSrc, getPieceSrc} from "@/helpers/images";
+import {getSvgSrc, getPieceSrc} from "@/helpers/images";
 
 const ROUTES = [
     { href: '/profile', text: 'Profile' },
@@ -88,7 +88,7 @@ const Profile = (avatar: string, name: string, links: UserNetworkLink[]) => {
                         return (
                             <div className="flex flex-col items-center justify-center">
                                 <Link href={link.link} className="flex flex-col items-center text-blue-500 hover:underline">
-                                    <Image className="" src={getImageSrc(link.type)}
+                                    <Image className="" src={getSvgSrc(link.type)}
                                            alt={link.type} width={30} height={30}></Image>
                                     {link.text}
                                 </Link>

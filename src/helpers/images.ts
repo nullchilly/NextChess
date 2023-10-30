@@ -18,6 +18,6 @@ export function getYoutubeThumbnail(videoUrl: string) {
   return thumbnailUrl;
 }
 
-export const getImageSrc = (src: string) => {
+export const getSvgSrc = (src: string) => {
   return `assets/${src}.svg`;
 }
