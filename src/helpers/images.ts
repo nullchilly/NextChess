@@ -17,3 +17,6 @@ export function getYoutubeThumbnail(videoUrl: string) {
   // You can fetch the image using your preferred method, for example, with Fetch API
   return thumbnailUrl;
 }
+export const getSvgSrc = (src: string) => {
+  return `assets/${src}.svg`;
+};
