@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from "react";
 
 export type VideosProps = {
@@ -20,3 +21,34 @@ export type VideoType = {
   tag?: string[];
   id: string;
 };
+=======
+export enum UserNetworkType{
+    FACEBOOK="FACEBOOK"
+}
+
+export type UserNetworkLink = {
+    link: string;
+    text: string;
+    type: UserNetworkType;
+}
+
+export enum GameType{
+    FAST="Fast Chess",
+    SLOW="Slow",
+    PUZZLE="Puzzle",
+    STARS="Stars"
+
+}
+
+export type Rating = {
+    gameType: GameType;
+    rate: number
+}
+
+export type UserProfile = {
+    name: string;
+    avatar: string,
+    userNetworkLinks: UserNetworkLink[];
+    ratings: Rating[]
+}
+>>>>>>> 2ae1555 (add profile page)
