@@ -1,5 +1,6 @@
 import { getYoutubeThumbnail } from "@/helpers/images";
 import { VideosProps } from "@/helpers/types";
+import Link from "next/link";
 
 const VideoComponent = ({
   url,
@@ -7,16 +8,19 @@ const VideoComponent = ({
   date,
   summary,
   length,
+  tag,
   style,
 }: VideosProps) => {
   return (
     <div>
       <div className="bg-white w-72 h-80 p-4 rounded-lg shadow-lg">
         <div className="relative">
-          <img
-            src={getYoutubeThumbnail(url)}
-            className="w-full h-full rounded-lg"
-          ></img>
+          <Link href={url}>
+            <img
+              src={getYoutubeThumbnail(url)}
+              className="w-full h-full rounded-lg"
+            ></img>
+          </Link>
           <span className="absolute top-2 right-2 bg-gray-800 text-white px-2 py-1 rounded-full text-xs">
             {length}
           </span>
