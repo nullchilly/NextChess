@@ -56,7 +56,7 @@ const ProfileNavbar = () => {
     return(
         <nav className="bg-gray-200 p-4 rounded-lg shadow-md">
             <div className="items-center justify-center mx-auto sp">
-                <div className="hidden md:flex md:space-x-4 mx-auto">
+                <div className="flex md:flex md:space-x-4 mx-auto">
                     {ROUTES.map((navElement) => {
                         return(
                             <div className="flex-grow text-center text-lg p-4 border
@@ -73,11 +73,11 @@ const ProfileNavbar = () => {
 
 const Profile = (avatar: string, name: string, links: UserNetworkLink[]) => {
     return (
-        <div className="bg-gray-200 p-4 rounded-lg shadow-md max-w-screen-xl">
+        <div className="bg-gray-200 p-4 rounded-lg shadow-md w-full">
             <div className="grid grid-cols-2">
                 <div className="grid grid-cols-2 items-center justify-center space-x-4">
                     <div className="rounded-full overflow-hidden">
-                        <Image className="w-full h-full" src={getPieceSrc('b', 'q')} width={100} height={100} alt="Avatar"></Image>
+                        <Image className="w-full h-full" src={getPieceSrc('b', 'q')} width={0} height={0} alt="Avatar"></Image>
                     </div>
                     <div className="text-4xl font-bold">
                         {name}
@@ -88,7 +88,8 @@ const Profile = (avatar: string, name: string, links: UserNetworkLink[]) => {
                         return (
                             <div className="flex flex-col items-center justify-center">
                                 <Link href={link.link} className="flex flex-col items-center text-blue-500 hover:underline">
-                                    <Image src={getImageSrc(link.type)} alt={link.type} width={30} height={30}></Image>
+                                    <Image className="" src={getImageSrc(link.type)}
+                                           alt={link.type} width={30} height={30}></Image>
                                     {link.text}
                                 </Link>
                             </div>
@@ -102,7 +103,7 @@ const Profile = (avatar: string, name: string, links: UserNetworkLink[]) => {
 
 const Rating = (userRatings: Rating[]) => {
     return (
-        <div className="bg-gray-200 text-black p-14 rounded-lg grid grid-cols-4">
+        <div className="bg-gray-200 text-black p-4 rounded-lg grid grid-cols-4">
             {userRatings.map((rating) => {
                 return (
                     <div className="grid-rows-3">
