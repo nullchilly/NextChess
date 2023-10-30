@@ -12,7 +12,7 @@ const ROUTES = [
 ];
 
 const fakeProfile: UserProfile = {
-    name: "tu nguyen",
+    name: "User Name",
     avatar: "https://www.chesskid.com/images/avatars/kids/100/kid-1162.png",
     userNetworkLinks: [
         {
