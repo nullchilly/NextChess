@@ -57,9 +57,9 @@ const ProfileNavbar = () => {
         <nav className="bg-gray-200 p-4 rounded-lg shadow-md">
             <div className="items-center justify-center mx-auto sp">
                 <div className="flex md:flex md:space-x-4 mx-auto">
-                    {ROUTES.map((navElement) => {
+                    {ROUTES.map((navElement, index) => {
                         return(
-                            <div className="flex-grow text-center text-lg p-4 border
+                            <div key={index} className="flex-grow text-center text-lg p-4 border
                             bg-gray-400 hover:bg-gray-600 transition-colors rounded-lg">
                                 <Link href={navElement.href} className=""> {navElement.text}</Link>
                             </div>
@@ -84,9 +84,9 @@ const Profile = (avatar: string, name: string, links: UserNetworkLink[]) => {
                     </div>
                 </div>
                 <div className="grid grid-cols-1 ">
-                    {links.map((link) => {
+                    {links.map((link, index) => {
                         return (
-                            <div className="flex flex-col items-center justify-center">
+                            <div key={index} className="flex flex-col items-center justify-center">
                                 <Link href={link.link} className="flex flex-col items-center text-blue-500 hover:underline">
                                     <Image className="" src={getSvgSrc(link.type)}
                                            alt={link.type} width={30} height={30}></Image>
@@ -104,9 +104,9 @@ const Profile = (avatar: string, name: string, links: UserNetworkLink[]) => {
 const Rating = (userRatings: Rating[]) => {
     return (
         <div className="bg-gray-200 text-black p-4 rounded-lg grid grid-cols-4">
-            {userRatings.map((rating) => {
+            {userRatings.map((rating, index) => {
                 return (
-                    <div className="grid-rows-3">
+                    <div key={index} className="grid-rows-3">
                         <div className="flex flex-col items-center justify-center">
                             <Image src={getPieceSrc('b','q')} alt="asd" width={100} height={100}></Image>
                         </div>
