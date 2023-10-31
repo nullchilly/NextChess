@@ -44,8 +44,8 @@ const ChessGame = ({ id, type }: ChessGameType) => {
       {id: "3", name: "monkey"},
       {id: "4", name: "penguin"},
       {id: "5", name: "cat"}])
-  })
-  
+  }, [])
+
   return (
     <div className="flex p-4 mt-8">
       <div className="flex justify-center w-2/3">
