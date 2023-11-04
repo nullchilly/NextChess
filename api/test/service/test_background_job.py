@@ -1,5 +1,5 @@
 from api.app.model import User
-from api.test.faker.user import UserProvider
+from api.test.faker import UserProvider
 
 def test_connect_db(session):
     new_user = UserProvider.create_user(session)
