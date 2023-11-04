@@ -1,4 +1,4 @@
-from api.app.model.user import User
+from api.app.model import User
 from api.test.faker.user import UserProvider
 
 def test_connect_db(session):
