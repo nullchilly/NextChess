@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
-from .app import create_app
+from api.app import create_app
 from fastapi.staticfiles import StaticFiles
 
 app = create_app()
