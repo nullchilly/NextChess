@@ -1,6 +1,7 @@
 from fastapi import FastAPI
+from .app import create_app
 
-app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json")
+app = create_app()
 
 
 @app.get("/api/healthchecker")
