@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 8000",
+    "fastapi-dev": "pip3 install -r requirements.txt && python3 -m uvicorn api.index:app --reload",
+    "next-dev": "next dev -p 8000",
+    "dev": "concurrently \"npm run next-dev\" \"npm run fastapi-dev\" ",
     "build": "next build",
     "start": "next start -p 8000",
     "lint": "next lint"
@@ -20,6 +22,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",
+    "concurrently": "^8.2.2",
     "lucide-react": "^0.279.0",
     "next": "latest",
     "next-themes": "^0.2.1",
