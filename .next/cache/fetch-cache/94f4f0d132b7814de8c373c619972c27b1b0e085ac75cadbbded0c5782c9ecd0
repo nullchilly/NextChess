@@ -1,0 +1,1 @@
+{"kind":"FETCH","data":{"headers":{"content-length":"73","content-type":"application/json","date":"Sun, 05 Nov 2023 12:32:56 GMT","server":"uvicorn"},"body":"eyJzdGF0dXMiOiJzdWNjZXNzIiwibWVzc2FnZSI6IkludGVncmF0ZSBGYXN0QVBJIEZyYW1ld29yayB3aXRoIE5leHQuanMifQ==","status":200,"url":"http://127.0.0.1:8000/api/healthchecker"},"revalidate":31536000,"tags":[]}

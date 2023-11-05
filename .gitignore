@@ -1,5 +1,4 @@
 /node_modules
-/.next
 package-lock.json
 .env.local
 __pycache__

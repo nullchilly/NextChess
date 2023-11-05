@@ -1,0 +1,13 @@
+{
+  "/_not-found": "app/_not-found.js",
+  "/computer/page": "app/computer/page.js",
+  "/forget/page": "app/forget/page.js",
+  "/login/page": "app/login/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/minimax/page": "app/minimax/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/page": "app/page.js",
+  "/random/page": "app/random/page.js",
+  "/signup/page": "app/signup/page.js",
+  "/videos/page": "app/videos/page.js"
+}
