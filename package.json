@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "fastapi-dev": "pip3 install --user -r requirements.txt && python3 -m uvicorn api.index:app --port 3000 --reload",
-    "next-dev": "next dev -p 8000",
+    "fastapi-dev": "pip3 install --user -r requirements.txt && python3 -m uvicorn api.index:app --reload",
+    "next-dev": "next dev",
     "dev": "concurrently \"npm run next-dev\" \"npm run fastapi-dev\" ",
     "build": "next build",
-    "start": "concurrently \"next start -p 8000\" \"npm run fastapi-dev\" ",
+    "start": "pip3 install --user -r requirements.txt && python3 -m uvicorn api.index:app --host 0.0.0.0 --port 8000",
     "lint": "next lint"
   },
   "dependencies": {
