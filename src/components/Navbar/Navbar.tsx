@@ -13,6 +13,7 @@ import Learn from "@/components/icons/Learn";
 import { ConfigProvider, Menu } from "antd";
 import type { MenuProps } from "antd";
 import Link from "next/link";
+import { httpGet } from "@/modules/next-backend-client/httpGet";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -49,7 +50,15 @@ const items: MenuProps["items"] = [
   ]),
 ];
 
-const Navbar = () => {
+const Navbar = async () => {
+  // NOTE: This's for experiment purpose only, DELTE ME later.
+  React.useEffect(() => {
+    async function f() {
+      const x = await httpGet("healthchecker");
+      console.log(x);
+    };
+    f();
+  }, [])
   const router = useRouter();
   const onClick: MenuProps["onClick"] = (e) => {
     let href = e.keyPath[0]; // WARNING: This's hacky...
