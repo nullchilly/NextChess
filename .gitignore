@@ -1,9 +1,7 @@
 /node_modules
-/.next
 package-lock.json
 .env.local
 __pycache__
 venv/
 .idea
-out/
 .env
