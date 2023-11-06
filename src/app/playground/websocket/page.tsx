@@ -6,7 +6,7 @@ export default function PlaygroundSocket() {
   const [messages, setMessages] = React.useState<string[]>([]);
 
   React.useEffect(() => {
-    const url = "ws://127.0.0.1:8000/ws";
+    const url = "ws://fall2324w3g9.int3306.freeddns.org/ws";
     const ws = new WebSocket(url);
 
     ws.onopen = event => {
