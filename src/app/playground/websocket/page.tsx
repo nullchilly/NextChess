@@ -34,9 +34,9 @@ export default function PlaygroundSocket() {
       <button onClick={handleOnClick}>
         Send
       </button>
-      {messages.map((m) => {
+      {messages.map((m, index) => {
         return (
-            <div>
+            <div key={index}>
               {m}
             </div>
         )
