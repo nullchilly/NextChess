@@ -2,7 +2,6 @@ import { useState } from 'react';
 import React from 'react'
 import { Chess, ChessInstance, Move, ShortMove, Square } from 'chess.js';
 import { evaluateBoard } from '@/helpers/chess';
-import { moveMessagePortToContext } from 'worker_threads';
 
 export type ChessType = 'random' | 'computer' | 'minimax';
 
@@ -14,9 +13,7 @@ enum ConnectionStatus {
 
 const useChess = (type: ChessType) => {
   // Start of socket
-  // const [socket] = React.useState(io(${process.env.NEXT_PUBLIC_SOCKET_URL}));
   const [socket, setSocket] = React.useState<WebSocket | null>(null);
-  const [messages, setMessages] = React.useState<string[]>([]);
   const [connectionStatus, setConnectionStatus] =
     React.useState<ConnectionStatus>(ConnectionStatus.Disconnected);
 
@@ -34,23 +31,12 @@ const useChess = (type: ChessType) => {
 
       socket.onmessage = (msg) => {
         const message = JSON.parse(msg.data);
-        // console.log("Message from BE: ", message);
         console.log("Message from BE: ", message['message']);
-        // makeMove(message['message'])
-        // console.log(move)
-        // const move = makeMove(message)
-        // const move = makeMove({
-        //   from: '',
-        //   to: targetSquare,
-        //   promotion: 'q',
-        // });
         makeMove({
           from: message['message']['from'],
           to: message['message']['to'],
           promotion: 'q',
         });
-        // makeMove(move)
-        setMessages((prev) => [...prev, message.message ?? "EMPTY"]);
       };
 
       socket.onerror = () => {
@@ -215,12 +201,6 @@ const useChess = (type: ChessType) => {
 
     if (move === null) return false;
     sendMessage(move.from + move.to)
-    console.log(move)
-    console.log("My move: ")
-    console.log(move.from + move.to)
-
-    // const newTimeout = setTimeout(getComputerType(), 500);
-    // setCurrentTimeout(newTimeout);
     return true;
   };
 
