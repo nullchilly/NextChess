@@ -1,10 +1,72 @@
 import { useState } from 'react';
+import React from 'react'
 import { Chess, ChessInstance, Move, ShortMove, Square } from 'chess.js';
 import { evaluateBoard } from '@/helpers/chess';
 
 export type ChessType = 'random' | 'computer' | 'minimax';
 
+enum ConnectionStatus {
+  Open = "open",
+  Connecting = "connecting",
+  Disconnected = "disconnected",
+}
+
 const useChess = (type: ChessType) => {
+  // Start of socket
+  const [socket, setSocket] = React.useState<WebSocket | null>(null);
+  const [connectionStatus, setConnectionStatus] =
+    React.useState<ConnectionStatus>(ConnectionStatus.Disconnected);
+
+  const disconnectSocket = React.useCallback(() => {
+    socket?.close();
+    setSocket(null);
+    setConnectionStatus(ConnectionStatus.Disconnected);
+  }, [socket, setConnectionStatus]);
+
+  React.useEffect(() => {
+    if (socket) {
+      socket.onopen = () => {
+        setConnectionStatus(ConnectionStatus.Open);
+      };
+
+      socket.onmessage = (msg) => {
+        const message = JSON.parse(msg.data);
+        console.log("Message from BE: ", message['message']);
+        makeMove({
+          from: message['message']['from'],
+          to: message['message']['to'],
+          promotion: 'q',
+        });
+      };
+
+      socket.onerror = () => {
+        disconnectSocket();
+        console.error("Websocket connection error");
+      };
+
+      socket.onclose = () => {
+        disconnectSocket();
+      };
+    }
+  }, [disconnectSocket, setConnectionStatus, socket]);
+
+  const sendMessage = (move: string) => {
+    console.log("MOVE: ", move);
+    socket?.send(move);
+  };
+
+  const onCloseSocket = () => {
+    socket?.close();
+    setSocket(null);
+    setConnectionStatus(ConnectionStatus.Disconnected);
+  };
+
+  const connectSocket = () => {
+    const url = `${process.env.NEXT_PUBLIC_SOCKET_URL}` + "/ws";
+    const socket = new WebSocket(url);
+    setSocket(socket);
+  };
+  // End of socket
   const [game, setGame] = useState(new Chess());
   const [playing, setPlaying] = useState(false);
   const [moves, setMoves] = useState<Move[]>([]);
@@ -20,6 +82,7 @@ const useChess = (type: ChessType) => {
   };
 
   const makeMove = (move: string | ShortMove) => {
+    console.log(move)
     const gameCopy = { ...game };
     const result = gameCopy.move(move);
 
@@ -58,6 +121,7 @@ const useChess = (type: ChessType) => {
     }
 
     if (bestMove === null) return;
+    console.log(bestMove)
     makeMove(bestMove);
   };
 
@@ -136,9 +200,7 @@ const useChess = (type: ChessType) => {
     });
 
     if (move === null) return false;
-
-    const newTimeout = setTimeout(getComputerType(), 500);
-    setCurrentTimeout(newTimeout);
+    sendMessage(move.from + move.to)
     return true;
   };
 
@@ -154,6 +216,7 @@ const useChess = (type: ChessType) => {
   };
 
   const startGame = () => {
+    connectSocket()
     resetGame();
     setPlaying(true);
   };
