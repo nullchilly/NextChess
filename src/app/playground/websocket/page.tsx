@@ -1,46 +1,72 @@
-"use client"
-import React from "react"
+"use client";
+import React from "react";
+
+enum ConnectionStatus {
+  Open = "open",
+  Connecting = "connecting",
+  Disconnected = "disconnected",
+}
 
 export default function PlaygroundSocket() {
-  const [websckt, setWebsckt] = React.useState<WebSocket>();
+  // const [socket] = React.useState(io(${process.env.NEXT_PUBLIC_SOCKET_URL}));
+  const [socket, setSocket] = React.useState<WebSocket | null>(null);
   const [messages, setMessages] = React.useState<string[]>([]);
+  const [connectionStatus, setConnectionStatus] =
+    React.useState<ConnectionStatus>(ConnectionStatus.Disconnected);
+
+  const disconnectSocket = React.useCallback(() => {
+    socket?.close();
+    setSocket(null);
+    setConnectionStatus(ConnectionStatus.Disconnected);
+  }, [socket, setConnectionStatus]);
 
   React.useEffect(() => {
-    const url = `${process.env.NEXT_PUBLIC_SOCKET_URL}` + '/ws';
-    const ws = new WebSocket(url);
+    if (socket) {
+      socket.onopen = () => {
+        setConnectionStatus(ConnectionStatus.Open);
+      };
 
-    ws.onopen = event => {
-      ws.send("Connect");
-    };
+      socket.onmessage = (msg) => {
+        const message = JSON.parse(msg.data);
+        console.log("Message from BE: ", message);
+        setMessages((prev) => [...prev, message.message ?? "EMPTY"]);
+      };
 
-    // recieve message every start page
-    ws.onmessage = e => {
-      const message = JSON.parse(e.data);
-      console.log("mess: ", message);
-      setMessages((prev) => [...prev, message.message ?? "EMPTY"]);
-    };
-    setWebsckt(ws);
-    //clean up function when we close page
-    // return () => ws.close();
-  }, [])
+      socket.onerror = () => {
+        disconnectSocket();
+        console.error("Websocket connection error");
+      };
 
-  const handleOnClick = () => {
-    websckt?.send("Hello how are you???");
-  }
+      socket.onclose = () => {
+        disconnectSocket();
+      };
+    }
+  }, [disconnectSocket, setConnectionStatus, socket]);
 
+  const sendMessage = () => {
+    socket?.send("Hello how are you???");
+  };
+
+  const onCloseSocket = () => {
+    socket?.close();
+    setSocket(null);
+    setConnectionStatus(ConnectionStatus.Disconnected);
+  };
+
+  const connectSocket = () => {
+    const url = `${process.env.NEXT_PUBLIC_SOCKET_URL}` + "/ws";
+    const socket = new WebSocket(url);
+    setSocket(socket);
+  };
   return (
     <div>
       <p>Hello Socket!</p>
-      <button onClick={handleOnClick}>
-        Send
-      </button>
+      <button onClick={connectSocket}>Connect</button>
+      <button onClick={sendMessage}>Send</button>
+      <button onClick={onCloseSocket}>Close</button>
       {messages.map((m, index) => {
-        return (
-            <div key={index}>
-              {m}
-            </div>
-        )
+        return <div key={index}>{m}</div>;
       })}
     </div>
-  )
+  );
 }
