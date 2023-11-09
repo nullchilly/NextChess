@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.app import create_app
 from fastapi.staticfiles import StaticFiles
 import json
+import chess.engine
 
 app = create_app()
 
@@ -42,10 +43,24 @@ manager = WebSocketConnectionManager();
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
+    engine = chess.engine.SimpleEngine.popen_uci("/home/nullchilly/code/git/stockfish/stockfish-ubuntu-x86-64")
+    limit = chess.engine.Limit(time=0.01)
+    board = chess.Board()
     try:
         while True:
             data = await websocket.receive_text()
-            message = {"time": "current_time", "message": data}
+            # print(data)
+            print(data)
+            board.push(chess.Move.from_uci(data))
+            print(board)
+            result = engine.play(board, limit)
+            board.push(result.move)
+            print(board)
+            move = result.move
+            from_square = chess.square_name(move.from_square)
+            to_square = chess.square_name(move.to_square)
+
+            message = {"time": "current_time", "message": {"from": from_square, "to": to_square, "promotion": "q"}}
             await manager.send_personal_message(json.dumps(message), websocket)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
