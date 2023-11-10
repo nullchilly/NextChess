@@ -25,6 +25,7 @@ def healthchecker():
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
+    engine.configure({"Skill Level": 1})
     limit = chess.engine.Limit(time=0.3)
     board = chess.Board()
     try:
