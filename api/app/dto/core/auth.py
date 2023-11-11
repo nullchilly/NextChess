@@ -22,3 +22,7 @@ class SignUpRequest(CamelBaseModel):
     email: str
     password: str
     date_of_birth: datetime
+
+class LoginRequest(CamelBaseModel):
+    user_name: str
+    password: str
