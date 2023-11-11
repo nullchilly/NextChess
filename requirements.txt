@@ -23,3 +23,9 @@ alembic==1.12.1
 SQLAlchemy-Utils==0.41.1
 importlib-metadata~=6.0.0
 python-chess==1.999
+cryptography==41.0.5
+pycparser==2.21
+cffi==1.16.0
+humps==0.2.2
+pytest==7.4.3
+chess==1.10.0
