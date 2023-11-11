@@ -8,8 +8,8 @@ from api.app.service.auth import AuthService
 
 auth_router = APIRouter()
 
-@auth_router.post('/signup', response_model=DataResponse[SignUpResponse])
-def sign_up(db: Session = Depends(db_session), *, request: SignUpRequest):
+@auth_router.post('/register', response_model=DataResponse[SignUpResponse])
+def register(db: Session = Depends(db_session), *, request: SignUpRequest):
     new_user = AuthService.create_new_user(db, request)
     return DataResponse().success_response(data=new_user)
 

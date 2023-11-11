@@ -11,7 +11,8 @@ class UserProvider:
             'is_admin': data.get('is_admin', False),
             "user_name": data.get('name', "test_user_name"),
             "password": data.get('password', "test_user_password"),
-            "email": data.get('email', "test_user_email")
+            "email": data.get('email', "test_user_email"),
+            "access_token": data.get('access_token', "secret")
         }
         new_user: User = User.create(db, new_user_data, commit=commit)
         return new_user

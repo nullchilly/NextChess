@@ -19,6 +19,6 @@ def test_get_token(client):
         'email': 'test@gmail.com',
         'password': '23',
     }
-    resp = client.post("/auth/signup/", json=request)
+    resp = client.post("/api/register/", json=request)
     print(resp.json().get('accessToken'))
-    assert resp.json().get('accessToken') == ""
+    assert resp.json().get('accessToken') != ""
