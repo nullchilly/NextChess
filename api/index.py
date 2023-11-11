@@ -7,6 +7,11 @@ from fastapi.staticfiles import StaticFiles
 import json
 import chess.engine
 
+from typing import Annotated
+
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
+
 app = create_app()
 
 app.add_middleware(
@@ -16,6 +21,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/api/healthchecker")
 def healthchecker():
@@ -45,4 +51,4 @@ async def websocket_endpoint(websocket: WebSocket):
         message = {"time": "current_time", "message": "Offline"}
         await manager.send_personal_message(json.dumps(message), websocket)
 
-app.mount("/", StaticFiles(directory="out", html=True), name="static")
+# app.mount("/", StaticFiles(directory="out", html=True), name="static")
