@@ -1,7 +1,6 @@
 from typing import TypeVar, Optional, Generic
 
 from pydantic import BaseModel
-from pydantic.generics import GenericModel
 
 T = TypeVar("T")
 
@@ -27,7 +26,7 @@ class ResponseSchemaBase(BaseModel):
         return self
 
 
-class DataResponse(ResponseSchemaBase, GenericModel, Generic[T]):
+class DataResponse(ResponseSchemaBase, BaseModel, Generic[T]):
     data: Optional[T] = None
 
     class Config:

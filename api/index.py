@@ -50,4 +50,4 @@ async def websocket_endpoint(websocket: WebSocket):
         message = {"time": "current_time", "message": "Offline"}
         await manager.send_personal_message(json.dumps(message), websocket)
 
-app.mount("/", StaticFiles(directory="out", html=True), name="static")
+# app.mount("/", StaticFiles(directory="out", html=True), name="static")

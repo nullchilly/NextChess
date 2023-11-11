@@ -12,7 +12,7 @@ class UserGender(str, Enum):
     WOMAN = "woman"
 
 class SignUpResponse(CamelBaseModel):
-    access_token: str
+    access_token: str = ''
     role: UserRole
 
 class SignUpRequest(CamelBaseModel):
