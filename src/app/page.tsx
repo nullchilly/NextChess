@@ -1,10 +1,13 @@
+"use client"
 import React from "react";
 import { Card, Col, Row } from "antd";
 import PlayBotPoster from "@/components/icons/PlayBotPoster";
 import PlayHumanPoster from "@/components/icons/PlayHumanPoster";
 import PlayPuzzlePoster from "@/components/icons/PlayPuzzlePoster";
+import ModalPlayBot from "@/components/Modal/ModalPlayBot";
 
 const Home = () => {
+  const [isModalPlayBotOpen, setIsModalPlayBotOpen] = React.useState(false);
   return (
     <>
       <div className="px-16 mt-8 flex flex-col gap-4">
@@ -26,9 +29,11 @@ const Home = () => {
                   fontFamily: "Haptic",
                   fontSize: "18px",
                 }}
+                onClick={() => {setIsModalPlayBotOpen(true)}}
               >
                 Play vs Bot
               </Card>
+              <ModalPlayBot isOpen={isModalPlayBotOpen} setOpen={setIsModalPlayBotOpen}/>
             </Col>
             <Col span={8}>
               <Card
