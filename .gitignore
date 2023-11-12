@@ -4,7 +4,6 @@ package-lock.json
 __pycache__
 venv/
 .idea
-.env
 .next/
 out/
 stockfish/stockfish-macos
