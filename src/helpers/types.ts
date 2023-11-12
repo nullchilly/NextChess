@@ -38,6 +38,19 @@ export enum GameType{
 
 }
 
+// TODO: Support more variants
+export enum ChessVariants {
+    STANDARD="Standard",
+    CHESS960="Chess960",
+}
+
+export enum TimeMode {
+    UNLIMITED="Unlimited",
+    ThreeMins="3 minutues",
+    FiveMins="5 minutes",
+    SevenMins="7 minutes",
+}
+
 export type Rating = {
     gameType: GameType;
     rate: number

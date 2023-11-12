@@ -10,9 +10,10 @@ import Human from "@/components/icons/Human";
 import Duel from "@/components/icons/Duel";
 import Video from "@/components/icons/Video";
 import Learn from "@/components/icons/Learn";
-import { ConfigProvider, Menu } from "antd";
+import { Menu } from "antd";
 import type { MenuProps } from "antd";
 import Link from "next/link";
+import ModalPlayBot from "../Modal/ModalPlayBot";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -50,28 +51,42 @@ const items: MenuProps["items"] = [
 ];
 
 const Navbar = () => {
+  const [isModalPlayBotOpen, setIsModalPlayBotOpen] = React.useState(false);
   const router = useRouter();
-  const onClick: MenuProps["onClick"] = (e) => {
-    let href = e.keyPath[0]; // WARNING: This's hacky...
-    router.push(href);
+
+  const showModal = () => {
+    setIsModalPlayBotOpen(true);
   };
+
+  const onClickMenuDrawer: MenuProps["onClick"] = (e) => {
+    let href = e.keyPath[0]; // WARNING: This's hacky...
+    if (href === "/computer") {
+      showModal();
+    } else {
+      router.push(href);
+    }
+  };
+
   return (
-    <div
-      className="bg-[#477330] px-4 py-4 grow text-center"
-      style={{ maxWidth: "272px", minWidth: "268px" }}
-    >
-      <Link href="/">
-        <StockChess />
-      </Link>
-      <div>
-        <Menu
-          onClick={onClick}
-          mode="inline"
-          items={items}
-          className="bg-transparent text-white font-['Albula'] text-lg"
-        />
+    <>
+      <div
+        className="bg-[#477330] px-4 py-4 grow text-center"
+        style={{ maxWidth: "272px", minWidth: "268px" }}
+      >
+        <Link href="/">
+          <StockChess />
+        </Link>
+        <div>
+          <Menu
+            onClick={onClickMenuDrawer}
+            mode="inline"
+            items={items}
+            className="bg-transparent text-white font-['Albula'] text-lg"
+          />
+        </div>
       </div>
-    </div>
+      <ModalPlayBot isOpen={isModalPlayBotOpen} setOpen={setIsModalPlayBotOpen}/>
+    </>
   );
 };
 
