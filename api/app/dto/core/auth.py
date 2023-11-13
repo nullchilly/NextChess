@@ -12,7 +12,6 @@ class UserGender(str, Enum):
     WOMAN = "woman"
 
 class SignUpResponse(CamelBaseModel):
-    access_token: str = ''
     role: UserRole
 
 class SignUpRequest(CamelBaseModel):
@@ -26,3 +25,10 @@ class SignUpRequest(CamelBaseModel):
 class LoginRequest(CamelBaseModel):
     user_name: str
     password: str
+
+class LoginResponse(CamelBaseModel):
+    access_token: str
+
+class ChangePasswordRequest(CamelBaseModel):
+    old_password: str
+    new_password: str
