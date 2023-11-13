@@ -2,7 +2,8 @@ from fastapi import HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from api.app.dto.core.auth import SignUpRequest, SignUpResponse, UserRole, LoginRequest
+from api.app.dto.core.auth import SignUpRequest, SignUpResponse, UserRole, LoginRequest, ChangePasswordRequest, \
+    LoginResponse
 from api.app.helper import auth
 from api.app.model import User
 
@@ -17,21 +18,19 @@ class AuthService:
         user = User(user_name=request.user_name, password=request.password, access_token=token, email=request.email, is_admin=False)
         db.add(user)
         db.commit()
-        return SignUpResponse(accessToken=token, role=UserRole.USER)
+        return SignUpResponse(role=UserRole.USER)
 
     @classmethod
     def existed_user(cls, db: Session, user_name: str) -> bool:
         return db.query(User).filter(User.user_name==user_name).first() is not None
 
     @classmethod
-    def verify(cls, db: Session, access_token: str, req: LoginRequest):
+    def verify(cls, db: Session, req: LoginRequest) -> LoginResponse:
         user = db.query(User.user_name, User.password, User.access_token).filter(User.user_name==req.user_name).first()
         if user is None:
             raise HTTPException(status_code=401, detail="Username or password not found")
         if user.password != req.password:
             raise HTTPException(status_code=401, detail="Username or password not found")
-        if user.access_token != access_token:
-            raise HTTPException(status_code=403, detail="Forbidden")
-
+        return LoginResponse(access_token=user.access_token)
 
 
