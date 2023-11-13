@@ -12,7 +12,7 @@ class AuthService:
     @classmethod
     def create_new_user(cls, db: Session, request: SignUpRequest):
         if cls.existed_user(db, request.user_name):
-            print(1)
+            raise HTTPException(status_code=409, detail="Username existed")
             return
         token = auth.signJWT(request.user_name)
         user = User(user_name=request.user_name, password=request.password, access_token=token, email=request.email, is_admin=False,
