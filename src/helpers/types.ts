@@ -62,3 +62,15 @@ export type UserProfile = {
     userNetworkLinks: UserNetworkLink[];
     ratings: Rating[]
 }
+
+export type BotProps = {
+  width? :number,
+  height? :number,
+  name?: string,
+}
+
+export type ChessProps = {
+  width? :number,
+  height? :number,
+  name?: string,
+}

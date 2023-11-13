@@ -1,15 +1,14 @@
 import React from "react";
 import { Card, Avatar, Row, Col, Dropdown, Button } from 'antd';
 import type { MenuProps } from 'antd';
-import {getSvgSrc} from "@/helpers/images";
+import BotIcon from "@/components/icons/BotIcon";
 
 type PlayerCardProps = {
-	avtRef: string,
 	name: string,
 	link: string,
 }
 
-const PlayerCard: React.FC<PlayerCardProps> = ({avtRef, name, link}) => {
+const PlayerCard: React.FC<PlayerCardProps> = ({name, link}) => {
 	const items: MenuProps['items'] = [
 		{
 			label: '1st menu item',
@@ -24,13 +23,17 @@ const PlayerCard: React.FC<PlayerCardProps> = ({avtRef, name, link}) => {
 			key: '3',
 		},
 	]
-	
+
 	return (
 		<div className="flex pt-4 pb-4">
 			<Card className="w-full justify-center relative">
 				<Row align="middle">
 					<Col flex="50px">
-						<Avatar src={avtRef ? avtRef : "https://bit.ly/3FzLkSs"} />
+						<Avatar >
+							<div className="w-[60px] -translate-y-1/2">
+								<BotIcon name={name} />
+							</div>
+						</Avatar>
 					</Col>
 					<Col
 						className="flex-auto font-bold"
@@ -42,8 +45,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({avtRef, name, link}) => {
 					</Col>
 					<Col>
 						<Dropdown menu={{ items }} placement="bottomRight" arrow={{ pointAtCenter: true }}>
-							<Button className="flex">
-								<img src={getSvgSrc("meatballs-menu")} width="20px" height="20px" alt=">"/>
+							<Button className="flex w-15 h-7" >
 							</Button>
 						</Dropdown>
 					</Col>
