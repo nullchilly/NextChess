@@ -7,5 +7,5 @@ venv/
 .next/
 out/
 stockfish/stockfish-macos
-database
+./database
 docker-compose.yml
