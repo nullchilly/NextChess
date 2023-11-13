@@ -1,6 +1,6 @@
 import React from "react";
-import {getSvgSrc} from "@/helpers/images";
 import {BotProps} from "@/type/type";
+import BotIcon from "@/components/icons/BotIcon";
 
 type BotSelectorProps = {
 	botList: BotProps[],
@@ -38,7 +38,9 @@ const BotSelector: React.FC<BotSelectorProps> = ({botList, onSelectBot}) => {
 const BotCard: React.FC<BotProps> = ({id, name}) => {
 	return (
 		<div className="hover:opacity-60">
-			<img className="w-[60px] h-[60px] border-2" src={getSvgSrc(name)} alt={"character"}/>
+			<div className="w-[60px] h-[60px] border-2">
+				<BotIcon name={name} />
+			</div>
 		</div>
 	)
 }
