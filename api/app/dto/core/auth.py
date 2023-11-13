@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from enum import Enum
 
 from api.app.dto.base import CamelBaseModel
@@ -20,7 +20,7 @@ class SignUpRequest(CamelBaseModel):
     gender: UserGender
     email: str
     password: str
-    date_of_birth: int
+    date_of_birth: date
 
 class LoginRequest(CamelBaseModel):
     user_name: str
@@ -37,7 +37,7 @@ class GetProfileResponse(CamelBaseModel):
     user_id: int
     user_name: str
     name: str
-    date_of_birth: int
+    date_of_birth: date
     gender: UserGender
     email: str
 

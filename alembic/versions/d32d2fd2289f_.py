@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     op.execute('ALTER TABLE `user` ADD COLUMN `name` VARCHAR(255) NOT NULL AFTER `user_name`;')
-    op.execute('ALTER TABLE `user` ADD COLUMN `date_of_birth` INTEGER NOT NULL AFTER `name`;')
+    op.execute('ALTER TABLE `user` ADD COLUMN `date_of_birth` DATE NOT NULL AFTER `name`;')
     op.execute('ALTER TABLE `user` ADD COLUMN `gender` VARCHAR(10) NOT NULL AFTER `name`;')
     pass
 
