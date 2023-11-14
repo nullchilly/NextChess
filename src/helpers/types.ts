@@ -73,4 +73,5 @@ export type ChessProps = {
   width? :number,
   height? :number,
   name?: string,
+  color?: string,
 }

@@ -12,6 +12,7 @@ import WhiteRook from "@/components/icons/ChessPiece/WhiteRook";
 import WhiteQueen from "@/components/icons/ChessPiece/WhiteQueen";
 import WhiteKnight from "@/components/icons/ChessPiece/WhiteKnight";
 import {ChessProps} from "@/helpers/types";
+import {getChess} from "@/helpers/string";
 
 const dynamicTag: Record<string, React.FC<ChessProps>> = {
 	BlackPawn,
@@ -29,7 +30,12 @@ const dynamicTag: Record<string, React.FC<ChessProps>> = {
 }
 
 const ChessPiece: React.FC<ChessProps> = (props) => {
-	const name = props.name ? props.name : "BlackPawn";
+	let name;
+	if (props.color) {
+		name = getChess(props.color, props.name ? props.name : "b");
+	} else {
+		name = props.name ? props.name : "BlackPawn";
+	}
 	const Chess = dynamicTag[name];
 	return Chess ? <Chess /> : <BlackPawn />;
 };
