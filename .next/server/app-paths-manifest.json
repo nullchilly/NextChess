@@ -1,15 +1,15 @@
 {
   "/_not-found": "app/_not-found.js",
   "/computer/page": "app/computer/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/forget/page": "app/forget/page.js",
   "/login/page": "app/login/page.js",
   "/minimax/page": "app/minimax/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/page": "app/page.js",
   "/playground/websocket/page": "app/playground/websocket/page.js",
   "/profile/page": "app/profile/page.js",
-  "/random/page": "app/random/page.js",
   "/signup/page": "app/signup/page.js",
+  "/random/page": "app/random/page.js",
   "/videos/page": "app/videos/page.js",
   "/computer/[slug]/page": "app/computer/[slug]/page.js"
 }
