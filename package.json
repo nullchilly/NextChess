@@ -4,19 +4,11 @@
   "private": true,
   "scripts": {
     "fastapi-dev": "pip3 install --user -r requirements.txt && python3 -m uvicorn api.index:app --reload",
-<<<<<<< HEAD
-    "fastapi-start": "pip3 install --user -r requirements.txt && python3 -m uvicorn api.index:app --host 0.0.0.0 --port 8000",
-    "next-dev": "next dev",
-    "dev": "concurrently \"npm run fastapi-dev\" \"npm run next-dev\" ",
-    "build": "next build",
-    "start": "pip3 install --user -r requirements.txt && python3 -m uvicorn api.index:app --host 0.0.0.0 --port 8000",
-=======
     "fastapi-start": "pip3 install --user -r requirements.txt && python3 -m uvicorn api.index:app --port 8000",
     "next-dev": "next dev",
     "dev": "concurrently \"npm run fastapi-dev\" \"npm run next-dev\" ",
     "build": "next build",
     "start": "pip3 install --user -r requirements.txt && python3 -m uvicorn api.index:app --port 8000",
->>>>>>> play-bot-full
     "my-start": "concurrently \"next start\" \"npm run fastapi-start\" ",
     "next-start": "next start",
     "lint": "next lint"
