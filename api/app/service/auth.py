@@ -73,9 +73,16 @@ class AuthService:
         user = db.query(User).filter(User.user_name == user_name).first()
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
-        user.name = request.name
-        user.date_of_birth = request.date_of_birth
-        user.gender = request.gender
-        user.email = request.email
+        user.name = request.name if request.name is not None else user.name
+        user.date_of_birth = request.date_of_birth if request.date_of_birth is not None else user.date_of_birth
+        user.gender = request.gender if request.gender is not None else user.gender
+        user.email = request.email if request.email is not None else user.email
+        db.query(User).filter(User.user_name == user_name).\
+                update({
+                        "name": user.name,
+                        "date_of_birth": user.date_of_birth,
+                        "gender": user.gender,
+                        "email": user.email
+                })
         db.commit()
 
