@@ -1,8 +1,7 @@
 "use client"; 
 import Link from "next/link";
-import Image from 'next/image';
-import { getPieceSrc } from '@/helpers/images';
 import { useState } from 'react';
+import BlackQueen from "@/components/icons/ChessPiece/BlackQueen";
 
 export default function Login() {
 
@@ -59,13 +58,7 @@ export default function Login() {
         <div className="w-full p-6 bg-white rounded-md shadow-xl lg:max-w-xl border">
         <div className="flex justify-center">
             <div className="text-4xl font-extrabold text-center text-gray-800 not-italic">Next Chess</div>
-            <Image
-                className="flex-none rounded-full ml-2"
-                src={getPieceSrc("b", "q")}
-                alt="Chess Piece"
-                width={45}
-                height={45}
-            />
+          <BlackQueen width={45} height={45} />
         </div>
         <form className="mt-4" onSubmit={handleSubmit}>
           <div className="mb-4">

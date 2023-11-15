@@ -1,5 +1,5 @@
-import {getSvgSrc} from "@/helpers/images";
 import React from "react";
+import BotIcon from "@/components/icons/BotIcon";
 
 type PlayerInfoCardProps = {
 	id: string,
@@ -9,7 +9,7 @@ type PlayerInfoCardProps = {
 
 const PlayerInfoCard: React.FC<PlayerInfoCardProps> = ({id, name, inGame}) => {
 	return (
-		<div className="bg-white">
+		<div className="bg-[#57903C]">
 			<div className="w-auto flex pl-4 flex-col items-center">
 				{ inGame &&
 					<div
@@ -22,7 +22,9 @@ const PlayerInfoCard: React.FC<PlayerInfoCardProps> = ({id, name, inGame}) => {
 					</div>
 				}
 				<div>
-					<img src={getSvgSrc(name)} className="h-[250px]" alt=">"/>
+					<div className="h-[250px] w-[250px]">
+						<BotIcon name={name}/>
+					</div>
 				</div>
 				
 				{!inGame &&

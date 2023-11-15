@@ -10,7 +10,6 @@ import PlayerCard from "@/components/Card/PlayerCard";
 import PrepareCard from "@/components/Card/PrepareCard";
 import {useEffect, useState} from "react";
 import {BotProps} from "@/type/type";
-import {getSvgSrc} from "@/helpers/images";
 
 type ChessGameType = {
   id: string
@@ -51,7 +50,7 @@ const ChessGame = ({ id, type }: ChessGameType) => {
       <div className="flex justify-center w-2/3">
         <div className="w-[450px]">
           <div className="">
-            <PlayerCard avtRef={bot ? getSvgSrc(bot.name) : ""} name={bot ? bot.name : "none"} link={bot ? "/home" : "/profile/chien"}/>
+            <PlayerCard name={bot ? bot.name : "none"} link={bot ? "/home" : "/profile/chien"}/>
           </div>
           {!playing && (
             <div className="absolute flex justify-center items-center w-[450px] h-[450px] z-10">
@@ -67,7 +66,7 @@ const ChessGame = ({ id, type }: ChessGameType) => {
             }}
           />
           <div className="">
-            <PlayerCard avtRef={""} name={"Chien"} link={"/profile/chien"}/>
+            <PlayerCard name={"Chien"} link={"/profile/chien"}/>
           </div>
           
         </div>
