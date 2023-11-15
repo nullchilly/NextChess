@@ -17,7 +17,7 @@
       "static/chunks/326-64249e47b237bfc1.js",
       "static/chunks/716-bf394cd511bd9b32.js",
       "static/css/6c4fcbf90c774001.css",
-      "static/chunks/app/layout-b9428949282e268b.js"
+      "static/chunks/app/layout-8a9fc488a20f32a6.js"
     ],
     "/computer/page": [
       "static/chunks/webpack-9469483957618cdf.js",
@@ -68,7 +68,7 @@
       "static/chunks/287-e15471f9ce560fcc.js",
       "static/chunks/173-5547650ecbeb99b1.js",
       "static/chunks/716-bf394cd511bd9b32.js",
-      "static/chunks/app/page-c29ab2eb9fbed1a8.js"
+      "static/chunks/app/page-c81a36b9c4210235.js"
     ],
     "/playground/websocket/page": [
       "static/chunks/webpack-9469483957618cdf.js",
