@@ -43,7 +43,7 @@ export default function Login() {
     }
     else sethaveemail(true);
     try {
-      const response = await fetch('http://localhost:8000/api/register', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}` + "/register", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -95,9 +95,7 @@ export default function Login() {
                     onChange={handleChange}
                     className="block w-full px-2 py-2 mt-2 text-gray-700 bg-white border rounded-lg focus:border-gray-800 focus:ring-gray-300"
                     />
-                    {!haveun && (
-                <p className="text-red-500 text-sm">Enter your Username</p>
-                )}
+                    {!haveun && (<p className="text-red-500 text-sm">Enter your Username</p>)}
                 </div>
             </div>
             <div className="mb-">
@@ -113,9 +111,7 @@ export default function Login() {
                 onChange={handleChange}
                 className="block w-full px-2 py-2 mt-2 mb-2 text-gray-700 bg-white border rounded-lg focus:border-gray-800 focus:ring-gray-300"
                 />
-                {!havepw && (
-                <p className="text-red-500 text-sm">Enter your Password</p>
-                )}
+                {!havepw && (<p className="text-red-500 text-sm">Enter your Password</p>)}
             </div>
             <div className="mb-">
             <label
