@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+<<<<<<< HEAD
   trailingSlash: true,
   // output: 'export',
+=======
+  // trailingSlash: true,
+>>>>>>> play-bot-full
   rewrites: async () => {
     return [
       {
