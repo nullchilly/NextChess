@@ -62,7 +62,7 @@ const useChess = (type: ChessType) => {
   };
 
   const connectSocket = () => {
-    const url = `${process.env.NEXT_PUBLIC_SOCKET_URL}` + "/ws";
+    const url = `${process.env.NEXT_PUBLIC_SOCKET_URL}` + "/websocket/ws";
     const socket = new WebSocket(url);
     setSocket(socket);
   };

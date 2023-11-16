@@ -5,6 +5,8 @@ from .config import STOCKFISH_PATH
 from .socket import manager
 from fastapi.staticfiles import StaticFiles
 import json
+import socketio
+import uvicorn
 import chess.engine
 
 from typing import Annotated
@@ -13,6 +15,8 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 
 app = create_app()
+sio = socketio.AsyncServer(cors_allowed_origins="*", async_mode='asgi')
+combined_asgi_app = socketio.ASGIApp(sio, app)
 
 app.add_middleware(
     CORSMiddleware,
@@ -27,7 +31,7 @@ app.add_middleware(
 def healthchecker():
     return {"status": "success", "message": "Integrate FastAPI Framework with Next.js"}
 
-@app.websocket("/ws")
+@app.websocket("/websocket/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
@@ -50,4 +54,27 @@ async def websocket_endpoint(websocket: WebSocket):
         manager.disconnect(websocket)
         pass
 
+@sio.on("connect")
+async def connect(sid, env):
+    print("Fucking connected")
+
+@sio.on("direct")
+async def direct(sid, msg):
+    print(f"direct {msg}")
+    # we can send message to specific sid
+    await sio.emit("event_name", msg, room=sid)
+
+@sio.on("broadcast")
+async def broadcast(sid, msg):
+    print(f"broadcast {msg}")
+    await sio.emit("event_name", msg)  # or send to everyone
+
+@sio.on("disconnect")
+async def disconnect(sid):
+    print("on disconnect")
+
+app.mount("/", socketio.ASGIApp(sio))
+
 # app.mount("/", StaticFiles(directory="out", html=True), name="static")
+# if __name__ == '__main__':
+#     uvicorn.run(combined_asgi_app, host='127.0.0.1', port=8000)
