@@ -14,12 +14,15 @@ export default function PlaygroundSocket() {
     socket.connect()
     socket.on("connect", () => { console.log("Connected", socket.id) }); 
     // socket.emit('direct', 'Hello how are you???');
-    socket.on("response", (msg) => { console.log("Response", msg) });  
-    // socket.on("message", data => { console.log(data) });
+    socket.on("response", (msg) => {
+      console.log("Response", msg)
+      // setMessages((prev) => [...prev, msg ?? "EMPTY"]);
+    });  
 
   }, [])
 
   const handleOnClick = () => {
+    console.log("Send", "Hello how are you???")
     socket.emit('direct', 'Hello how are you???');
   }
 
