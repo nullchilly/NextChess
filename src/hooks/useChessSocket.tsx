@@ -89,7 +89,7 @@ const useChessSocket = (type: ChessType) => {
     });
 
     if (move === null) return false;
-    sendMessage(move.from + move.to)
+    sendMessage(move.from + move.to + (move.promotion ? move.promotion : ''));
     return true;
   };
 
