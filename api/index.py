@@ -31,7 +31,7 @@ app.add_middleware(
 def healthchecker():
     return {"status": "success", "message": "Integrate FastAPI Framework with Next.js"}
 
-@app.websocket("/websocket/ws")
+@app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
@@ -62,7 +62,7 @@ async def connect(sid, env):
 async def direct(sid, msg):
     print(f"direct {msg}")
     # we can send message to specific sid
-    await sio.emit("event_name", msg, room=sid)
+    await sio.emit("response", msg, room=sid)
 
 @sio.on("broadcast")
 async def broadcast(sid, msg):
