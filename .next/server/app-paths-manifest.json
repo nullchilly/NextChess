@@ -1,5 +1,0 @@
-{
-  "/playground/socketio/page": "app/playground/socketio/page.js",
-  "/playground/websocket/page": "app/playground/websocket/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js"
-}
