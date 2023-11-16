@@ -6,7 +6,6 @@ from .socket import manager
 from fastapi.staticfiles import StaticFiles
 import json
 import socketio
-import uvicorn
 import chess.engine
 
 from typing import Annotated
