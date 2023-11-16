@@ -14,7 +14,7 @@ export default function PlaygroundSocket() {
     socket.connect()
     socket.on("connect", () => { console.log("Connected", socket.id) }); 
     // socket.emit('direct', 'Hello how are you???');
-    // socket.on("response", () => { console.log("Response", socket.id) });  
+    socket.on("response", (msg) => { console.log("Response", msg) });  
     // socket.on("message", data => { console.log(data) });
 
   }, [])
