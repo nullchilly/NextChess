@@ -5,7 +5,7 @@ import { Chessboard } from 'react-chessboard';
 import Controls from '../Controls/Controls';
 import MoveList from '../MoveList/MoveList';
 
-import useChess, { ChessType } from '@/hooks/useChess';
+import useChessSocket, { ChessType } from '@/hooks/useChessSocket';
 import PlayerCard from "@/components/Card/PlayerCard";
 import PrepareCard from "@/components/Card/PrepareCard";
 import {useEffect, useState} from "react";
@@ -26,7 +26,7 @@ const ChessGame = ({ id, type }: ChessGameType) => {
     onPieceDrop,
     startGame,
     resetGame,
-  } = useChess(type);
+  } = useChessSocket(type);
 
   const [botList, setBotList] = useState<BotProps[]>([])
   const [bot, setBot] = useState<BotProps>({id: "0", name: "shark"})
