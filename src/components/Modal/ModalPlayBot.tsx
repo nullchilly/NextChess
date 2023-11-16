@@ -82,11 +82,9 @@ export default function ModalPlayBot({ isOpen, setOpen }: Props) {
       console.error("Can't index game slug: ", cause);
     });
 
-    setTimeout(() => {
-      setOpen(false);
-      setConfirmLoading(false);
-      router.push(`/computer/${slug}`);
-    }, 3000);
+    setOpen(false);
+    setConfirmLoading(false);
+    router.push(`/computer/${slug}`);
   };
 
   const selectStrength = ({ target: { value } }: RadioChangeEvent) => {
