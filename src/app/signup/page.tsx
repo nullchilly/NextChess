@@ -3,13 +3,14 @@ import Link from "next/link";
 import Image from 'next/image';
 import { getPieceSrc } from '@/helpers/images';
 import { useState } from 'react';
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [formData, setFormData] = useState({
     "userName": "",
     "name": "name",
-    "gender": "man",
-    "dateOfBirth": 1234,
+    "gender": "male",
+    "dateOfBirth": "2003-10-01",
     "email": "",
     "password": ""
   });
@@ -19,6 +20,7 @@ export default function Login() {
   const [havepw, sethavepw] = useState(true);
   const [haveun, sethaveun] = useState(true);
   const [haveemail, sethaveemail] = useState(true);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -51,10 +53,11 @@ export default function Login() {
         body: JSON.stringify(formData),
       });
       if (response.ok) {
+        // Redirect to Home
+        router.push('/');
+      } else  {
         const data = await response.json();
-        if(data['data'] == null) alert("Username or Email is already existed");
-      } else {
-        console.error('Registration failed:', response.statusText);
+        alert(`${response.status}: ${data.detail} `);
       }
     } catch (error) {
       console.error('An unexpected error occurred:', error);

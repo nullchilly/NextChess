@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState } from 'react';
 import BlackQueen from "@/components/icons/ChessPiece/BlackQueen";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
 
@@ -13,6 +14,7 @@ export default function Login() {
   const [havepw, sethavepw] = useState(true);
   const [haveun, sethaveun] = useState(true);
   const [check, setcheck] = useState(true);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,6 +41,7 @@ export default function Login() {
       if (response.ok) {
         const data = await response.json();
         setcheck(true);
+        router.push('/');
       } else {
         console.error('Login failed:', response.statusText);
         setcheck(false);
