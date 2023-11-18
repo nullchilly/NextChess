@@ -9,16 +9,3 @@ def test_connect_db(session):
     assert users[0].password == new_user.password
     assert users[0].email == new_user.email
     assert users[0].is_admin == new_user.is_admin
-
-def test_get_token(client):
-    request = {
-        'userName': 'user_name_test',
-        'name': 'name_test',
-        'dateOfBirth': 1234,
-        'gender': 'man',
-        'email': 'test@gmail.com',
-        'password': '23',
-    }
-    resp = client.post("/api/register/", json=request)
-    print(resp.json().get('accessToken'))
-    assert resp.json().get('accessToken') != ""

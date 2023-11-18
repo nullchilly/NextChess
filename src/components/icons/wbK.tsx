@@ -2,11 +2,16 @@ import React, { CSSProperties } from "react";
 
 type Props = {
   className: string;
-}
+};
 
 function Random({ className }: Props) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" className={className}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="45"
+      height="45"
+      className={className}
+    >
       <defs>
         <clipPath id="a">
           <rect

@@ -1,5 +1,6 @@
 from datetime import datetime, date
 from enum import Enum
+from typing import Optional
 
 from api.app.dto.base import CamelBaseModel
 
@@ -40,4 +41,10 @@ class GetProfileResponse(CamelBaseModel):
     date_of_birth: date
     gender: UserGender
     email: str
+
+class UpdateProfileRequest(CamelBaseModel):
+    name: Optional[str]
+    date_of_birth: Optional[date]
+    gender: Optional[UserGender]
+    email: Optional[str]
 
