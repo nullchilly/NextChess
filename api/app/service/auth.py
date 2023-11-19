@@ -25,7 +25,7 @@ class AuthService:
     @classmethod
     def existed_user(cls, db: Session, user_name: str) -> bool:
         user = db.query(User).filter(User.user_name == user_name).first()
-        return user is not None and user.deleted_at is None
+        return user is not None
 
     @classmethod
     def verify(cls, db: Session, req: LoginRequest) -> LoginResponse:
