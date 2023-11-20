@@ -3,13 +3,14 @@ import Link from "next/link";
 import Image from 'next/image';
 import { getPieceSrc } from '@/helpers/images';
 import { useState } from 'react';
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [formData, setFormData] = useState({
     "userName": "",
     "name": "name",
-    "gender": "man",
-    "dateOfBirth": 1234,
+    "gender": "male",
+    "dateOfBirth": "2003-10-01",
     "email": "",
     "password": ""
   });
@@ -19,6 +20,7 @@ export default function Login() {
   const [havepw, sethavepw] = useState(true);
   const [haveun, sethaveun] = useState(true);
   const [haveemail, sethaveemail] = useState(true);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,7 +45,7 @@ export default function Login() {
     }
     else sethaveemail(true);
     try {
-      const response = await fetch('http://localhost:8000/api/register', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}` + "/api/register", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,10 +53,11 @@ export default function Login() {
         body: JSON.stringify(formData),
       });
       if (response.ok) {
+        // Redirect to Home
+        router.push('/');
+      } else  {
         const data = await response.json();
-        if(data['data'] == null) alert("Username or Email is already existed");
-      } else {
-        console.error('Registration failed:', response.statusText);
+        alert(`${response.status}: ${data.detail} `);
       }
     } catch (error) {
       console.error('An unexpected error occurred:', error);
@@ -95,9 +98,7 @@ export default function Login() {
                     onChange={handleChange}
                     className="block w-full px-2 py-2 mt-2 text-gray-700 bg-white border rounded-lg focus:border-gray-800 focus:ring-gray-300"
                     />
-                    {!haveun && (
-                <p className="text-red-500 text-sm">Enter your Username</p>
-                )}
+                    {!haveun && (<p className="text-red-500 text-sm">Enter your Username</p>)}
                 </div>
             </div>
             <div className="mb-">
@@ -113,9 +114,7 @@ export default function Login() {
                 onChange={handleChange}
                 className="block w-full px-2 py-2 mt-2 mb-2 text-gray-700 bg-white border rounded-lg focus:border-gray-800 focus:ring-gray-300"
                 />
-                {!havepw && (
-                <p className="text-red-500 text-sm">Enter your Password</p>
-                )}
+                {!havepw && (<p className="text-red-500 text-sm">Enter your Password</p>)}
             </div>
             <div className="mb-">
             <label
