@@ -45,7 +45,7 @@ export default function Login() {
     }
     else sethaveemail(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}` + "/register", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}` + "/api/register", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
