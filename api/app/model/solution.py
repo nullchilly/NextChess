@@ -7,5 +7,3 @@ class Solution(BareBaseModel):
 
     puzzle_id = Column(Integer, ForeignKey('puzzle.id'), nullable=False)
     solution = Column(String(1025), nullable=False)
-
-    puzzle = relationship('Puzzle')  # Create a relationship with the Puzzle table
