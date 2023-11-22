@@ -24,7 +24,7 @@ const PuzzleGame = ({ id }: PuzzleGameProps) => {
     onRetry,
     onNext,
   } = usePuzzleChess(puzzleData)
-  
+  //TODO: fix cant load game.fen (could be due to usePuzzleChess hook)
   return (
     <div className="flex p-4 mt-8">
       <div className="flex justify-center w-2/3">
