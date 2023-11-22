@@ -55,17 +55,20 @@ async def websocket_endpoint(websocket: WebSocket):
         manager.disconnect(websocket)
         pass
 
-all_games_sid = set()
+all_game_ids = set()
 game_states = dict()
 
-# TODO: Clean up old game state?
+
 @sio.on("play-chess")
 async def play_chess(sid, msg):
-    if (sid not in all_games_sid):
-        all_games_sid.add(sid);
+    data = json.loads(msg)
+    gameID = data["id"]
+    move = data["move"]
+    if (gameID not in all_game_ids):
+        all_game_ids.add(gameID)
         engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
         engine.configure({"Skill Level": 1})
-        limit = chess.engine.Limit(time=0.3)
+        limit = chess.engine.Limit(time=0.3);
         board = chess.Board()
 
         current_state = dict()
@@ -73,12 +76,12 @@ async def play_chess(sid, msg):
         current_state['board'] = board
         current_state['limit'] = limit
 
-        game_states[sid] = current_state
+        game_states[gameID] = current_state
 
-    game_states[sid]['board'].push(chess.Move.from_uci(msg))
-    result = game_states[sid]['engine'].play(
-        game_states[sid]['board'], game_states[sid]['limit'])
-    game_states[sid]['board'].push(result.move)
+    game_states[gameID]['board'].push(chess.Move.from_uci(move))
+    result = game_states[gameID]['engine'].play(
+        game_states[gameID]['board'], game_states[gameID]['limit'])
+    game_states[gameID]['board'].push(result.move)
     move = result.move
     from_square = chess.square_name(move.from_square)
     to_square = chess.square_name(move.to_square)
@@ -87,6 +90,18 @@ async def play_chess(sid, msg):
 
     await sio.emit("play-chess", json.dumps(message), room=sid)
 
+# Clean up after game is ended, TODO: Check auth-user?
+@sio.on("end-game")
+async def end_game(sid, msg):
+    data = json.loads(msg)
+    gameID = data["id"]
+    print("Inp end: ", gameID)
+    all_game_ids.discard(gameID) # safe removal
+    if (gameID in game_states):
+        game_states.pop(gameID)
+
+    message = "Successfully cleaned up";
+    await sio.emit("end-game", message, room=sid)
 
 @sio.on("connect")
 async def connect(sid, env):
