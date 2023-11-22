@@ -5,13 +5,23 @@ import { io, Socket } from "socket.io-client";
 
 export type ChessType = 'random' | 'computer' | 'minimax';
 
+type Props = {
+  id: string
+  type: ChessType
+};
+
 enum ConnectionStatus {
   Open = "open",
   Connecting = "connecting",
   Disconnected = "disconnected",
 }
 
-const useChessSocket = (type: ChessType) => {
+type EmitData = {
+  move: string | ShortMove,
+  id: string,
+}
+
+const useChessSocket = ({ type, id }: Props) => {
   // Start of socket
   const [socket, setSocket] = React.useState<Socket | null>(null);
   const [connectionStatus, setConnectionStatus] =
@@ -43,18 +53,31 @@ const useChessSocket = (type: ChessType) => {
           promotion: 'q',
         });
       });
+
+      socket.on("end-game", (msg) => {
+        console.log("clean up state: ", msg);
+      });
+
     }
   }, [disconnectSocket, setConnectionStatus, socket]);
 
-  const sendMessage = (move: string) => {
+  // Send latest move over socket
+  const sendMove = (move: string) => {
     console.log("MOVE: ", move);
-    socket?.emit("play-chess", move);
+    const emitData: EmitData = {move, id};
+    socket?.emit("play-chess", JSON.stringify(emitData));
   };
 
+  // Make sure new game id not appeared in BE
+  const cleanOldGame = () => {
+    const endGameData = {"id": id};
+    socket?.emit("end-game", JSON.stringify(endGameData));
+  }
+  
   const connectSocket = () => {
     const socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`, {
       autoConnect: false,
-      reconnection: false,
+      reconnection: true,
     });
     setSocket(socket);
   };
@@ -89,7 +112,7 @@ const useChessSocket = (type: ChessType) => {
     });
 
     if (move === null) return false;
-    sendMessage(move.from + move.to + (move.promotion ? move.promotion : ''));
+    sendMove(move.from + move.to + (move.promotion ? move.promotion : ''));
     return true;
   };
 
@@ -97,7 +120,7 @@ const useChessSocket = (type: ChessType) => {
     const gameCopy = { ...game };
     gameCopy.reset();
     setGame(gameCopy);
-
+    cleanOldGame();
     setMoves([]);
 
     if (currentTimeout) clearTimeout(currentTimeout);

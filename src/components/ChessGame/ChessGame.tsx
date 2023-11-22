@@ -26,7 +26,7 @@ const ChessGame = ({ id, type }: ChessGameType) => {
     onPieceDrop,
     startGame,
     resetGame,
-  } = useChessSocket(type);
+  } = useChessSocket({type, id});
 
   const [botList, setBotList] = useState<BotProps[]>([])
   const [bot, setBot] = useState<BotProps>({id: "0", name: "shark"})
