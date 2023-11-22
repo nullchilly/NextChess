@@ -10,5 +10,5 @@ export type Puzzle = {
 	moves: string[],
 	results?: string,
 	date?: string,
-	id?: string,
+	id: string,
 }

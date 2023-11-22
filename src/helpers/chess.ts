@@ -1,4 +1,4 @@
-import { PieceColor, PieceType, Square } from 'chess.js';
+import { Color, PieceSymbol, Square } from 'chess.js';
 import {
   bishopEvalBlack,
   bishopEvalWhite,
@@ -13,8 +13,8 @@ import {
 } from './chessEvaluations';
 
 type BoardType = {
-  type: PieceType;
-  color: PieceColor;
+  type: PieceSymbol;
+  color: Color;
   square: Square;
 } | null;
 
@@ -34,7 +34,7 @@ const getPieceValue = (piece: BoardType, x: number, y: number) => {
   if (piece === null) return 0;
 
   const getAbsoluteValue = function (
-    piece: PieceType,
+    piece: PieceSymbol,
     isWhite: boolean,
     x: number,
     y: number

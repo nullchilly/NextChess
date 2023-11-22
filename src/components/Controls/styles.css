@@ -1,0 +1,51 @@
+.headerControls {
+    font-family: "Montserrat",sans-serif;
+    padding: 20px 20px 60px;
+    font-weight: 700;
+    font-size: 2.2rem;
+    border-radius: .5rem .5rem 0 0;
+}
+
+.puzzleStats {
+    overflow: auto;
+    padding: 0 1.5rem;
+}
+
+.puzzleStatsRow {
+    align-items: center;
+    color: #ffffff;
+    display: flex;
+    font-size: 1.3rem;
+    gap: .5rem;
+    justify-content: space-between;
+    line-height: 1.2;
+    min-height: 3rem;
+    padding: .5rem 0;
+    height: 3rem;
+    border-bottom: .1rem solid #ffffff
+}
+
+.puzzleStatsText {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Helvetica,Arial,sans-serif;
+}
+
+.puzzleStatsFlex {
+    align-items: center;
+    display: flex;
+    justify-content: center
+}
+
+.button {
+    padding-left: 1.5rem;
+}
+
+.hintButton {
+    width: 15rem;
+    justify-content: center;
+    margin-left: 1.5rem;
+}
+
+.buttonSize {
+    font-size: 20px;
+    height: 40px;
+}
