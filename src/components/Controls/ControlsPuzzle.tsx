@@ -35,7 +35,9 @@ const ControlsPuzzle : React.FC<ControlsPuzzleProps> = ({
 	onHint,
 	onRetry,
 	onNext }) => {
-
+	
+	console.log(status)
+	
 	return (
 		<div>
 			<Row

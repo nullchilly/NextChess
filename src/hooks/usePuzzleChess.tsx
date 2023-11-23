@@ -29,7 +29,7 @@ const usePuzzleChess = (puzzleData: Puzzle) => {
 			setSolved(false);
 			setRated(true);
 			setId(puzzleData.id);
-			setMessage("Solving...");
+			setMessage("pending");
 		}
 	}
 	
@@ -79,7 +79,7 @@ const usePuzzleChess = (puzzleData: Puzzle) => {
 		
 		setValidMoves(validMoves.slice(1));
 		if (computerMove) {
-			setMessage('Solving...');
+			setMessage('pending');
 			setTimeout(() => {
 				const tmp = new Chess(move.after);
 				const result = tmp.move(computerMove as any);
@@ -90,7 +90,8 @@ const usePuzzleChess = (puzzleData: Puzzle) => {
 			setSolved(true);
 			if (rated) {
 				console.log("duoc lam con trai");
-				setMessage("Solved")
+				setMessage("done")
+				setSolved(true);
 			}
 		}
 		return true;
