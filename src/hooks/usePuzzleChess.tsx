@@ -48,7 +48,11 @@ const usePuzzleChess = (puzzleData: Puzzle) => {
 		try {
 			const tmp = new Chess(game.fen());
 			const result = tmp.move(move);
-			if (result?.san !== validMoves[0]) return null
+			console.log("result", result);
+			if (result === null) {
+				return false;
+			}
+			if (result.san !== validMoves[0]) return null
 			return result;
 		} catch (error) {
 			setError(error);
@@ -62,6 +66,10 @@ const usePuzzleChess = (puzzleData: Puzzle) => {
 			to: target,
 			promotion: "q", // promote to a queen
 		})
+		
+		if (move === false) {
+			return true;
+		}
 		
 		if (!move) {
 			setMessage("done")
