@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 import Link from "next/link";
 import { useState } from 'react';
 import BlackQueen from "@/components/icons/ChessPiece/BlackQueen";

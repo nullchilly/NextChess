@@ -75,3 +75,17 @@ export type ChessProps = {
   name?: string,
   color?: string,
 }
+
+export type IconProps = {
+  width? :number,
+  height? :number,
+}
+
+export type PuzzleInfo = {
+  rating: number;
+  targetTime: number;
+  speedBonus: number;
+  passRate: number;
+  attempts: number;
+  themes: string[];
+};
