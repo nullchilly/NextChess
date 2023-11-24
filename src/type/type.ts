@@ -12,3 +12,9 @@ export type Puzzle = {
 	date?: string,
 	id: string,
 }
+
+export type ShortMove = {
+	from: string;
+	to: string;
+	promotion?: string;
+}

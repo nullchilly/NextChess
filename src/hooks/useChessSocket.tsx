@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import React from 'react'
-import { Chess, Move, ShortMove, Square } from 'chess.js';
+import { Chess, Move, Square } from 'chess.js';
 import { io, Socket } from "socket.io-client";
+import { ShortMove } from '@/type/type';
 
 export type ChessType = 'random' | 'computer' | 'minimax';
 
@@ -91,7 +92,7 @@ const useChessSocket = ({ type, id }: Props) => {
 
   const makeMove = (move: string | ShortMove) => {
     console.log(move)
-    const gameCopy = { ...game };
+    const gameCopy = game;
     const result = gameCopy.move(move);
 
     if (result) {
@@ -117,7 +118,7 @@ const useChessSocket = ({ type, id }: Props) => {
   };
 
   const resetGame = () => {
-    const gameCopy = { ...game };
+    const gameCopy = game;
     gameCopy.reset();
     setGame(gameCopy);
     cleanOldGame();
