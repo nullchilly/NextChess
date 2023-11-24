@@ -2,6 +2,7 @@ import { useState } from 'react';
 import React from 'react'
 import { Chess, Move, Square } from 'chess.js';
 import { evaluateBoard } from '@/helpers/chess';
+import { ShortMove } from '@/type/type';
 
 export type ChessType = 'random' | 'computer' | 'minimax';
 
@@ -80,7 +81,7 @@ const useChess = (type: ChessType) => {
     return calculateMinimaxMove;
   };
 
-  const makeMove = (move: any) => {
+  const makeMove = (move: string | ShortMove) => {
     console.log(move)
     const gameCopy = game ;
     const result = gameCopy.move(move);
