@@ -103,6 +103,18 @@ async def end_game(sid, msg):
     message = "Successfully cleaned up";
     await sio.emit("end-game", message, room=sid)
 
+@sio.on("undo")
+async def undo(sid, msg):
+    data = json.loads(msg)
+    gameID = data["id"]
+    if (gameID in game_states):
+        # Pop twice, engine move + user move, refine later!
+        try: 
+            game_states[gameID]['board'].pop()
+            game_states[gameID]['board'].pop()
+        except IndexError:
+            print("No move yet!")
+
 @sio.on("connect")
 async def connect(sid, env):
     print("Fucking connected")

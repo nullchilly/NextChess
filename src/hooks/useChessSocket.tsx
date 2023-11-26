@@ -74,6 +74,11 @@ const useChessSocket = ({ type, id }: Props) => {
     const endGameData = {"id": id};
     socket?.emit("end-game", JSON.stringify(endGameData));
   }
+
+  const undoMoveSocket = () => {
+    const undoMoveData = {"id": id};
+    socket?.emit("undo", JSON.stringify(undoMoveData));
+  }
   
   const connectSocket = () => {
     const socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`, {
@@ -87,7 +92,7 @@ const useChessSocket = ({ type, id }: Props) => {
   const [game, setGame] = useState(new Chess());
   const [playing, setPlaying] = useState(false);
   const [moves, setMoves] = useState<Move[]>([]);
-  const [depth, setDepth] = useState(3);
+  const [gameFen, setGameFen] = useState<string>(game.fen());
   const [currentTimeout, setCurrentTimeout] = useState<NodeJS.Timeout>();
 
   const makeMove = (move: string | ShortMove) => {
@@ -98,6 +103,7 @@ const useChessSocket = ({ type, id }: Props) => {
     if (result) {
       setMoves((prevMoves) => [result, ...prevMoves]);
       setGame(gameCopy);
+      setGameFen(gameCopy.fen());
     }
 
     return result;
@@ -121,6 +127,7 @@ const useChessSocket = ({ type, id }: Props) => {
     const gameCopy = game;
     gameCopy.reset();
     setGame(gameCopy);
+    setGameFen(gameCopy.fen());
     cleanOldGame();
     setMoves([]);
 
@@ -134,15 +141,33 @@ const useChessSocket = ({ type, id }: Props) => {
     setPlaying(true);
   };
 
+  const undoMove = () => {
+    undoMoveSocket();
+
+    const gameCopy = game;
+    gameCopy.undo();
+    gameCopy.undo();
+
+    const movesCopy = moves;
+    movesCopy.shift();
+    movesCopy.shift();
+
+    setGame(gameCopy);
+    setGameFen(gameCopy.fen());
+    setMoves(movesCopy);
+  }
+
   return {
     game,
     playing,
     moves,
 
-    depth,
-    setDepth,
+    gameFen,
+    setGameFen,
 
     onPieceDrop,
+    undoMove,
+
     startGame,
     resetGame,
   };
