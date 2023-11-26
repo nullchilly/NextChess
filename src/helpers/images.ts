@@ -1,6 +1,6 @@
-import { PieceColor, PieceType } from "chess.js";
+import { Color, PieceSymbol } from "chess.js";
 
-export const getPieceSrc = (color: PieceColor, piece: PieceType) => {
+export const getPieceSrc = (color: Color, piece: PieceSymbol) => {
   return `assets/${color}_${piece}.svg`;
 };
 

@@ -41,6 +41,7 @@ const items: MenuProps["items"] = [
 
   // TODO: Change path to the corresponding component
   getItem("Puzzle", "sub2", <Puzzle />, [
+    // Why `puzzleData`, thought this should be `puzzle`?
     getItem("Play Puzzle", "/puzzleData", <Puzzle />),
     getItem("Puzzle Duel", "/puzzleData-duel", <Duel />),
   ]),
