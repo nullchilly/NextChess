@@ -2,7 +2,7 @@ import json
 from typing import List
 
 import typer
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session
 from api.app.model.puzzle import Puzzle
 
 data_path_puzzle = "public/all.json"
@@ -14,29 +14,20 @@ def read_json_data_puzzle(path: str):
 	return data
 
 def create_puzzle_data(data) -> Puzzle:
-	new_puzzle_data = {
-		"name": data.get('title', None),
-		"position": data.get('pgn', None),
-		"rating": data.get('solved_count', None),
-		"moves": data.get('parsed', None).get('moves', None),
-		"fen": data.get('parsed', None).get('fen', None),
-		"created_at": data.get('date', None),
-	}
-	new_puzzle: Puzzle = Puzzle()
-	new_puzzle.name = new_puzzle_data['name']
-	new_puzzle.position = new_puzzle_data['position']
-	new_puzzle.rating = new_puzzle_data['rating']
-	new_puzzle.moves = new_puzzle_data['moves']
-	new_puzzle.fen = new_puzzle_data['fen']
-	new_puzzle.created_at = new_puzzle_data['created_at']
+	new_puzzle: Puzzle = Puzzle(
+		name=data.get('title', None),
+		position=data.get('pgn', None),
+		rating=data.get('solved_count', None),
+		moves=data.get('parsed', None).get('moves', None),
+		fen=data.get('parsed', None).get('fen', None),
+		created_at=data.get('date', None),
+	)
 	return new_puzzle
 
 
 def update_puzzle_data_to_db(db: Session, data_item: List[Puzzle]):
 	# add puzzle data to table puzzle in db
-	for i in range(len(data_item)):
-		db.add(data_item[i])
-		print("pushed puzzle data: ", i)
+	db.add_all(data_item)
 	db.commit()
 
 

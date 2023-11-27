@@ -10,3 +10,4 @@ stockfish/stockfish-macos
 ./database
 docker-compose.yml
 database/
+public/all.json

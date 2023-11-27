@@ -7,3 +7,5 @@ class Puzzle(BareBaseModel):
     name = Column(String(255), nullable=False)
     position = Column(String(50), nullable=False)
     rating = Column(Integer)
+    moves = Column(String(255))
+    fen = Column(String(255))
