@@ -9,3 +9,4 @@ class Puzzle(BareBaseModel):
     rating = Column(Integer)
     moves = Column(String(255))
     fen = Column(String(255))
+

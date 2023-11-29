@@ -13,8 +13,6 @@ class User(BareBaseModel):
     email = Column(String(255), nullable=False, index=True, unique=True)
     password = Column(String(1000), nullable=False)
     access_token = Column(String(1000), nullable=True)
-    streak = Column(Integer, nullable=False, server_default='0')
-    longest_streak = Column(Integer, nullable=False, server_default='0')
-    last_streak = Column(Integer, nullable=False, server_default='0')
+
 
 

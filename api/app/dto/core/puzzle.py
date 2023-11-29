@@ -1,29 +1,29 @@
+from typing import Any
+
 from api.app.dto.base import CamelBaseModel
 
 
 class SubmitPuzzleRequest(CamelBaseModel):
-	token: str
-	id: int
-	isSolvedWithHint: bool
-	moves: str
-	totalTime: int
-
-
-class UserRatingStatus(CamelBaseModel):
-	current: int
-	new: int
-	change: int
-
-
-class RatingInfo(CamelBaseModel):
-	user: UserRatingStatus
-	score: int
-	currentStreak: int
-	highestStreak: int
-	isNewHighestStreak: bool
-	lastPositiveStreak: int
+	tactics_problem_id: int
+	seconds: float
+	is_passed: bool
+	is_rated: bool
 
 
 class SubmitPuzzleResponse(CamelBaseModel):
-	result: str
-	newRatingInfo: RatingInfo
+	attempt_id: int
+	new_rating: int
+	rating_change: int
+
+
+class PuzzleResponse(CamelBaseModel):
+	id: int
+	name: str
+	rating: int
+	moves: str
+	fen: str
+	created_at: str
+
+
+class MultiPuzzleResponse(CamelBaseModel):
+	puzzles: list[PuzzleResponse]

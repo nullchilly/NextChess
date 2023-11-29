@@ -11,5 +11,6 @@ def init_puzzle():
 	with next(db_session()) as db:
 		push_data_to_db(db)
 
+
 if __name__ == "__main__":
 	app()

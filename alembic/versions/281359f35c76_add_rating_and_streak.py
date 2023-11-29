@@ -17,14 +17,14 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('user', sa.Column('streak', sa.Integer(), nullable=False, server_default='0'))
-    op.add_column('user', sa.Column('longest_streak', sa.Integer(), nullable=False, server_default='0'))
-    op.add_column('user', sa.Column('last_streak', sa.Integer(), nullable=False, server_default='0'))
+    op.add_column('profile', sa.Column('streak', sa.Integer(), nullable=False, server_default='0'))
+    op.add_column('profile', sa.Column('longest_streak', sa.Integer(), nullable=False, server_default='0'))
+    op.add_column('profile', sa.Column('last_streak', sa.Integer(), nullable=False, server_default='0'))
     pass
 
 
 def downgrade():
-    op.drop_column('user', 'streak')
-    op.drop_column('user', 'longest_streak')
-    op.drop_column('user', 'last_streak')
+    op.drop_column('profile', 'streak')
+    op.drop_column('profile', 'longest_streak')
+    op.drop_column('profile', 'last_streak')
     pass

@@ -3,6 +3,7 @@ from typing import List
 
 import typer
 from sqlalchemy.orm import Session
+
 from api.app.model.puzzle import Puzzle
 
 data_path_puzzle = "public/all.json"
@@ -13,6 +14,7 @@ def read_json_data_puzzle(path: str):
 		data = json.load(f)
 	return data
 
+
 def create_puzzle_data(data) -> Puzzle:
 	new_puzzle: Puzzle = Puzzle(
 		name=data.get('title', None),
@@ -22,6 +24,7 @@ def create_puzzle_data(data) -> Puzzle:
 		fen=data.get('parsed', None).get('fen', None),
 		created_at=data.get('date', None),
 	)
+
 	return new_puzzle
 
 
