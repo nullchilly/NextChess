@@ -68,3 +68,30 @@ export type UserProfile = {
     userNetworkLinks: UserNetworkLink[];
     ratings: Rating[]
 }
+
+export type BotProps = {
+  width? :number,
+  height? :number,
+  name?: string,
+}
+
+export type ChessProps = {
+  width? :number,
+  height? :number,
+  name?: string,
+  color?: string,
+}
+
+export type IconProps = {
+  width? :number,
+  height? :number,
+}
+
+export type PuzzleInfo = {
+  rating: number;
+  targetTime: number;
+  speedBonus: number;
+  passRate: number;
+  attempts: number;
+  themes: string[];
+};

@@ -5,6 +5,10 @@ import Black from "@/components/icons/bK";
 import White from "@/components/icons/wK";
 import Random from "@/components/icons/wbK";
 import { ChessVariants, TimeMode } from "@/helpers/types";
+import { useRouter } from "next/navigation";
+import { httpPostCreateBotGame } from "@/modules/backend-client/httpPostCreateBotGame";
+import { tryUntil } from "@/modules/async-utils";
+import { httpGetAllGameSlugs } from "@/modules/backend-client/httpGetAllGameSlugs";
 
 type Props = {
   isOpen: boolean;
@@ -14,30 +18,30 @@ type Props = {
 // TODO: Fetch these from DB?
 const allVariants = [
   {
-    value: "Standard",
+    value: 1,
     label: ChessVariants.STANDARD,
   },
   {
-    value: "Chess960",
+    value: 2,
     label: ChessVariants.CHESS960,
   },
 ];
 
 const timeOptions = [
   {
-    value: "0",
+    value: 0,
     label: TimeMode.UNLIMITED,
   },
   {
-    value: "3",
+    value: 3,
     label: TimeMode.ThreeMins,
   },
   {
-    value: "5",
+    value: 5,
     label: TimeMode.FiveMins,
   },
   {
-    value: "7",
+    value: 7,
     label: TimeMode.SevenMins,
   },
 ];
@@ -45,10 +49,9 @@ const timeOptions = [
 export default function ModalPlayBot({ isOpen, setOpen }: Props) {
   const [confirmLoading, setConfirmLoading] = React.useState(false);
   const [strength, setStrength] = React.useState<number>(3);
-  const [variant, setVariant] = React.useState<ChessVariants>(
-    ChessVariants.STANDARD
-  );
+  const [variant, setVariant] = React.useState<number>(1);
   const [timeMode, setTimeMode] = React.useState<number>(0);
+  const router = useRouter();
 
   const stockfishStrength = Array.from({ length: 8 }, (v, i) => i + 1);
 
@@ -56,20 +59,39 @@ export default function ModalPlayBot({ isOpen, setOpen }: Props) {
     setOpen(false);
   };
 
-  const handleOKBotModal = () => {
+  const waitUntilSlugIndexed = async (slug: string) => {
+    await tryUntil({
+      run: () => httpGetAllGameSlugs(),
+      until: (response) => response.includes(slug),
+    });
+  };
+
+  const handleOKBotModal = async () => {
     setConfirmLoading(true);
-    // TODO: This send something to BE then wait for result.
-    setTimeout(() => {
-      setOpen(false);
-      setConfirmLoading(false);
-    }, 2000);
+
+    const createBotGameRes = await httpPostCreateBotGame({
+      strength,
+      variant,
+      timeMode,
+    });
+    const slug = createBotGameRes.slug;
+    console.log("HELO: ", createBotGameRes.slug);
+
+    // Check game is added to db, then route...
+    await waitUntilSlugIndexed(slug).then((cause) => {
+      console.error("Can't index game slug: ", cause);
+    });
+
+    setOpen(false);
+    setConfirmLoading(false);
+    router.push(`/computer/${slug}`);
   };
 
   const selectStrength = ({ target: { value } }: RadioChangeEvent) => {
     setStrength(value);
   };
 
-  const selectVariant = (value: ChessVariants) => {
+  const selectVariant = (value: number) => {
     setVariant(value);
   };
 
@@ -94,7 +116,7 @@ export default function ModalPlayBot({ isOpen, setOpen }: Props) {
         <div className="flex justify-center center gap-4 items-center">
           <span className="font-bold">Variant</span>
           <Select
-            defaultValue={ChessVariants.STANDARD}
+            defaultValue={1}
             options={allVariants}
             style={{ width: 120 }}
             onChange={selectVariant}

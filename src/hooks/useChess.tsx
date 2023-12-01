@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import React from 'react'
-import { Chess, ChessInstance, Move, ShortMove, Square } from 'chess.js';
+import { Chess, Move, Square } from 'chess.js';
 import { evaluateBoard } from '@/helpers/chess';
+import { ShortMove } from '@/type/type';
 
 export type ChessType = 'random' | 'computer' | 'minimax';
 
@@ -62,7 +63,7 @@ const useChess = (type: ChessType) => {
   };
 
   const connectSocket = () => {
-    const url = `${process.env.NEXT_PUBLIC_SOCKET_URL}` + "/ws";
+    const url = `${process.env.NEXT_PUBLIC_SOCKET_URL}`;
     const socket = new WebSocket(url);
     setSocket(socket);
   };
@@ -72,8 +73,7 @@ const useChess = (type: ChessType) => {
   const [moves, setMoves] = useState<Move[]>([]);
   const [depth, setDepth] = useState(3);
   const [currentTimeout, setCurrentTimeout] = useState<NodeJS.Timeout>();
-
-  // TODO: Change this into a {key: value} object
+	
   const getComputerType = () => {
     if (type === 'random') return calculateRandomMove;
     else if (type === 'computer') return calculateBestMove;
@@ -83,7 +83,7 @@ const useChess = (type: ChessType) => {
 
   const makeMove = (move: string | ShortMove) => {
     console.log(move)
-    const gameCopy = { ...game };
+    const gameCopy = game ;
     const result = gameCopy.move(move);
 
     if (result) {
@@ -96,7 +96,7 @@ const useChess = (type: ChessType) => {
 
   const calculateRandomMove = () => {
     const possibleMoves = game.moves();
-    if (game.game_over() || game.in_draw() || possibleMoves.length <= 0) return;
+    if (game.isGameOver() || game.isDraw() || possibleMoves.length <= 0) return;
 
     const randomIndex = Math.floor(Math.random() * possibleMoves.length);
     makeMove(possibleMoves[randomIndex]);
@@ -104,7 +104,7 @@ const useChess = (type: ChessType) => {
 
   const calculateBestMove = () => {
     const possibleMoves = game.moves();
-    if (game.game_over() || game.in_draw() || possibleMoves.length <= 0) return;
+    if (game.isGameOver() || game.isDraw() || possibleMoves.length <= 0) return;
 
     let bestMove = null;
     let bestValue = -9999;
@@ -127,7 +127,7 @@ const useChess = (type: ChessType) => {
 
   const minimax = (
     depth: number,
-    game: ChessInstance,
+    game: Chess,
     alpha: number,
     beta: number,
     isMaximizingPlayer: boolean
@@ -169,7 +169,7 @@ const useChess = (type: ChessType) => {
 
   const calculateMinimaxMove = () => {
     const possibleMoves = game.moves();
-    if (game.game_over() || game.in_draw() || possibleMoves.length <= 0) return;
+    if (game.isGameOver() || game.isDraw() || possibleMoves.length <= 0) return;
 
     const searchDepth = depth;
     let minimaxMove = null;
@@ -205,7 +205,7 @@ const useChess = (type: ChessType) => {
   };
 
   const resetGame = () => {
-    const gameCopy = { ...game };
+    const gameCopy = game;
     gameCopy.reset();
     setGame(gameCopy);
 
@@ -216,7 +216,7 @@ const useChess = (type: ChessType) => {
   };
 
   const startGame = () => {
-    connectSocket()
+    // connectSocket()
     resetGame();
     setPlaying(true);
   };
