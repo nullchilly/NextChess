@@ -1,13 +1,10 @@
-> **IMPORTANT**
-> web is important
-> 
+> [!NOTE]
 > Migration database: alembic upgrade head
 
+> [!WARNING]
+> Please do NOT `npm run dev` inside Python virtual environment
 
-NOTE:
-  * Please do NOT `npm run dev` inside Python virtual environment
-
-
+> [!IMPORTANT]
 > Build & Run
 > 
 > Build phase:
