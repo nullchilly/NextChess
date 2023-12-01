@@ -1,12 +1,12 @@
-import {useEffect, useState} from "react";
-import {Puzzle} from "@/type/type";
+import { useEffect, useState } from "react";
+import { Puzzle } from "@/types";
 
 // const NEXT_PUBLIC_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "/api";
 const NEXT_PUBLIC_BACKEND_URL = "/api";
 
 
 export const usePuzzleData = (id: string) => {
-  const [puzzle, setPuzzle] = useState<Puzzle>({
+	const [puzzle, setPuzzle] = useState<Puzzle>({
 		fen: undefined,
 		title: "No data found",
 		player: "w",
@@ -16,7 +16,7 @@ export const usePuzzleData = (id: string) => {
 	const [cache, setCache] = useState<any>({});
 	const [error, setError] = useState<any>(null);
 	const [isLoading, setIsLoading] = useState(false);
-	
+
 	useEffect(() => {
 		const fetchData = async () => {
 			setIsLoading(true);
@@ -66,8 +66,8 @@ export const usePuzzleData = (id: string) => {
 			fetchData();
 		}
 	}, [id])
-	
-	return {data: puzzle, error, isLoading}
+
+	return { data: puzzle, error, isLoading }
 }
 
 export default usePuzzleData;
