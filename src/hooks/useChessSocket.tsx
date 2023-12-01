@@ -162,6 +162,7 @@ const useChessSocket = ({ type, id }: Props) => {
 
     if (currentTimeout) clearTimeout(currentTimeout);
     setPlaying(false);
+    updateCustomSquares({ check: undefined });
   };
 
   const startGame = () => {
