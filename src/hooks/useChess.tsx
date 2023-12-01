@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import React from 'react'
-import { Chess, Move, Square } from 'chess.js';
-import { evaluateBoard } from '@/helpers/chess';
-import { ShortMove } from '@/type/type';
+import { useState } from "react";
+import React from "react";
+import { Chess, Move, Square } from "chess.js";
+import { evaluateBoard } from "@/helpers/chess";
+import { ShortMove } from "@/types";
 
-export type ChessType = 'random' | 'computer' | 'minimax';
+export type ChessType = "random" | "computer" | "minimax";
 
 enum ConnectionStatus {
   Open = "open",
@@ -32,11 +32,11 @@ const useChess = (type: ChessType) => {
 
       socket.onmessage = (msg) => {
         const message = JSON.parse(msg.data);
-        console.log("Message from BE: ", message['message']);
+        console.log("Message from BE: ", message["message"]);
         makeMove({
-          from: message['message']['from'],
-          to: message['message']['to'],
-          promotion: 'q',
+          from: message["message"]["from"],
+          to: message["message"]["to"],
+          promotion: "q",
         });
       };
 
@@ -73,17 +73,17 @@ const useChess = (type: ChessType) => {
   const [moves, setMoves] = useState<Move[]>([]);
   const [depth, setDepth] = useState(3);
   const [currentTimeout, setCurrentTimeout] = useState<NodeJS.Timeout>();
-	
+
   const getComputerType = () => {
-    if (type === 'random') return calculateRandomMove;
-    else if (type === 'computer') return calculateBestMove;
+    if (type === "random") return calculateRandomMove;
+    else if (type === "computer") return calculateBestMove;
 
     return calculateMinimaxMove;
   };
 
   const makeMove = (move: string | ShortMove) => {
-    console.log(move)
-    const gameCopy = game ;
+    console.log(move);
+    const gameCopy = game;
     const result = gameCopy.move(move);
 
     if (result) {
@@ -121,7 +121,7 @@ const useChess = (type: ChessType) => {
     }
 
     if (bestMove === null) return;
-    console.log(bestMove)
+    console.log(bestMove);
     makeMove(bestMove);
   };
 
@@ -196,11 +196,11 @@ const useChess = (type: ChessType) => {
     const move = makeMove({
       from: sourceSquare,
       to: targetSquare,
-      promotion: 'q',
+      promotion: "q",
     });
 
     if (move === null) return false;
-    sendMessage(move.from + move.to)
+    sendMessage(move.from + move.to);
     return true;
   };
 

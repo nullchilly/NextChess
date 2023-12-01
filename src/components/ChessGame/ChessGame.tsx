@@ -9,7 +9,7 @@ import useChessSocket, { ChessType } from "@/hooks/useChessSocket";
 import PlayerCard from "@/components/Card/PlayerCard";
 import PrepareCard from "@/components/Card/PrepareCard";
 import { useEffect, useState } from "react";
-import { BotProps } from "@/type/type";
+import { BotProps } from "@/types";
 
 type ChessGameType = {
   id: string;
@@ -21,6 +21,7 @@ const ChessGame = ({ id, type }: ChessGameType) => {
     game,
     moves,
     playing,
+    customSquares,
     gameFen,
     setGameFen,
     onPieceDrop,
@@ -63,11 +64,13 @@ const ChessGame = ({ id, type }: ChessGameType) => {
           <Chessboard
             id={id}
             onPieceDrop={onPieceDrop}
+            // boardOrientation="black" TODO: make the bot play 1st, or just ignore, bot ALWAYS 'black'.
             position={gameFen}
             customBoardStyle={{
               borderRadius: "8px",
               boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
             }}
+            customSquareStyles={{ ...customSquares.check }}
           />
           <div className="">
             <PlayerCard name={"Chien"} link={"/profile/chien"} />

@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import React from 'react'
-import { Chess, Move, Square } from 'chess.js';
+import { useReducer, useState } from "react";
+import React from "react";
+import { Chess, Move, Square } from "chess.js";
 import { io, Socket } from "socket.io-client";
-import { ShortMove } from '@/type/type';
+import { CustomSquares, ShortMove } from "@/types";
 
-export type ChessType = 'random' | 'computer' | 'minimax';
+export type ChessType = "random" | "computer" | "minimax";
 
 type Props = {
-  id: string
-  type: ChessType
+  id: string;
+  type: ChessType;
 };
 
 enum ConnectionStatus {
@@ -18,8 +18,12 @@ enum ConnectionStatus {
 }
 
 type EmitData = {
-  move: string | ShortMove,
-  id: string,
+  move: string | ShortMove;
+  id: string;
+};
+
+function squareReducer(squares: CustomSquares, action: Partial<CustomSquares>) {
+  return { ...squares, ...action };
 }
 
 const useChessSocket = ({ type, id }: Props) => {
@@ -43,43 +47,42 @@ const useChessSocket = ({ type, id }: Props) => {
 
       socket.on("disconnect", () => {
         disconnectSocket();
-      })
+      });
 
       socket.on("play-chess", (msg) => {
         console.log("Response", msg);
         const message = JSON.parse(msg);
         makeMove({
-          from: message['message']['from'],
-          to: message['message']['to'],
-          promotion: 'q',
+          from: message["message"]["from"],
+          to: message["message"]["to"],
+          promotion: "q",
         });
       });
 
       socket.on("end-game", (msg) => {
         console.log("clean up state: ", msg);
       });
-
     }
   }, [disconnectSocket, setConnectionStatus, socket]);
 
   // Send latest move over socket
   const sendMove = (move: string) => {
     console.log("MOVE: ", move);
-    const emitData: EmitData = {move, id};
+    const emitData: EmitData = { move, id };
     socket?.emit("play-chess", JSON.stringify(emitData));
   };
 
   // Make sure new game id not appeared in BE
   const cleanOldGame = () => {
-    const endGameData = {"id": id};
+    const endGameData = { id: id };
     socket?.emit("end-game", JSON.stringify(endGameData));
-  }
+  };
 
   const undoMoveSocket = () => {
-    const undoMoveData = {"id": id};
+    const undoMoveData = { id: id };
     socket?.emit("undo", JSON.stringify(undoMoveData));
-  }
-  
+  };
+
   const connectSocket = () => {
     const socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`, {
       autoConnect: false,
@@ -94,9 +97,12 @@ const useChessSocket = ({ type, id }: Props) => {
   const [moves, setMoves] = useState<Move[]>([]);
   const [gameFen, setGameFen] = useState<string>(game.fen());
   const [currentTimeout, setCurrentTimeout] = useState<NodeJS.Timeout>();
+  const [customSquares, updateCustomSquares] = useReducer(squareReducer, {
+    check: {},
+  });
 
   const makeMove = (move: string | ShortMove) => {
-    console.log(move)
+    console.log(move);
     const gameCopy = game;
     const result = gameCopy.move(move);
 
@@ -104,6 +110,29 @@ const useChessSocket = ({ type, id }: Props) => {
       setMoves((prevMoves) => [result, ...prevMoves]);
       setGame(gameCopy);
       setGameFen(gameCopy.fen());
+
+      let kingSquare = undefined;
+      if (game.inCheck()) {
+        const kingPos = game.board().reduce((acc, row, index) => {
+          const squareIndex = row.findIndex(
+            (square) =>
+              square && square.type === "k" && square.color === game.turn()
+          );
+          return squareIndex >= 0
+            ? `${String.fromCharCode(squareIndex + 97)}${8 - index}`
+            : acc;
+        }, "");
+        kingSquare = {
+          [kingPos]: {
+            background:
+              "radial-gradient(red, rgba(255,0,0,.8), transparent 70%)",
+            borderRadius: "50%",
+          },
+        };
+      }
+      updateCustomSquares({
+        check: kingSquare,
+      });
     }
 
     return result;
@@ -115,11 +144,11 @@ const useChessSocket = ({ type, id }: Props) => {
     const move = makeMove({
       from: sourceSquare,
       to: targetSquare,
-      promotion: 'q',
+      promotion: "q",
     });
 
     if (move === null) return false;
-    sendMove(move.from + move.to + (move.promotion ? move.promotion : ''));
+    sendMove(move.from + move.to + (move.promotion ? move.promotion : ""));
     return true;
   };
 
@@ -155,12 +184,15 @@ const useChessSocket = ({ type, id }: Props) => {
     setGame(gameCopy);
     setGameFen(gameCopy.fen());
     setMoves(movesCopy);
-  }
+    updateCustomSquares({ check: undefined }); // Reset style
+  };
 
   return {
     game,
     playing,
     moves,
+
+    customSquares,
 
     gameFen,
     setGameFen,

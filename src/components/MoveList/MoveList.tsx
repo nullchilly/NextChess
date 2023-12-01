@@ -1,6 +1,6 @@
-import { Move } from 'chess.js';
-import MoveItem from './MoveItem';
-import {BotProps} from "@/type/type";
+import { Move } from "chess.js";
+import MoveItem from "./MoveItem";
+import { BotProps } from "@/types";
 import React from "react";
 import PlayerInfoCard from "@/components/Card/PlayerInfoCard";
 
