@@ -51,9 +51,15 @@ export enum TimeMode {
     SevenMins="7 minutes",
 }
 
+export type DataPoint = {
+    x: string;
+    y: number;
+};
+
 export type Rating = {
     gameType: GameType;
-    rate: number
+    rate: number;
+    history: DataPoint[];
 }
 
 export type UserProfile = {

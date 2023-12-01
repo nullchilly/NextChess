@@ -1,8 +1,43 @@
 import Link from "next/link";
 import Image from 'next/image';
 import { getPieceSrc } from '@/helpers/images';
+import { useState } from 'react';
 
 export default function Login() {
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    confirmPassword: '',
+    email: '',
+  });
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('User registered:', data.user);
+        // Optionally, you can redirect the user to a success page or perform other actions
+      } else {
+        console.error('Registration failed:', response.statusText);
+      }
+    } catch (error) {
+      console.error('An unexpected error occurred:', error);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
         <div className="w-full p-6 bg-white rounded-md shadow-xl lg:max-w-xl border">
@@ -16,7 +51,7 @@ export default function Login() {
                 height={45}
             />
         </div>
-        <form className="mt-4">
+        <form className="mt-4" onSubmit={handleSubmit}>
             <div className="mb-4">
                 <div className="mb-4">
                     <label
