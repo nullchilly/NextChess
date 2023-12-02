@@ -1,4 +1,3 @@
-import time
 from datetime import datetime
 
 from fastapi import HTTPException
@@ -8,6 +7,7 @@ from api.app.dto.core.auth import SignUpRequest, SignUpResponse, UserRole, Login
     LoginResponse, GetProfileResponse, UpdateProfileRequest
 from api.app.helper import auth
 from api.app.model import User
+from api.app.model import Profile
 
 
 class AuthService:
@@ -19,7 +19,19 @@ class AuthService:
         user = User(user_name=request.user_name, password=request.password, access_token=token, email=request.email, is_admin=False,
                     name=request.name, gender=request.gender, date_of_birth=request.date_of_birth)
         db.add(user)
+        # create profile from user
+        user = db.query(User).filter(User.user_name == request.user_name).first()
+        profile = Profile(
+            user_id=user.id,
+            name=user.name,
+            dob=user.date_of_birth,
+            gender=user.gender,
+            rating=0,
+            country="Viet Nam"
+        )
+        db.add(profile)
         db.commit()
+
         return SignUpResponse(role=UserRole.USER)
 
     @classmethod

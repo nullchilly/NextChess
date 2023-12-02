@@ -11,7 +11,10 @@
     "start": "pip3 install --user -r requirements.txt && python3 -m uvicorn api.index:app --port 8000",
     "my-start": "concurrently \"next start\" \"npm run fastapi-start\" ",
     "next-start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "create-puzzle": "python3 -m api.main",
+    "update-db": "alembic upgrade head",
+    "server": "python3 -m uvicorn api.index:app --reload"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",

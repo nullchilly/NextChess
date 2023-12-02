@@ -2,7 +2,6 @@ from sqlalchemy import Column, Boolean, String, Integer, Date
 
 from api.app.model.base import BareBaseModel
 
-
 class User(BareBaseModel):
     __tablename__ = 'user'
 
@@ -14,5 +13,6 @@ class User(BareBaseModel):
     email = Column(String(255), nullable=False, index=True, unique=True)
     password = Column(String(1000), nullable=False)
     access_token = Column(String(1000), nullable=True)
+
 
 
