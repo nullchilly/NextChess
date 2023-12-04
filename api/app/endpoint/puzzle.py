@@ -1,4 +1,5 @@
 from typing import Annotated
+from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
@@ -27,7 +28,7 @@ async def get_random_puzzle_for_rating(db: Session = Depends(db_session), *, rat
 @puzzle_router.get('/puzzle/daily', response_model=PuzzleResponse)
 async def get_random_puzzle_for_date(db: Session = Depends(db_session),
                                      *,
-                                     date: Annotated[str | None, Query(pattern=r'^\d{4}-\d{2}-\d{2}$')]):
+                                     date: Annotated[Optional[str], Query(pattern=r'^\d{4}-\d{2}-\d{2}$')]):
 	return PuzzleService().get_random_puzzle_for_date(db, date)
 
 
