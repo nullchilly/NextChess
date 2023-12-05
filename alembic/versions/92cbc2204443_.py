@@ -18,8 +18,7 @@ depends_on = None
 
 def upgrade():
     op.add_column('puzzle', sa.Column('moves', sa.String(length=255), nullable=True))
-    op.add_column('puzzle', sa.Column('fen', sa.String(length=50), nullable=True))
-    op.drop_column('puzzle_user', 'position')
+    op.add_column('puzzle', sa.Column('fen', sa.String(length=255), nullable=True))
     pass
 
 

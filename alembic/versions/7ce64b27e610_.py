@@ -114,7 +114,7 @@ def upgrade():
     op.create_table('puzzle',
                     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
                     sa.Column('name', sa.String(length=255), nullable=False),
-                    sa.Column('position', sa.String(length=50), nullable=False),
+                    sa.Column('position', sa.String(length=2000), nullable=False),
                     sa.Column('rating', sa.Integer(), nullable=True),
                     sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
                     sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
@@ -126,7 +126,7 @@ def upgrade():
     op.create_table('solution',
                     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
                     sa.Column('puzzle_id', sa.Integer(), nullable=False),
-                    sa.Column('solution', sa.String(length=1025), nullable=False),
+                    sa.Column('solution', sa.String(length=2000), nullable=False),
                     sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
                     sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
                     sa.Column('deleted_at', sa.DateTime(), nullable=True),
@@ -141,7 +141,6 @@ def upgrade():
                     sa.Column('user_id', sa.Integer(), nullable=False),
                     sa.Column('state', sa.Integer(), nullable=False),
                     sa.Column('gained_rating', sa.Boolean(), nullable=False),
-                    sa.Column('position', sa.String(length=255), nullable=False),
                     sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
                     sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
                     sa.Column('deleted_at', sa.DateTime(), nullable=True),
@@ -162,8 +161,6 @@ def upgrade():
     op.create_index('idx_puzzle_solution', 'solution', ['puzzle_id'])
     op.create_index('idx_puzzle_user_puzzle', 'puzzle_user', ['puzzle_id'])
     op.create_index('idx_puzzle_user_user', 'puzzle_user', ['user_id'])
-    op.create_index('idx_puzzle_user_position', 'puzzle_user', ['position'])
-    op.create_index('idx_puzzle_position', 'puzzle', ['position'])
     op.create_index('idx_puzzle_rating', 'puzzle', ['rating'])
     op.create_index('idx_game_status', 'game', ['status'])
     op.create_index('idx_game_result', 'game', ['result'])
@@ -200,8 +197,6 @@ def downgrade():
     op.drop_index('idx_game_result', 'game')
     op.drop_index('idx_game_status', 'game')
     op.drop_index('idx_puzzle_rating', 'puzzle')
-    op.drop_index('idx_puzzle_position', 'puzzle')
-    op.drop_index('idx_puzzle_user_position', 'puzzle_user')
     op.drop_index('idx_puzzle_user_user', 'puzzle_user')
     op.drop_index('idx_puzzle_user_puzzle', 'puzzle_user')
     op.drop_index('idx_puzzle_solution', 'solution')
