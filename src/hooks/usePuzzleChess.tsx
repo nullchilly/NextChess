@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Chess } from "chess.js";
 import { Puzzle } from "@/types";
-import { router } from "next/client";
+import { useRouter } from "next/navigation";
 import { randomInt } from "crypto";
 
 const NEXT_PUBLIC_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "/api";
@@ -15,6 +15,7 @@ const usePuzzleChess = (puzzleData: Puzzle) => {
   const [message, setMessage] = useState<string>("");
   const [id, setId] = useState<string>("");
   const [messHint, setMessHint] = useState<string>("");
+  const router = useRouter();
 
   useEffect(() => {
     if (puzzleData && puzzleData.fen) {
