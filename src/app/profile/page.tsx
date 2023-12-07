@@ -39,22 +39,22 @@ const fakeProfile: UserProfile = {
         {
             gameType: GameType.FAST,
             rate: 800,
-            history: [500, 600, 700, 650, 550, 800, 900]
+            history: [{x:"", y: 500}, {x:"", y: 600}, {x:"", y: 700}, {x: "", y: 650}, {x: "", y: 550}, {x: "", y: 800}, {x: "", y: 900}]
         },
         {
             gameType: GameType.SLOW,
             rate: 800,
-            history: [500, 450, 400, 600]
+            history: [{x:"", y: 500}, {x:"", y: 450}, {x:"", y: 400}, {x: "", y: 600}]
         },
         {
             gameType: GameType.PUZZLE,
             rate: 1000,
-            history: [500, 600, 700]
+            history: [{x:"", y: 500}, {x:"", y: 600}, {x:"", y: 700}]
         },
         {
             gameType: GameType.STARS,
             rate: 0,
-            history: [550, 800, 900]
+            history: [{x:"", y: 550}, {x:"", y: 800}, {x:"", y: 900}]
         }
 
     ]
