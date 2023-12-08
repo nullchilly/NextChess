@@ -16,8 +16,7 @@ export function useLocalStorage<T>(args: Args<T>): [T, (arg: T) => void, () => v
       if (persistedState) {
         setValue(JSON.parse(persistedState));
       } else {
-        // setValue(defaultValue);
-        // setValue()
+        setValue(defaultValue);
       }
     }
   }, []);

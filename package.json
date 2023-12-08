@@ -41,6 +41,7 @@
     "react": "latest",
     "react-chartjs-2": "^5.2.0",
     "react-chessboard": "^4.3.1",
+    "react-countdown": "^2.3.5",
     "react-dom": "latest",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",

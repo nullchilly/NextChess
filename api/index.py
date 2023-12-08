@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 import json
 import socketio
 import chess.engine
+from .chess_timer import ChessTimer
 
 from typing import Annotated
 
@@ -58,6 +59,21 @@ async def websocket_endpoint(websocket: WebSocket):
 all_game_ids = set()
 game_states = dict()
 
+# Return each player time left
+@app.get("/api/get-timer-info/{gameID}")
+def get_timer_info(gameID: str):
+    if (gameID in all_game_ids):
+        w_time_left = game_states[gameID]['time']['wPlayer'].get_time_left()
+        b_time_left = game_states[gameID]['time']['bPlayer'].get_time_left()
+        return {
+            "status": 200,
+            "data": {
+                "w": w_time_left,
+                "b": b_time_left
+            }
+        }
+    else:
+        return {"status": 422, "error": "Game not exist"}
 
 @sio.on("play-chess")
 async def play_chess(sid, msg):
@@ -65,43 +81,85 @@ async def play_chess(sid, msg):
     gameID = data["id"]
     move = data["move"]
     if (gameID not in all_game_ids):
+        message = {"ok": False, "error": "Can't find game ID"}
+        await sio.emit("play-chess", json.dumps(message), room=sid)
+        return
+
+    # Switch timer
+    game_states[gameID]['time']['wPlayer'].pause_time()
+    game_states[gameID]['time']['bPlayer'].run_clock()
+
+    game_states[gameID]['board'].push(chess.Move.from_uci(move))
+    result = game_states[gameID]['engine'].play(
+        game_states[gameID]['board'], game_states[gameID]['limit'])
+    # TODO: Check whether game state is over
+    game_states[gameID]['board'].push(result.move)
+    move = result.move
+
+    # NOTE: When checkmated, there's no available move, hence no `from_square`, please hanlde it.
+    from_square = chess.square_name(move.from_square)
+    to_square = chess.square_name(move.to_square)
+    message = {"ok": True, "move": {
+        "from": from_square, "to": to_square, "promotion": "q"}}
+
+    # Switch again
+    game_states[gameID]['time']['wPlayer'].run_clock()
+    game_states[gameID]['time']['bPlayer'].pause_time()
+    await sio.emit("play-chess", json.dumps(message), room=sid)
+
+# Clean up after game is ended, TODO: Check auth-user?
+
+
+@sio.on("end-game")
+async def end_game(sid, msg):
+    data = json.loads(msg)
+    gameID = data["id"]
+    print("Inp end: ", gameID)
+    all_game_ids.discard(gameID)  # safe removal
+    if (gameID in game_states):
+        game_states.pop(gameID)
+
+    message = "Successfully cleaned up"
+    await sio.emit("end-game", message, room=sid)
+
+
+@sio.on("start-game")
+async def start_game(sid, msg):
+    try:
+        data = json.loads(msg)
+        gameID = data["id"]
+        all_game_ids.discard(gameID)  # safe removal
         all_game_ids.add(gameID)
         engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
-        engine.configure({"Skill Level": 1})
-        limit = chess.engine.Limit(time=0.3);
+        engine.configure({"Skill Level": 1})  # Parameterize this
+        limit = chess.engine.Limit(time=1.2)
         board = chess.Board()
+
+        wTimer = ChessTimer(time_left=120)  # 120s
+        bTimer = ChessTimer(time_left=120)  # 120s
 
         current_state = dict()
         current_state['engine'] = engine
         current_state['board'] = board
         current_state['limit'] = limit
 
+        timer_dict = dict()
+        timer_dict['wPlayer'] = wTimer
+        timer_dict['bPlayer'] = bTimer
+
+        current_state['time'] = timer_dict
+        current_state['time']['wPlayer'].run_clock()
+
         game_states[gameID] = current_state
 
-    game_states[gameID]['board'].push(chess.Move.from_uci(move))
-    result = game_states[gameID]['engine'].play(
-        game_states[gameID]['board'], game_states[gameID]['limit'])
-    game_states[gameID]['board'].push(result.move)
-    move = result.move
-    from_square = chess.square_name(move.from_square)
-    to_square = chess.square_name(move.to_square)
-    message = {"time": "current_time", "message": {
-        "from": from_square, "to": to_square, "promotion": "q"}}
+        successMessage = {"ok": True}
+        await sio.emit("start-game", json.dumps(successMessage), room=sid)
 
-    await sio.emit("play-chess", json.dumps(message), room=sid)
+    except Exception as e:
+        failMessage = {"ok": False,
+                       "error": "Error when initializing new game"}
+        await sio.emit("start-game", json.dumps(failMessage), room=sid)
 
-# Clean up after game is ended, TODO: Check auth-user?
-@sio.on("end-game")
-async def end_game(sid, msg):
-    data = json.loads(msg)
-    gameID = data["id"]
-    print("Inp end: ", gameID)
-    all_game_ids.discard(gameID) # safe removal
-    if (gameID in game_states):
-        game_states.pop(gameID)
-
-    message = "Successfully cleaned up";
-    await sio.emit("end-game", message, room=sid)
 
 @sio.on("undo")
 async def undo(sid, msg):
@@ -109,11 +167,12 @@ async def undo(sid, msg):
     gameID = data["id"]
     if (gameID in game_states):
         # Pop twice, engine move + user move, refine later!
-        try: 
+        try:
             game_states[gameID]['board'].pop()
             game_states[gameID]['board'].pop()
         except IndexError:
             print("No move yet!")
+
 
 @sio.on("connect")
 async def connect(sid, env):
