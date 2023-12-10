@@ -22,8 +22,8 @@ const ChessGame = ({ id, type }: ChessGameType) => {
     moves,
     playing,
     customSquares,
-    gameFen,
-    setGameFen,
+    // gameFen,
+    // setGameFen,
     onPieceDrop,
     undoMove,
     startGame,
@@ -65,7 +65,7 @@ const ChessGame = ({ id, type }: ChessGameType) => {
             id={id}
             onPieceDrop={onPieceDrop}
             // boardOrientation="black" TODO: make the bot play 1st, or just ignore, bot ALWAYS 'black'.
-            position={gameFen}
+            position={game.fen()}
             customBoardStyle={{
               borderRadius: "8px",
               boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
@@ -81,7 +81,7 @@ const ChessGame = ({ id, type }: ChessGameType) => {
         <div>
           {playing ? (
             <MoveList
-              moves={moves}
+              moves={moves.reverse()}
               bot={bot ? bot : { id: "0", name: "shark" }}
             />
           ) : (
