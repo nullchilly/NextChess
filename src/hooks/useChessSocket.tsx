@@ -3,6 +3,7 @@ import React from "react";
 import { Chess, Move, Square } from "chess.js";
 import { io, Socket } from "socket.io-client";
 import { CustomSquares, ShortMove } from "@/types";
+import { useLocalStorage } from "./useLocalStorage";
 
 export type ChessType = "random" | "computer" | "minimax";
 
@@ -65,6 +66,22 @@ const useChessSocket = ({ type, id }: Props) => {
     }
   }, [disconnectSocket, setConnectionStatus, socket]);
 
+  React.useEffect(() => {
+    // Auto open socket connection on page load
+    connectSocket();
+    const savedMoves = localStorage.getItem(`@stockchess/useLocalStorage/ComputerChessBoard-moves`)
+    if (savedMoves) {
+      const parsedSavedMoves = JSON.parse(savedMoves) as Move[];
+      const newGame = new Chess();
+      try {
+        parsedSavedMoves.forEach((move) => newGame.move(move));
+      } catch (error) {
+        console.log("[!!!] Error in initializing saved game: ", error);
+      }
+      setGame(newGame);
+    }
+  }, []);
+
   // Send latest move over socket
   const sendMove = (move: string) => {
     console.log("MOVE: ", move);
@@ -93,9 +110,17 @@ const useChessSocket = ({ type, id }: Props) => {
 
   // End of socket
   const [game, setGame] = useState(new Chess());
-  const [playing, setPlaying] = useState(false);
-  const [moves, setMoves] = useState<Move[]>([]);
-  const [gameFen, setGameFen] = useState<string>(game.fen());
+  // const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useLocalStorage({
+    name: `${id}-is-playing`,
+    defaultValue: false,
+  });
+  const [moves, setMoves] = useLocalStorage<Move[]>({
+    name: `${id}-moves`,
+    defaultValue: [],
+  });
+  // const [moves, setMoves] = useState<Move[]>([]);
+  // const [gameFen, setGameFen] = useState<string>("start");
   const [currentTimeout, setCurrentTimeout] = useState<NodeJS.Timeout>();
   const [customSquares, updateCustomSquares] = useReducer(squareReducer, {
     check: {},
@@ -107,9 +132,9 @@ const useChessSocket = ({ type, id }: Props) => {
     const result = gameCopy.move(move);
 
     if (result) {
-      setMoves((prevMoves) => [result, ...prevMoves]);
+      setMoves(gameCopy.history({verbose: true}));
       setGame(gameCopy);
-      setGameFen(gameCopy.fen());
+      // setGameFen(gameCopy.fen());
 
       let kingSquare = undefined;
       if (game.inCheck()) {
@@ -156,7 +181,7 @@ const useChessSocket = ({ type, id }: Props) => {
     const gameCopy = game;
     gameCopy.reset();
     setGame(gameCopy);
-    setGameFen(gameCopy.fen());
+    // setGameFen(gameCopy.fen());
     cleanOldGame();
     setMoves([]);
 
@@ -166,7 +191,8 @@ const useChessSocket = ({ type, id }: Props) => {
   };
 
   const startGame = () => {
-    connectSocket();
+    // NOTE: I think it's better to init socket on page load
+    // connectSocket();
     resetGame();
     setPlaying(true);
   };
@@ -183,8 +209,7 @@ const useChessSocket = ({ type, id }: Props) => {
     movesCopy.shift();
 
     setGame(gameCopy);
-    setGameFen(gameCopy.fen());
-    setMoves(movesCopy);
+    // setGameFen(gameCopy.fen());
     updateCustomSquares({ check: undefined }); // Reset style
   };
 
@@ -195,8 +220,9 @@ const useChessSocket = ({ type, id }: Props) => {
 
     customSquares,
 
-    gameFen,
-    setGameFen,
+    // NOTE: Since FEN can be easily extract from `games`, we dont need to maintain it
+    // gameFen,
+    // setGameFen,
 
     onPieceDrop,
     undoMove,
