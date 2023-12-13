@@ -12,8 +12,7 @@
     "my-start": "concurrently \"next start\" \"npm run fastapi-start\" ",
     "next-start": "next start",
     "lint": "next lint",
-    "create-puzzle": "python3 -m api.main",
-    "update-db": "alembic upgrade head",
+    "update-db": "alembic upgrade head && python3 -m api.main",
     "server": "python3 -m uvicorn api.index:app --reload"
   },
   "dependencies": {
