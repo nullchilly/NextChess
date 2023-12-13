@@ -11,6 +11,8 @@ import PrepareCard from "@/components/Card/PrepareCard";
 import { useEffect, useState } from "react";
 import { BotProps } from "@/types";
 
+import PlayerTimer from "@/components/PlayerTimer/PlayerTimer";
+
 type ChessGameType = {
   id: string;
   type: ChessType;
@@ -19,11 +21,16 @@ type ChessGameType = {
 const ChessGame = ({ id, type }: ChessGameType) => {
   const {
     game,
-    moves,
+    // moves,
     playing,
     customSquares,
-    // gameFen,
-    // setGameFen,
+
+    wPlayerTimeLeft,
+    isWPlayerActive,
+
+    bPlayerTimeLeft,
+    isBPlayerActive,
+
     onPieceDrop,
     undoMove,
     startGame,
@@ -53,6 +60,11 @@ const ChessGame = ({ id, type }: ChessGameType) => {
       <div className="flex justify-center w-2/3">
         <div className="w-[450px]">
           <div className="">
+            <PlayerTimer
+              timeLeft={bPlayerTimeLeft}
+              going={isBPlayerActive && playing}
+              turnIndicator={false}
+            />
             <PlayerCard
               name={bot ? bot.name : "none"}
               link={bot ? "/home" : "/profile/chien"}
@@ -74,6 +86,11 @@ const ChessGame = ({ id, type }: ChessGameType) => {
           />
           <div className="">
             <PlayerCard name={"Chien"} link={"/profile/chien"} />
+            <PlayerTimer
+              timeLeft={wPlayerTimeLeft}
+              going={isWPlayerActive && playing}
+              turnIndicator={true}
+            />
           </div>
         </div>
       </div>
@@ -81,7 +98,7 @@ const ChessGame = ({ id, type }: ChessGameType) => {
         <div>
           {playing ? (
             <MoveList
-              moves={moves.reverse()}
+              moves={game.history({ verbose: true }).reverse()}
               bot={bot ? bot : { id: "0", name: "shark" }}
             />
           ) : (

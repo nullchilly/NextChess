@@ -4,6 +4,7 @@ import { Chess, Move, Square } from "chess.js";
 import { io, Socket } from "socket.io-client";
 import { CustomSquares, ShortMove } from "@/types";
 import { useLocalStorage } from "./useLocalStorage";
+import { httpGetPlayerTimeLeft } from "@/modules/backend-client/httpGetPlayerTimeLeft";
 
 export type ChessType = "random" | "computer" | "minimax";
 
@@ -33,6 +34,12 @@ const useChessSocket = ({ type, id }: Props) => {
   const [connectionStatus, setConnectionStatus] =
     React.useState<ConnectionStatus>(ConnectionStatus.Disconnected);
 
+  const [wPlayerTimeLeft, setWPlayerTimeLeft] = React.useState<number>(120000); // 120s
+  const [isWPlayerActive, setWPlayerActive] = React.useState<boolean>(false);
+
+  const [bPlayerTimeLeft, setBPlayerTimeLeft] = React.useState<number>(120000); // 120s
+  const [isBPlayerActive, setBPlayerActive] = React.useState<boolean>(false);
+
   const disconnectSocket = React.useCallback(() => {
     socket?.close();
     setSocket(null);
@@ -52,12 +59,31 @@ const useChessSocket = ({ type, id }: Props) => {
 
       socket.on("play-chess", (msg) => {
         console.log("Response", msg);
+        try {
+          const message = JSON.parse(msg);
+          if (message["ok"]) {
+            makeMove({
+              from: message["move"]["from"],
+              to: message["move"]["to"],
+              promotion: "q",
+            });
+          } else {
+            console.error("[!!!] Play chess socket error: ", message["error"]);
+          }
+        } catch (error) {
+          console.log("[!!!] Play chess socket error: ", error);
+        }
+      });
+
+      socket.on("start-game", (msg) => {
+        console.log("Start game info: ", msg);
         const message = JSON.parse(msg);
-        makeMove({
-          from: message["message"]["from"],
-          to: message["message"]["to"],
-          promotion: "q",
-        });
+        console.log("Given mess: ", message, message["ok"]);
+        if (message["ok"]) {
+          // White time running
+          setWPlayerActive(true);
+          setBPlayerActive(false);
+        }
       });
 
       socket.on("end-game", (msg) => {
@@ -69,7 +95,9 @@ const useChessSocket = ({ type, id }: Props) => {
   React.useEffect(() => {
     // Auto open socket connection on page load
     connectSocket();
-    const savedMoves = localStorage.getItem(`@stockchess/useLocalStorage/ComputerChessBoard-moves`)
+    const savedMoves = localStorage.getItem(
+      `@stockchess/useLocalStorage/${id}-moves`
+    );
     if (savedMoves) {
       const parsedSavedMoves = JSON.parse(savedMoves) as Move[];
       const newGame = new Chess();
@@ -80,6 +108,23 @@ const useChessSocket = ({ type, id }: Props) => {
       }
       setGame(newGame);
     }
+
+    async function getTime() {
+      const response = await httpGetPlayerTimeLeft({ gameID: id });
+      if (response.ok && response.data) {
+        setWPlayerTimeLeft(response.data.w * 1000);
+        setBPlayerTimeLeft(response.data.b * 1000);
+        if (game.turn() === "w") {
+          setWPlayerActive(true);
+          setBPlayerActive(false);
+        } else {
+          setWPlayerActive(false);
+          setBPlayerActive(true);
+        }
+      }
+    }
+    getTime();
+
   }, []);
 
   // Send latest move over socket
@@ -95,6 +140,12 @@ const useChessSocket = ({ type, id }: Props) => {
     socket?.emit("end-game", JSON.stringify(endGameData));
   };
 
+  const onInitGame = () => {
+    console.log("Running init...");
+    const initNewGame = { id: id }; // TODO: Add preferences (difficulty, timer, ...)
+    socket?.emit("start-game", JSON.stringify(initNewGame));
+  };
+
   const undoMoveSocket = () => {
     const undoMoveData = { id: id };
     socket?.emit("undo", JSON.stringify(undoMoveData));
@@ -105,12 +156,12 @@ const useChessSocket = ({ type, id }: Props) => {
       autoConnect: false,
       reconnection: true,
     });
+    // onInitGame(socket);
     setSocket(socket);
   };
 
   // End of socket
   const [game, setGame] = useState(new Chess());
-  // const [playing, setPlaying] = useState(false);
   const [playing, setPlaying] = useLocalStorage({
     name: `${id}-is-playing`,
     defaultValue: false,
@@ -132,9 +183,8 @@ const useChessSocket = ({ type, id }: Props) => {
     const result = gameCopy.move(move);
 
     if (result) {
-      setMoves(gameCopy.history({verbose: true}));
+      setMoves(gameCopy.history({ verbose: true }));
       setGame(gameCopy);
-      // setGameFen(gameCopy.fen());
 
       let kingSquare = undefined;
       if (game.inCheck()) {
@@ -158,6 +208,14 @@ const useChessSocket = ({ type, id }: Props) => {
       updateCustomSquares({
         check: kingSquare,
       });
+
+      if (game.turn() === "b") {
+        setBPlayerActive(true);
+        setWPlayerActive(false);
+      } else {
+        setBPlayerActive(false);
+        setWPlayerActive(true);
+      }
     }
 
     return result;
@@ -181,12 +239,17 @@ const useChessSocket = ({ type, id }: Props) => {
     const gameCopy = game;
     gameCopy.reset();
     setGame(gameCopy);
-    // setGameFen(gameCopy.fen());
     cleanOldGame();
     setMoves([]);
 
     if (currentTimeout) clearTimeout(currentTimeout);
     setPlaying(false);
+
+    setWPlayerTimeLeft(120000);
+    setBPlayerTimeLeft(120000);
+    setBPlayerActive(false);
+    setWPlayerActive(false);
+
     updateCustomSquares({ check: undefined });
   };
 
@@ -194,6 +257,7 @@ const useChessSocket = ({ type, id }: Props) => {
     // NOTE: I think it's better to init socket on page load
     // connectSocket();
     resetGame();
+    onInitGame();
     setPlaying(true);
   };
 
@@ -204,12 +268,8 @@ const useChessSocket = ({ type, id }: Props) => {
     gameCopy.undo();
     gameCopy.undo();
 
-    const movesCopy = moves;
-    movesCopy.shift();
-    movesCopy.shift();
-
     setGame(gameCopy);
-    // setGameFen(gameCopy.fen());
+    setMoves(gameCopy.history({ verbose: true }));
     updateCustomSquares({ check: undefined }); // Reset style
   };
 
@@ -220,7 +280,13 @@ const useChessSocket = ({ type, id }: Props) => {
 
     customSquares,
 
-    // NOTE: Since FEN can be easily extract from `games`, we dont need to maintain it
+    wPlayerTimeLeft,
+    isWPlayerActive,
+
+    bPlayerTimeLeft,
+    isBPlayerActive,
+
+    // NOTE: Since FEN can be easily extract from `games`, we dont have to maintain it
     // gameFen,
     // setGameFen,
 
@@ -229,6 +295,8 @@ const useChessSocket = ({ type, id }: Props) => {
 
     startGame,
     resetGame,
+
+    socket,
   };
 };
 
