@@ -1,6 +1,6 @@
 from datetime import datetime, date
 from enum import Enum
-from typing import Optional
+from typing import Optional, List
 
 from api.app.dto.base import CamelBaseModel
 
@@ -35,12 +35,12 @@ class ChangePasswordRequest(CamelBaseModel):
     new_password: str
 
 class GetProfileResponse(CamelBaseModel):
-    user_id: int
-    user_name: str
     name: str
     date_of_birth: date
     gender: UserGender
     email: str
+    current_rating: int
+    ratings: List[int]
 
 class UpdateProfileRequest(CamelBaseModel):
     name: Optional[str]
