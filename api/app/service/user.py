@@ -65,7 +65,7 @@ class UserService:
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
         user_profile = db.query(Profile).filter(Profile.user_id == user.id).first()
-        q = db.query(UserRating).filter(UserRating.user_id == user.id)
+        q = db.query(UserRating.rating).filter(UserRating.user_id == user.id)
         ratings = []
         for res in q.all():
             ratings.append(res.rating)
@@ -78,7 +78,7 @@ class UserService:
         user_profile = db.query(Profile).filter(Profile.user_id == id).first()
         if user_profile is None or user_profile.deleted_at is not None:
             raise HTTPException(status_code=404, detail="User not found")
-        q = db.query(UserRating).filter(UserRating.user_id == id)
+        q = db.query(UserRating.rating).filter(UserRating.user_id == id)
         ratings = []
         for res in q.all():
             ratings.append(res.rating)
