@@ -32,6 +32,7 @@ def downgrade():
     op.add_column('user', sa.Column('email', sa.VARCHAR(255), nullable=False))
     op.add_column('user', sa.Column('name', sa.VARCHAR(255), nullable=False))
     op.add_column('user', sa.Column('gender', sa.VARCHAR(10), default=False))
+    op.add_column('profile', sa.Column('dob', sa.DateTime(), default=False))
     op.drop_column('profile', 'date_of_birth')
     op.drop_column('profile', 'email')
     pass
