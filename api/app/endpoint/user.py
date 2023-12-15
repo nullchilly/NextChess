@@ -3,13 +3,13 @@ from typing import List
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
-from api.app.dto.core.auth import SignUpResponse, SignUpRequest, LoginRequest, LoginResponse, ChangePasswordRequest, \
+from api.app.dto.core.user import SignUpResponse, SignUpRequest, LoginRequest, LoginResponse, ChangePasswordRequest, \
     GetProfileResponse, UpdateProfileRequest
 from api.app.helper.base_response import DataResponse, ResponseSchemaBase
 from api.app.helper.db import db_session
 from api.app.helper.middleware import get_current_user
 from api.app.model import User
-from api.app.service.auth import UserService
+from api.app.service.user import UserService
 
 auth_router = APIRouter()
 

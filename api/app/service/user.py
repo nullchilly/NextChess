@@ -4,7 +4,7 @@ from datetime import datetime
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from api.app.dto.core.auth import SignUpRequest, SignUpResponse, UserRole, LoginRequest, ChangePasswordRequest, \
+from api.app.dto.core.user import SignUpRequest, SignUpResponse, UserRole, LoginRequest, ChangePasswordRequest, \
     LoginResponse, GetProfileResponse, UpdateProfileRequest
 from api.app.helper import auth
 from api.app.model import User
