@@ -95,3 +95,5 @@ export type PuzzleInfo = {
   attempts: number;
   themes: string[];
 };
+
+export type WINNER = "black" | "white" | "draw" | "unknown";

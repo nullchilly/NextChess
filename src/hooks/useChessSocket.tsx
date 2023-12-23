@@ -5,6 +5,7 @@ import { io, Socket } from "socket.io-client";
 import { CustomSquares, ShortMove } from "@/types";
 import { useLocalStorage } from "./useLocalStorage";
 import { httpGetPlayerTimeLeft } from "@/modules/backend-client/httpGetPlayerTimeLeft";
+import { WINNER } from "@/helpers/types";
 
 export type ChessType = "random" | "computer" | "minimax";
 
@@ -39,6 +40,8 @@ const useChessSocket = ({ type, id }: Props) => {
 
   const [bPlayerTimeLeft, setBPlayerTimeLeft] = React.useState<number>(120000); // 120s
   const [isBPlayerActive, setBPlayerActive] = React.useState<boolean>(false);
+
+  const [winner, setWinner] = React.useState<WINNER>("unknown");
 
   const disconnectSocket = React.useCallback(() => {
     socket?.close();
@@ -89,6 +92,10 @@ const useChessSocket = ({ type, id }: Props) => {
       socket.on("end-game", (msg) => {
         console.log("clean up state: ", msg);
       });
+
+      socket.on("user-forfeit", (msg) => {
+        console.log("user-forfeit socket message: ", msg);
+      });
     }
   }, [disconnectSocket, setConnectionStatus, socket]);
 
@@ -124,7 +131,6 @@ const useChessSocket = ({ type, id }: Props) => {
       }
     }
     getTime();
-
   }, []);
 
   // Send latest move over socket
@@ -261,6 +267,15 @@ const useChessSocket = ({ type, id }: Props) => {
     setPlaying(true);
   };
 
+  // White (user, as default) forfeit => black win
+  const forfeitGame = () => {
+    const gameForfeited = { id: id };
+    socket?.emit("user-forfeit", JSON.stringify(gameForfeited));
+    setWinner("black");
+    setWPlayerActive(false);
+    setBPlayerActive(false);
+  };
+
   const undoMove = () => {
     undoMoveSocket();
 
@@ -277,6 +292,7 @@ const useChessSocket = ({ type, id }: Props) => {
     game,
     playing,
     moves,
+    winner,
 
     customSquares,
 
@@ -295,6 +311,7 @@ const useChessSocket = ({ type, id }: Props) => {
 
     startGame,
     resetGame,
+    forfeitGame,
 
     socket,
   };

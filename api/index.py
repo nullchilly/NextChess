@@ -85,6 +85,11 @@ async def play_chess(sid, msg):
         await sio.emit("play-chess", json.dumps(message), room=sid)
         return
 
+    if (game_states[gameID]['status'] is True):
+        message = {"ok": False, "error": "Game ended"}
+        await sio.emit("play-chess", json.dumps(message), room=sid)
+        return
+
     # Switch timer
     game_states[gameID]['time']['wPlayer'].pause_time()
     game_states[gameID]['time']['bPlayer'].run_clock()
@@ -108,8 +113,6 @@ async def play_chess(sid, msg):
     await sio.emit("play-chess", json.dumps(message), room=sid)
 
 # Clean up after game is ended, TODO: Check auth-user?
-
-
 @sio.on("end-game")
 async def end_game(sid, msg):
     data = json.loads(msg)
@@ -122,6 +125,16 @@ async def end_game(sid, msg):
     message = "Successfully cleaned up"
     await sio.emit("end-game", message, room=sid)
 
+@sio.on("user-forfeit")
+async def user_forfeit(sid, msg):
+    data = json.loads(msg)
+    gameID = data["id"]
+    if (gameID in game_states):
+        game_states[gameID]['status'] = True
+        game_states[gameID]['result'] = 2 # Black win
+
+    message = "White forfeited" # TODO: Return match info for modal rendering?
+    await sio.emit("user-forfeit", message, room=sid)
 
 @sio.on("start-game")
 async def start_game(sid, msg):
@@ -142,6 +155,8 @@ async def start_game(sid, msg):
         current_state['engine'] = engine
         current_state['board'] = board
         current_state['limit'] = limit
+        current_state['status'] = False # Unfinished game
+        current_state['result'] = 3 # Unknown result
 
         timer_dict = dict()
         timer_dict['wPlayer'] = wTimer

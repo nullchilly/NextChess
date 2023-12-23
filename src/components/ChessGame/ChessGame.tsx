@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { BotProps } from "@/types";
 
 import PlayerTimer from "@/components/PlayerTimer/PlayerTimer";
+import ModalEndGame from "../Modal/ModalEndGame";
 
 type ChessGameType = {
   id: string;
@@ -24,6 +25,7 @@ const ChessGame = ({ id, type }: ChessGameType) => {
     // moves,
     playing,
     customSquares,
+    winner,
 
     wPlayerTimeLeft,
     isWPlayerActive,
@@ -35,10 +37,12 @@ const ChessGame = ({ id, type }: ChessGameType) => {
     undoMove,
     startGame,
     resetGame,
+    forfeitGame,
   } = useChessSocket({ type, id });
 
   const [botList, setBotList] = useState<BotProps[]>([]);
   const [bot, setBot] = useState<BotProps>({ id: "0", name: "shark" });
+  const [isModalEndGameOpen, setOpenModalEndGame] = useState<boolean>(true);
 
   const onSelectBot = (bot: BotProps) => {
     setBot(bot);
@@ -111,10 +115,18 @@ const ChessGame = ({ id, type }: ChessGameType) => {
           <Controls
             startGame={startGame}
             resetGame={resetGame}
+            forfeitGame={forfeitGame}
             undoMove={undoMove}
           />
         </div>
       </div>
+      {winner === "unknown" ? null : (
+        <ModalEndGame
+          winner={winner}
+          isOpen={isModalEndGameOpen}
+          setOpen={setOpenModalEndGame}
+        />
+      )}
     </div>
   );
 };

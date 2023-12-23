@@ -18,7 +18,7 @@ const Layout = ({ children }: LayoutType) => {
     <html lang="en">
       <body>
         <ThemeProvider attribute="class" defaultTheme="light">
-          <div style={{display: 'flex', height: '100vh'}}>
+          <div style={{display: 'flex', minHeight: '100vh'}}>
             <Navbar />
             <div style={{flexGrow: 9, backgroundColor: '#57903C'}}>
               {children}
