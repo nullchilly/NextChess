@@ -94,7 +94,32 @@ async def play_chess(sid, msg):
     game_states[gameID]['time']['wPlayer'].pause_time()
     game_states[gameID]['time']['bPlayer'].run_clock()
 
+    # Insert user's move
     game_states[gameID]['board'].push(chess.Move.from_uci(move))
+
+    # Winner check
+    winner = 3 # Unknown
+    reason = ""
+
+    outcome = game_states[gameID]['board'].outcome()
+    # Check if the last move makes user win
+    if (outcome):
+        reason = outcome.termination.name
+        winner_color = outcome.winner
+        winner = 0 if winner_color is None else 1 if winner_color is True else 2
+        message = {
+            "ok": True,
+            "result": {
+                "winner": winner,
+                "reason": reason
+            }
+        }
+        game_states[gameID]['status'] = True
+        game_states[gameID]['result'] = winner
+        # TODO: Insert moves into database
+        await sio.emit("play-chess", json.dumps(message), room=sid)
+        return
+
     result = game_states[gameID]['engine'].play(
         game_states[gameID]['board'], game_states[gameID]['limit'])
     # TODO: Check whether game state is over
@@ -104,8 +129,27 @@ async def play_chess(sid, msg):
     # NOTE: When checkmated, there's no available move, hence no `from_square`, please hanlde it.
     from_square = chess.square_name(move.from_square)
     to_square = chess.square_name(move.to_square)
-    message = {"ok": True, "move": {
-        "from": from_square, "to": to_square, "promotion": "q"}}
+    outcome = game_states[gameID]['board'].outcome()
+    if (outcome):
+        reason = outcome.termination.name
+        winner_color = outcome.winner
+        winner = 0 if winner_color is None else 1 if winner_color is True else 2
+        game_states[gameID]['status'] = True
+        game_states[gameID]['result'] = winner
+        # TODO: Insert moves into database
+
+    message = {
+        "ok": True,
+        "move": {
+            "from": from_square,
+            "to": to_square,
+            "promotion": "q"
+        },
+        "result": {
+            "winner": winner,
+            "reason": reason
+        }
+    }
 
     # Switch again
     game_states[gameID]['time']['wPlayer'].run_clock()

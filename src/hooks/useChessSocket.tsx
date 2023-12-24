@@ -60,21 +60,34 @@ const useChessSocket = ({ type, id }: Props) => {
         disconnectSocket();
       });
 
-      socket.on("play-chess", (msg) => {
+      socket.on("play-chess", async (msg) => {
         console.log("Response", msg);
         try {
           const message = JSON.parse(msg);
           if (message["ok"]) {
-            makeMove({
-              from: message["move"]["from"],
-              to: message["move"]["to"],
-              promotion: "q",
-            });
+            if (message["move"]) {
+              makeMove({
+                from: message["move"]["from"],
+                to: message["move"]["to"],
+                promotion: "q",
+              });
+            }
+            if (message["result"]["winner"] !== 3) {
+              const winner_id = message["result"]["winner"];
+              const reason = message["result"]["reason"];
+              console.log("Reason: ", reason);
+              await new Promise(r => setTimeout(r, 1200));
+              setWinner(
+                winner_id === 0 ? "draw" : winner_id === 1 ? "white" : "black"
+              );
+              setWPlayerActive(false);
+              setBPlayerActive(false);
+            }
           } else {
             console.error("[!!!] Play chess socket error: ", message["error"]);
           }
         } catch (error) {
-          console.log("[!!!] Play chess socket error: ", error);
+          console.error("[!!!] Play chess socket error: ", error);
         }
       });
 
