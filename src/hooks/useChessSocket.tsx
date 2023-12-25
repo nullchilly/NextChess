@@ -43,11 +43,39 @@ const useChessSocket = ({ type, id }: Props) => {
 
   const [winner, setWinner] = React.useState<WINNER>("unknown");
 
+  // Handle prev-next move button in game review
+  // const [prevGame, setPrevGame] = React.useState(new Chess());
+  const [nextGame, setNextGame] = React.useState(new Chess());
+  // const [finalGameMoves, setFinalGameMoves] = React.useState<Move[]>([]);
+  const [moveIndex, setMoveIndex] = React.useState(0);
+  const [allGameStates, setAllGameStates] = React.useState<Chess[]>([]);
+
   const disconnectSocket = React.useCallback(() => {
     socket?.close();
     setSocket(null);
     setConnectionStatus(ConnectionStatus.Disconnected);
   }, [socket, setConnectionStatus]);
+
+  function handleGameEnd(winner: WINNER) {
+    setWinner(winner);
+
+    // Stop clock
+    setWPlayerActive(false);
+    setBPlayerActive(false);
+
+    // Save all moves for review
+    const allMoves = game.history({verbose: true});
+    let allStates: Chess[] = [new Chess()];
+    for (let i = 0; i < allMoves.length; i++) {
+      let tempState: Chess = new Chess();
+      for (let j = 0; j <= i; j++) {
+        tempState.move(allMoves[j]);
+      }
+      allStates.push(tempState);
+    }
+    setAllGameStates(allStates);
+    setMoveIndex(allStates.length - 1);
+  }
 
   React.useEffect(() => {
     if (socket) {
@@ -77,11 +105,7 @@ const useChessSocket = ({ type, id }: Props) => {
               const reason = message["result"]["reason"];
               console.log("Reason: ", reason);
               await new Promise(r => setTimeout(r, 1200));
-              setWinner(
-                winner_id === 0 ? "draw" : winner_id === 1 ? "white" : "black"
-              );
-              setWPlayerActive(false);
-              setBPlayerActive(false);
+              handleGameEnd(winner_id === 0 ? "draw" : winner_id === 1 ? "white" : "black");
             }
           } else {
             console.error("[!!!] Play chess socket error: ", message["error"]);
@@ -284,9 +308,7 @@ const useChessSocket = ({ type, id }: Props) => {
   const forfeitGame = () => {
     const gameForfeited = { id: id };
     socket?.emit("user-forfeit", JSON.stringify(gameForfeited));
-    setWinner("black");
-    setWPlayerActive(false);
-    setBPlayerActive(false);
+    handleGameEnd("black");
   };
 
   const undoMove = () => {
@@ -300,6 +322,22 @@ const useChessSocket = ({ type, id }: Props) => {
     setMoves(gameCopy.history({ verbose: true }));
     updateCustomSquares({ check: undefined }); // Reset style
   };
+
+  const prevMove = () => {
+    const newMoveIndex = Math.max(moveIndex - 1, 0);
+    const currentGame = allGameStates[newMoveIndex];
+    setMoveIndex(newMoveIndex);
+    setGame(currentGame);
+    updateCustomSquares({ check: undefined }); // Reset style
+  }
+
+  const nextMove = () => {
+    const newMoveIndex = Math.min(moveIndex + 1, allGameStates.length - 1);
+    const currentGame = allGameStates[newMoveIndex];
+    setMoveIndex(newMoveIndex);
+    setGame(currentGame);
+    updateCustomSquares({ check: undefined }); // Reset style
+  }
 
   return {
     game,
@@ -325,6 +363,9 @@ const useChessSocket = ({ type, id }: Props) => {
     startGame,
     resetGame,
     forfeitGame,
+
+    prevMove,
+    nextMove,
 
     socket,
   };

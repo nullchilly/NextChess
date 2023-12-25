@@ -14,6 +14,8 @@ import { BotProps } from "@/types";
 import PlayerTimer from "@/components/PlayerTimer/PlayerTimer";
 import ModalEndGame from "../Modal/ModalEndGame";
 
+import { CaretLeftFilled, CaretRightFilled } from "@ant-design/icons";
+
 type ChessGameType = {
   id: string;
   type: ChessType;
@@ -38,6 +40,10 @@ const ChessGame = ({ id, type }: ChessGameType) => {
     startGame,
     resetGame,
     forfeitGame,
+
+    prevMove,
+    nextMove
+
   } = useChessSocket({ type, id });
 
   const [botList, setBotList] = useState<BotProps[]>([]);
@@ -101,10 +107,18 @@ const ChessGame = ({ id, type }: ChessGameType) => {
       <div className="flex justify-center w-1/3">
         <div>
           {playing ? (
-            <MoveList
-              moves={game.history({ verbose: true }).reverse()}
-              bot={bot ? bot : { id: "0", name: "shark" }}
-            />
+            <>
+              <MoveList
+                moves={game.history({ verbose: true }).reverse()}
+                bot={bot ? bot : { id: "0", name: "shark" }}
+              />
+              {winner !== "unknown" ? 
+                <div className="flex justify-center">
+                  <CaretLeftFilled style={{fontSize: "32px"}} onClick={prevMove} />
+                  <CaretRightFilled style={{fontSize: "32px"}} onClick={nextMove} />
+                </div>
+              : null}
+            </>
           ) : (
             <PrepareCard
               botList={botList}
