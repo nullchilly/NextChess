@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import BlackQueen from "@/components/icons/ChessPiece/BlackQueen";
 import { useRouter } from "next/navigation";
 
@@ -16,6 +16,12 @@ export default function Login() {
   const [check, setcheck] = useState(true);
   const router = useRouter();
 
+  useEffect(() => {
+    if (localStorage.getItem('accessToken')) {
+      router.push('/profile');
+    }
+  },[])
+  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     let err = false;
@@ -40,8 +46,13 @@ export default function Login() {
       });
       if (response.ok) {
         const data = await response.json();
+        const token = data.data.accessToken;
+        if (token) {
+          localStorage.setItem('accessToken', token);
+        }
         setcheck(true);
         router.push('/');
+        
       } else {
         console.error('Login failed:', response.statusText);
         setcheck(false);

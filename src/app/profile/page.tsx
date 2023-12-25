@@ -1,13 +1,13 @@
 // @ts-check
-
+'use client';
 import Link from "next/link";
-import Image from 'next/image';
 import {GameType, Rating, UserNetworkLink, UserNetworkType, UserProfile} from "@/helpers/types";
-import {getSvgSrc, getPieceSrc} from "@/helpers/images";
 import FastChessLogo from "@/components/icons/FastChessLogo";
 import SlowChessLogo from "@/components/icons/SlowChessLogo";
 import PuzzleLogo from "@/components/icons/PuzzleLogo";
 import Star from "@/components/icons/Star";
+import {UserContext, withUserContext} from "@/context/UserContext";
+import {useContext, useEffect} from "react";
 
 const ROUTES = [
     { href: '/profile', text: 'Profile' },
@@ -65,14 +65,13 @@ const ProfileNavbar = () => {
         <nav className="bg-[#477330] p-4 rounded-lg shadow-md">
             <div className="items-center justify-center mx-auto sp">
                 <div className="flex md:flex md:space-x-4 mx-auto">
+                    <div key={0} className="flex-grow text-center text-slate-100 font-mono p-4 bg-[#58943c] hover:bg-[#4f8536] transition-colors rounded-lg">
+                        <Link href="/profile" className=""> Profile</Link>
+                    </div>
 
-                            <div key={0} className="flex-grow text-center text-slate-100 font-mono p-4 bg-[#58943c] hover:bg-[#4f8536] transition-colors rounded-lg">
-                                <Link href="/profile" className=""> Profile</Link>
-                            </div>
-
-                            <div key={0} className="flex-grow text-center text-slate-100 font-mono p-4 hover:bg-[#4f8536] transition-colors rounded-lg">
-                                <Link href="/stat" className=""> Stat</Link>
-                            </div>
+                    <div key={0} className="flex-grow text-center text-slate-100 font-mono p-4 hover:bg-[#4f8536] transition-colors rounded-lg">
+                        <Link href="/stat" className=""> Stat</Link>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -187,13 +186,18 @@ const Analyst = () => {
 }
 
 const ProfilePage = () => {
+  const {dob, email, gender, name, rate, rating} = useContext(UserContext);
+  useEffect(() => {
+    console.log(dob)
+    console.log(name)
+  }, []);
     return (
         <div className="flex flex-col">
             <div className="rw-full sm:w-full md:w-full p-4">
                 {ProfileNavbar()}
             </div>
             <div className="rw-full sm:w-full md:w-full p-4">
-                {Profile( fakeProfile.avatar, fakeProfile.name, fakeProfile.userNetworkLinks)}
+                {Profile( fakeProfile.avatar, name ? name : "Not Found", fakeProfile.userNetworkLinks)}
             </div>
             <div className="rw-full sm:w-full md:w-full p-4">
                 {Rating(fakeProfile.ratings)}
@@ -202,4 +206,4 @@ const ProfilePage = () => {
     )
 };
 
-export default ProfilePage
+export default withUserContext(ProfilePage)
