@@ -8,7 +8,7 @@
     "next-dev": "next dev",
     "dev": "concurrently \"npm run fastapi-dev\" \"npm run next-dev\" ",
     "build": "next build",
-    "start": "concurrently \"npm run fastapi-start\" \"npm run next-start\" ",
+    "start": "/etc/jupyter/bin/expose 3000 && concurrently \"npm run fastapi-start\" \"npm run next-start\" ",
     "my-start": "concurrently \"next start\" \"npm run fastapi-start\" ",
     "next-start": "next start",
     "lint": "next lint",
