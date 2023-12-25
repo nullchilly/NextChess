@@ -3,8 +3,7 @@ import { Chess } from "chess.js";
 import { Puzzle } from "@/types";
 import { useRouter } from "next/navigation";
 import { randomInt } from "crypto";
-
-const NEXT_PUBLIC_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "/api";
+import { delay } from "@/helpers/chess"
 
 const usePuzzleChess = (puzzleData: Puzzle) => {
   const [solved, setSolved] = useState(false);
@@ -14,9 +13,14 @@ const usePuzzleChess = (puzzleData: Puzzle) => {
   const [error, setError] = useState<any>(null);
   const [message, setMessage] = useState<string>("");
   const [id, setId] = useState<string>("");
-  const [messHint, setMessHint] = useState<string>("");
   const router = useRouter();
-
+  
+  useEffect(() => {
+    if (solved && rated) {
+      // const result = fetch()
+    }
+  }, [solved]);
+  
   useEffect(() => {
     if (puzzleData && puzzleData.fen) {
       setData();
@@ -67,7 +71,6 @@ const usePuzzleChess = (puzzleData: Puzzle) => {
       to: target,
       promotion: "q", // promote to a queen
     });
-
     if (move === false) {
       return true;
     }
@@ -76,7 +79,6 @@ const usePuzzleChess = (puzzleData: Puzzle) => {
       setMessage("done");
       if (rated) {
         setSolved(false);
-        console.log("tach me m roi ngu vai ca lon");
         setRated(false);
       }
       return false;
@@ -98,8 +100,22 @@ const usePuzzleChess = (puzzleData: Puzzle) => {
     } else {
       setSolved(true);
       if (rated) {
-        console.log("duoc lam con trai");
         setMessage("done");
+        const raw = JSON.stringify({
+          "tacticsProblemId": id,
+          "seconds": 60,
+          "isPassed": true,
+          "isRated": true
+        });
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}` + "/api/puzzle/submit", {
+          method: 'POST',
+          headers: {
+            'accessToken': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJubWMifQ.IHyQnmsMdE0DBC9PoJcwaQrky0R7MygS863H99ljJwg',
+            'Content-Type': 'application/json',
+          },
+          body: raw,
+        }).then(result => console.log(result))
+          .catch(error => console.log('error', error));
         setSolved(true);
       }
     }
@@ -112,8 +128,43 @@ const usePuzzleChess = (puzzleData: Puzzle) => {
     }
   };
 
-  const onHint = () => {
-    setMessHint(validMoves[0]);
+  
+  
+  const onHint = async () => {
+    const hintMove = validMoves[0];
+    const computerMove = validMoves[1];
+    let tmpGame = game;
+    console.log("validMoves:", validMoves);
+    console.log("hintMove:", hintMove);
+    console.log("computerMove:", computerMove);
+    if (hintMove) {
+      setMessage("pending");
+      setTimeout(() => {
+        const tmp = new Chess(tmpGame.fen());
+        const result = tmp.move(hintMove as any);
+        tmpGame = new Chess(result.after);
+        setGame(tmpGame)
+      }, 200);
+    }
+    await delay(1000);
+    console.log(2)
+    if (computerMove) {
+      setMessage("pending");
+      setTimeout(() => {
+        const tmp = new Chess(tmpGame.fen());
+        const result = tmp.move(computerMove as any);
+        tmpGame = new Chess(result.after);
+        setGame(tmpGame)
+        console.log(3)
+      }, 200);
+      setValidMoves(validMoves.slice(2))
+    } else {
+      setSolved(true);
+      setRated(false);
+      setMessage("done");
+      setValidMoves(validMoves.slice(1))
+    }
+    setGame(tmpGame)
   };
 
   const onSkip = () => {

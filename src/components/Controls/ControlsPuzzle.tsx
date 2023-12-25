@@ -1,12 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Puzzle } from "@/types";
-import { Button, Col, ConfigProvider, Row } from "antd";
+import { Button, Row } from "antd";
 import "./styles.css";
 import PlayerInfoCard from "@/components/Card/PlayerInfoCard";
-import playerCard from "@/components/Card/PlayerCard";
 import WhiteMove from "@/components/icons/WhiteMove";
 import BlackMove from "../icons/BlackMove";
-import SkipIcon from "@/components/icons/SkipIcon";
 import {
   ArrowRightOutlined,
   BulbOutlined,
@@ -15,7 +13,6 @@ import {
   RedoOutlined,
   StepForwardOutlined,
 } from "@ant-design/icons";
-import { gray } from "@ant-design/colors";
 
 type ControlsPuzzleProps = {
   puzzleData: Puzzle;
@@ -36,7 +33,6 @@ const ControlsPuzzle: React.FC<ControlsPuzzleProps> = ({
   onRetry,
   onNext,
 }) => {
-  console.log(status);
 
   return (
     <div>
@@ -120,7 +116,17 @@ const ControlsPuzzle: React.FC<ControlsPuzzleProps> = ({
           </div>
         </div>
       </Row>
-      <Row className="flex justify-center pt-20 overflow-auto w-full">
+      <Row>
+        <div className="overflow-auto puzzleStats justify-center w-full">
+          <div className="puzzleStatsRow">
+            <div className="puzzleStatsText">Rating</div>
+            <div className="puzzleStatsFlex">
+              <strong className="puzzleStatsText">{puzzleData.rate}</strong>
+            </div>
+          </div>
+        </div>
+      </Row>
+      <Row className="flex justify-center pt-10 overflow-auto w-full">
         <div>
           {status === "pending" ? (
             <>
