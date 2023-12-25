@@ -42,8 +42,8 @@ const items: MenuProps["items"] = [
   // TODO: Change path to the corresponding component
   getItem("Puzzle", "sub2", <Puzzle />, [
     // Why `puzzleData`, thought this should be `puzzle`?
-    getItem("Play Puzzle", "/puzzleData", <Puzzle />),
-    getItem("Puzzle Duel", "/puzzleData-duel", <Duel />),
+    getItem("Play Puzzle", "/puzzle", <Puzzle />),
+    getItem("Puzzle Duel", "/puzzle-duel", <Duel />),
   ]),
 
   getItem("Learn", "sub3", <Learn />, [
@@ -86,7 +86,7 @@ const Navbar = () => {
           />
         </div>
       </div>
-      <ModalPlayBot isOpen={isModalPlayBotOpen} setOpen={setIsModalPlayBotOpen}/>
+      <ModalPlayBot isOpen={isModalPlayBotOpen} setOpen={setIsModalPlayBotOpen} />
     </>
   );
 };
