@@ -60,3 +60,11 @@ const getPieceValue = (piece: BoardType, x: number, y: number) => {
   const absoluteValue = getAbsoluteValue(piece.type, piece.color === 'w', x, y);
   return piece.color === 'w' ? absoluteValue : -absoluteValue;
 };
+
+export async function delay(ms: number): Promise<void> {
+  return new Promise((res) => {
+    setTimeout(() => {
+      res(undefined)
+    }, ms);
+  });
+}

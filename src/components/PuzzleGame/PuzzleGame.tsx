@@ -1,8 +1,7 @@
 'use client';
 
 import { Chessboard } from 'react-chessboard';
-import { Chess } from 'chess.js';
-import React, {useEffect, useState} from "react";
+import React from "react";
 import usePuzzleData from "@/hooks/usePuzzleData";
 import usePuzzleChess from "@/hooks/usePuzzleChess";
 import ControlsPuzzle from "@/components/Controls/ControlsPuzzle";
@@ -13,23 +12,19 @@ type PuzzleGameProps = {
 };
 
 const PuzzleGame = ({ id }: PuzzleGameProps) => {
-  const {data: puzzleData, error: errorData, isLoading} = usePuzzleData(id);
+  const {data: puzzleData, error: errorData, isLoading, onSkip} = usePuzzleData(id);
   const {
     game,
-    error,
     message,
     solved,
     onDrop,
-    onSkip,
     onHint,
     onRetry,
-    onNext,
   } = usePuzzleChess(puzzleData)
   
   const onCloseModal = () => {
   
   }
-  
   return (
     <div>
       {
@@ -44,7 +39,7 @@ const PuzzleGame = ({ id }: PuzzleGameProps) => {
                     boardWidth={650}
                     position={game.fen()}
                     onPieceDrop={onDrop}
-                    boardOrientation={puzzleData.player.toLocaleLowerCase() as any}
+                    boardOrientation={'white'}
                     animationDuration={300}
                     arePiecesDraggable={!solved}
                   />
@@ -59,7 +54,7 @@ const PuzzleGame = ({ id }: PuzzleGameProps) => {
                       puzzleData={puzzleData}
                       result={solved ? 1 : 0}
                       status={message}
-                      onNext={onNext}
+                      onNext={onSkip}
                       onRetry={onRetry}
                       onHint={onHint}
                       onSkipModal={onSkip}

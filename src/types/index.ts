@@ -11,6 +11,7 @@ export type Puzzle = {
 	results?: string,
 	date?: string,
 	id: string,
+	rate?: string,
 }
 
 export type ShortMove = {
