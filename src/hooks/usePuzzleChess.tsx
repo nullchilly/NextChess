@@ -131,7 +131,6 @@ const usePuzzleChess = (puzzleData: Puzzle) => {
   
   
   const onHint = async () => {
-    setMessHint(validMoves[0]);
     const hintMove = validMoves[0];
     const computerMove = validMoves[1];
     let tmpGame = game;
