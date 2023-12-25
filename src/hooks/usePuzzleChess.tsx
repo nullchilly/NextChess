@@ -107,15 +107,18 @@ const usePuzzleChess = (puzzleData: Puzzle) => {
           "isPassed": true,
           "isRated": true
         });
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}` + "/api/puzzle/submit", {
-          method: 'POST',
-          headers: {
-            'accessToken': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJubWMifQ.IHyQnmsMdE0DBC9PoJcwaQrky0R7MygS863H99ljJwg',
-            'Content-Type': 'application/json',
-          },
-          body: raw,
-        }).then(result => console.log(result))
-          .catch(error => console.log('error', error));
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}` + "/api/puzzle/submit", {
+            method: 'POST',
+            headers: {
+              'accessToken': token,
+              'Content-Type': 'application/json',
+            },
+            body: raw,
+          }).then(result => console.log(result))
+            .catch(error => console.log('error', error));
+        }
         setSolved(true);
       }
     }
