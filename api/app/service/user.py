@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from api.app.dto.core.user import SignUpRequest, SignUpResponse, UserRole, LoginRequest, ChangePasswordRequest, \
-    LoginResponse, GetProfileResponse, UpdateProfileRequest
+    LoginResponse, GetProfileResponse, UpdateProfileRequest, RatingInGetProfileResponse
 from api.app.helper import auth
 from api.app.model import User
 from api.app.model import Profile
@@ -65,26 +65,25 @@ class UserService:
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
         user_profile = db.query(Profile).filter(Profile.user_id == user.id).first()
-        q = db.query(UserRating.rating).filter(UserRating.user_id == user.id)
+        q = db.query(UserRating.rating, UserRating.variant_id).filter(UserRating.user_id == user.id).order_by(UserRating.id)
         ratings = []
         for res in q.all():
-            ratings.append(res.rating)
+            ratings.append(RatingInGetProfileResponse(rating=res.rating, variant_id=res.variant_id))
         return GetProfileResponse(name=user_profile.name, date_of_birth=user_profile.date_of_birth,
-                                  gender=user_profile.gender, email=user_profile.email,
-                                  current_rating=user_profile.rating,ratings=ratings)
+                                  gender=user_profile.gender, email=user_profile.email, ratings=ratings)
 
     @classmethod
     def get_user_profile_by_id(cls, db: Session, id: int) -> GetProfileResponse:
         user_profile = db.query(Profile).filter(Profile.user_id == id).first()
         if user_profile is None or user_profile.deleted_at is not None:
             raise HTTPException(status_code=404, detail="User not found")
-        q = db.query(UserRating.rating).filter(UserRating.user_id == id)
+        q = db.query(UserRating.rating, UserRating.variant_id).filter(UserRating.user_id == id).order_by(
+            UserRating.id)
         ratings = []
         for res in q.all():
-            ratings.append(res.rating)
+            ratings.append(RatingInGetProfileResponse(rating=res.rating, variant_id=res.variant_id))
         return GetProfileResponse(name=user_profile.name, date_of_birth=user_profile.date_of_birth,
-                                  gender=user_profile.gender, email=user_profile.email, current_rating=user_profile.rating,
-                                  ratings=ratings)
+                                  gender=user_profile.gender, email=user_profile.email, ratings=ratings)
 
     @classmethod
     def update_profile(cls, db: Session, user: User, request: UpdateProfileRequest):
