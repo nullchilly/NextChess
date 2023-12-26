@@ -62,7 +62,7 @@ const UserProvider: React.FC<Props> = (props) => {
 			rating: dataUser?.rating,
 			accessToken: currentUser,
 		}}>
-			{currentUser ? props.children : <Login/>}
+			{props.children}
 		</UserContext.Provider>
 	)
 }

@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, {useContext} from "react";
 
 import StockChess from "@/components/icons/StockChess";
 import ChessBoard from "@/components/icons/ChessBoard";
@@ -14,8 +14,12 @@ import { Menu } from "antd";
 import type { MenuProps } from "antd";
 import Link from "next/link";
 import ModalPlayBot from "../Modal/ModalPlayBot";
+import Icon, {BulbOutlined, SettingOutlined} from "@ant-design/icons";
+import {UserContext, withUserContext} from "@/context/UserContext";
 
 type MenuItem = Required<MenuProps>["items"][number];
+
+const avatar = 'https://www.chesskid.com/images/avatars/kids/100/kid-1162.png'
 
 function getItem(
   label: React.ReactNode,
@@ -54,7 +58,8 @@ const items: MenuProps["items"] = [
 const Navbar = () => {
   const [isModalPlayBotOpen, setIsModalPlayBotOpen] = React.useState(false);
   const router = useRouter();
-
+  const {name, rate} = useContext(UserContext);
+  console.log(name)
   const showModal = () => {
     setIsModalPlayBotOpen(true);
   };
@@ -77,6 +82,26 @@ const Navbar = () => {
         <Link href="/">
           <StockChess />
         </Link>
+        <div className="object-cover p-6 w-full flex items-center justify-center">
+          <Link href="/profile">
+            <img src={avatar} alt="image description" className="shadow rounded-full max-w-full h-auto border-4 border-[#518538]"/>
+          </Link>
+          <Link href={"/settings"}>
+            <SettingOutlined style={{ fontSize: "40px", color:'#f1f1f1' }} className='pl-5'/>
+          </Link>
+        </div>
+        <div className="pb-6">
+          <div className="object-cover max-w-full flex items-center justify-center bg-[#518538] rounded-lg shadow-md h-auto m-1">
+            <Link href="/profile">
+                <div className="text-3xl text-slate-100 font-mono font-bold flex items-center pt-3">
+                  {name ? name : "Guest"}
+                </div>
+                <div className="text-l text-slate-100 font-mono flex items-center pb-3 pt-0.5">
+                  Rate: {rate ? rate : "xxx"}
+                </div>
+            </Link>
+          </div>
+        </div>
         <div>
           <Menu
             onClick={onClickMenuDrawer}
@@ -91,4 +116,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default withUserContext(Navbar);
