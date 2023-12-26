@@ -55,11 +55,16 @@ const items: MenuProps["items"] = [
   ]),
 ];
 
-const Navbar = () => {
+// type NavbarProps = {
+//   name?: string;
+//   rate?: string;
+// }
+
+const Navbar : React.FC = () => {
   const [isModalPlayBotOpen, setIsModalPlayBotOpen] = React.useState(false);
   const router = useRouter();
   const {name, rate} = useContext(UserContext);
-  console.log(name)
+  
   const showModal = () => {
     setIsModalPlayBotOpen(true);
   };
@@ -91,7 +96,7 @@ const Navbar = () => {
           </Link>
         </div>
         <div className="pb-6">
-          <div className="object-cover max-w-full flex items-center justify-center bg-[#518538] rounded-lg shadow-md h-auto m-1">
+          <div className="object-cover max-w-full flex items-center justify-center bg-[#518538] rounded-3xl shadow-md h-auto m-1">
             <Link href="/profile">
                 <div className="text-3xl text-slate-100 font-mono font-bold flex items-center pt-3">
                   {name ? name : "Guest"}
@@ -116,4 +121,4 @@ const Navbar = () => {
   );
 };
 
-export default withUserContext(Navbar);
+export default Navbar;

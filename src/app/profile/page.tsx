@@ -187,7 +187,7 @@ const Analyst = () => {
 }
 
 const ProfilePage = () => {
-  const {dob, email, gender, name, rate, rating, accessToken} = useContext(UserContext);
+  const {name } = useContext(UserContext);
   const router = useRouter();
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
@@ -210,4 +210,4 @@ const ProfilePage = () => {
     )
 };
 
-export default withUserContext(ProfilePage)
+export default ProfilePage
