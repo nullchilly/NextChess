@@ -8,6 +8,7 @@ import PuzzleLogo from "@/components/icons/PuzzleLogo";
 import Star from "@/components/icons/Star";
 import {UserContext, withUserContext} from "@/context/UserContext";
 import {useContext, useEffect} from "react";
+import {useRouter} from "next/navigation";
 
 const ROUTES = [
     { href: '/profile', text: 'Profile' },
@@ -186,11 +187,14 @@ const Analyst = () => {
 }
 
 const ProfilePage = () => {
-  const {dob, email, gender, name, rate, rating} = useContext(UserContext);
+  const {name } = useContext(UserContext);
+  const router = useRouter();
   useEffect(() => {
-    console.log(dob)
-    console.log(name)
-  }, []);
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      router.push('/login');
+    }
+  },[])
     return (
         <div className="flex flex-col">
             <div className="rw-full sm:w-full md:w-full p-4">
@@ -206,4 +210,4 @@ const ProfilePage = () => {
     )
 };
 
-export default withUserContext(ProfilePage)
+export default ProfilePage
