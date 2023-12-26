@@ -34,13 +34,16 @@ class ChangePasswordRequest(CamelBaseModel):
     old_password: str
     new_password: str
 
+class RatingInGetProfileResponse(CamelBaseModel):
+    rating: int
+    variant_id: int
+
 class GetProfileResponse(CamelBaseModel):
     name: str
     date_of_birth: date
     gender: UserGender
     email: str
-    current_rating: int
-    ratings: List[int]
+    ratings: List[RatingInGetProfileResponse]
 
 class UpdateProfileRequest(CamelBaseModel):
     name: Optional[str]
