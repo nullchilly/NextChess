@@ -3,23 +3,29 @@ import React, {ComponentType, useState, useEffect} from "react";
 
 type UserContextType = {
 	name?: string,
-	dob?: string,
+	dateOfBirth?: string,
 	gender?: string,
 	email?: string,
 	rate?: string,
 	rating?: string[],
-	accessToken?: string,
-	checkLogin?: () => void,
+	accessToken: string,
+	isLoading?: boolean,
+	checkLogin: () => void,
 }
 
-const UserContext = React.createContext<UserContextType>({
-	dob: '',
+const defaultValue = {
+	dateOfBirth: "",
 	email: "",
 	gender: "",
 	name: "",
 	rate: "",
 	rating: [],
 	accessToken: "",
+	isLoading: false,
+}
+
+const UserContext = React.createContext<UserContextType>({
+	...defaultValue,
 	checkLogin: () => {},
 });
 
@@ -29,9 +35,14 @@ interface Props {
 
 const UserProvider: React.FC<Props> = (props) => {
 	const [currentUser, setCurrentUser] = useState('');
-	const [dataUser, setDataUser] = useState<UserContextType>()
-	
+	const [dataUser, setDataUser] = useState<UserContextType>({
+		...defaultValue,
+		checkLogin: () => {},
+	})
+	const [isLoading, setIsLoading] = useState(false);
+
 	const checkLogin = async () => {
+		setIsLoading(true);
 		const token = localStorage.getItem('accessToken');
 		if (token) {
 			setCurrentUser(token);
@@ -46,7 +57,13 @@ const UserProvider: React.FC<Props> = (props) => {
 			if (data?.code === 200) {
 				setDataUser(data.data)
 			}
+		} else {
+			setDataUser({
+				...defaultValue,
+				checkLogin: () => {},
+			});
 		}
+		setIsLoading(false);
 	}
 	
 	useEffect(() => {
@@ -55,13 +72,14 @@ const UserProvider: React.FC<Props> = (props) => {
 	
 	return (
 		<UserContext.Provider value={{
-			dob: dataUser?.dob,
+			dateOfBirth: dataUser?.dateOfBirth,
 			email: dataUser?.email,
 			gender: dataUser?.gender,
 			name: dataUser?.name,
 			rate: dataUser?.rate,
 			rating: dataUser?.rating,
 			accessToken: currentUser,
+			isLoading: isLoading,
 			checkLogin: checkLogin,
 		}}>
 			{props.children}
