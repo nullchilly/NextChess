@@ -1,10 +1,11 @@
 "use client";
 import Link from "next/link";
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import BlackQueen from "@/components/icons/ChessPiece/BlackQueen";
 import { useRouter } from "next/navigation";
+import {UserContext} from "@/context/UserContext";
 
-export default function Login() {
+function Login() {
 
   const [formData, setFormData] = useState({
     "user_name": "",
@@ -15,7 +16,8 @@ export default function Login() {
   const [haveun, sethaveun] = useState(true);
   const [check, setcheck] = useState(true);
   const router = useRouter();
-
+  const {checkLogin} = useContext(UserContext);
+  
   useEffect(() => {
     if (localStorage.getItem('accessToken')) {
       router.push('/profile');
@@ -51,8 +53,9 @@ export default function Login() {
           localStorage.setItem('accessToken', token);
         }
         setcheck(true);
-        router.push('/');
-        
+        if (checkLogin) {
+          await checkLogin();
+        }
       } else {
         console.error('Login failed:', response.statusText);
         setcheck(false);
@@ -60,6 +63,7 @@ export default function Login() {
     } catch (error) {
       console.error('An unexpected error occurred:', error);
     }
+    router.push('/profile');
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,3 +162,5 @@ export default function Login() {
     </div>
   );
 }
+
+export default Login;

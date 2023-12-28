@@ -1,8 +1,6 @@
 'use client';
 import React, {ComponentType, useState, useEffect} from "react";
 
-import Login from '@/app/login/page';
-
 type UserContextType = {
 	name?: string,
 	dob?: string,
@@ -11,6 +9,7 @@ type UserContextType = {
 	rate?: string,
 	rating?: string[],
 	accessToken?: string,
+	checkLogin?: () => void,
 }
 
 const UserContext = React.createContext<UserContextType>({
@@ -21,6 +20,7 @@ const UserContext = React.createContext<UserContextType>({
 	rate: "",
 	rating: [],
 	accessToken: "",
+	checkLogin: () => {},
 });
 
 interface Props {
@@ -30,25 +30,26 @@ interface Props {
 const UserProvider: React.FC<Props> = (props) => {
 	const [currentUser, setCurrentUser] = useState('');
 	const [dataUser, setDataUser] = useState<UserContextType>()
-	useEffect(() => {
-		const checkLogin = async () => {
-			const token = localStorage.getItem('accessToken');
-			if (token) {
-				setCurrentUser(token);
-				const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}` + '/api/profile', {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						'accessToken': token,
-					},
-				})
-				const data = await response.json();
-				if (data?.code === 200) {
-					setDataUser(data.data)
-				}
+	
+	const checkLogin = async () => {
+		const token = localStorage.getItem('accessToken');
+		if (token) {
+			setCurrentUser(token);
+			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}` + '/api/profile', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'accessToken': token,
+				},
+			})
+			const data = await response.json();
+			if (data?.code === 200) {
+				setDataUser(data.data)
 			}
 		}
-		
+	}
+	
+	useEffect(() => {
 		checkLogin().then();
 	}, []);
 	
@@ -61,13 +62,14 @@ const UserProvider: React.FC<Props> = (props) => {
 			rate: dataUser?.rate,
 			rating: dataUser?.rating,
 			accessToken: currentUser,
+			checkLogin: checkLogin,
 		}}>
-			{currentUser ? props.children : <Login/>}
+			{props.children}
 		</UserContext.Provider>
 	)
 }
 
-function withUserContext<T extends {}> (Component: ComponentType<T>) {
+function withUserContext<T extends {}> (Component: ComponentType<T>, token: string) {
 	return (props: T) => {
 		return (
 			<UserProvider>
