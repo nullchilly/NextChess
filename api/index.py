@@ -1,8 +1,12 @@
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+
 from api.app import create_app
+from .app.helper.db import db_session
+from .app.service.puzzle import PuzzleService
 from .config import STOCKFISH_PATH
-from .socket import manager
+from .socket import manager, WebSocketConnectionManager
 from fastapi.staticfiles import StaticFiles
 import json
 import socketio
@@ -254,6 +258,109 @@ async def broadcast(sid, msg):
 @sio.on("disconnect")
 async def disconnect(sid):
     print("on disconnect")
+
+
+@app.websocket("/puzzle/{gameID}/ws")
+async def websocket_endpoint(*, websocket: WebSocket, gameID: str, db: Session = Depends(db_session)):
+    manager = WebSocketConnectionManager()
+    await manager.connect(websocket)
+    puzzle_list = PuzzleService().get_random_ten_puzzle(db).puzzles
+    # set puzzle solved by user is map of user_id -> set of puzzle_id
+    puzzle_solved_by_user = dict()
+    """
+	two form of json data:
+	// type 1 request
+	{
+	"status": "start",
+	"message": {
+		"user_id" : 1,
+	}
+	// type 1 response
+	{
+		"status": "start",
+		"message": {
+			"user_id" : 1,
+			"game_id" : 1,
+			"puzzle": {
+				"id": 1,
+				"fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+				"rating": 1000,
+				"rating_deviation": 350,
+				"popularity": 0,
+				"nb_plays": 0,
+				"themes": [],
+				"game_url": "https://lichess.org/7hJ3U0YB",
+				"puzzle_url": "https://lichess.org/training/7hJ3U0YB",
+				"fen_url": "https://lichess.org/editor/rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+			},
+			"timer": {
+				"white": 600,
+				"black": 600
+			}
+		} // puzzle list
+	}
+
+	// type 2
+	{
+		"status": "begin",
+		"message": {
+			"user_id": 1,
+			"submitPuzzleId": 18181,
+		}
+	}
+
+	// response of type 2
+	{
+		"status": "success",
+		"message": {
+			"user_id": 1,
+			"remaining_quiz": 9,
+		}
+	}
+	"""
+    try:
+        while True:
+            data = await websocket.receive_text()
+            response = json.loads(data)
+            if response["status"] == "start":
+                user_id = response["message"]["user_id"]
+                response = {
+                    "status": "start",
+                    "message": {
+                        "user_id": user_id,
+                        "game_id": gameID,
+                        "puzzle": puzzle_list,
+                    }
+                }
+                await manager.send_personal_message(json.dumps(response), websocket)
+            elif response["status"] == "begin":
+                user_id = response["message"]["user_id"]
+                puzzle_id = response["message"]["submitPuzzleId"]
+                if user_id not in puzzle_solved_by_user:
+                    puzzle_solved_by_user[user_id] = set()
+                if puzzle_id in puzzle_solved_by_user[user_id]:
+                    response = {
+                        "status": "error",
+                        "message": {
+                            "user_id": user_id,
+                            "error": "Puzzle already solved",
+                        }
+                    }
+                    await manager.send_personal_message(json.dumps(response), websocket)
+                else:
+                    puzzle_solved_by_user[user_id].add(puzzle_id)
+                    response = {
+                        "status": "success",
+                        "message": {
+                            "user_id": user_id,
+                            "remaining_quiz": len(puzzle_list) - len(puzzle_solved_by_user[user_id]),
+                        }
+                    }
+                    await manager.send_personal_message(json.dumps(response), websocket)
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        pass
+
 
 app.mount("/", socketio.ASGIApp(sio))
 
