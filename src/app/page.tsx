@@ -5,7 +5,6 @@ import PlayBotPoster from "@/components/icons/PlayBotPoster";
 import PlayHumanPoster from "@/components/icons/PlayHumanPoster";
 import PlayPuzzlePoster from "@/components/icons/PlayPuzzlePoster";
 import ModalPlayBot from "@/components/Modal/ModalPlayBot";
-import {withUserContext} from "@/context/UserContext";
 
 const Home = () => {
   const [isModalPlayBotOpen, setIsModalPlayBotOpen] = React.useState(false);

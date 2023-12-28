@@ -15,7 +15,7 @@ import type { MenuProps } from "antd";
 import Link from "next/link";
 import ModalPlayBot from "../Modal/ModalPlayBot";
 import Icon, {BulbOutlined, SettingOutlined} from "@ant-design/icons";
-import {UserContext, withUserContext} from "@/context/UserContext";
+import {UserContext} from "@/context/UserContext";
 
 type MenuItem = Required<MenuProps>["items"][number];
 

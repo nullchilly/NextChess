@@ -6,7 +6,7 @@ import FastChessLogo from "@/components/icons/FastChessLogo";
 import SlowChessLogo from "@/components/icons/SlowChessLogo";
 import PuzzleLogo from "@/components/icons/PuzzleLogo";
 import Star from "@/components/icons/Star";
-import {UserContext, withUserContext} from "@/context/UserContext";
+import {UserContext} from "@/context/UserContext";
 import {useContext, useEffect} from "react";
 import {useRouter} from "next/navigation";
 

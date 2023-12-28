@@ -87,14 +87,4 @@ const UserProvider: React.FC<Props> = (props) => {
 	)
 }
 
-function withUserContext<T extends {}> (Component: ComponentType<T>, token: string) {
-	return (props: T) => {
-		return (
-			<UserProvider>
-				<Component {...props}/>
-			</UserProvider>
-		)
-	}
-}
-
-export {withUserContext, UserContext, UserProvider}
+export {UserContext, UserProvider}
