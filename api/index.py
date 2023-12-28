@@ -261,8 +261,7 @@ async def disconnect(sid):
 
 
 @app.websocket("/puzzle/{gameID}/ws")
-async def websocket_endpoint(*, websocket: WebSocket, gameID: str, db: Session = Depends(db_session)):
-    manager = WebSocketConnectionManager()
+async def websocket_puzzle(*, websocket: WebSocket, gameID: str, db: Session = Depends(db_session)):
     await manager.connect(websocket)
     puzzle_list = PuzzleService().get_random_ten_puzzle(db).puzzles
     # set puzzle solved by user is map of user_id -> set of puzzle_id
