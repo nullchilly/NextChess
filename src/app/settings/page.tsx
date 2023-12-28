@@ -6,7 +6,7 @@ import {useRouter} from "next/navigation";
 import SettingsNavbar from "@/components/Settings/NavbarSettings";
 import AccountSettings from "@/components/Settings/AccountSettings";
 
-const ProfilePage = () => {
+const Page = () => {
 	const {name } = useContext(UserContext);
 	const router = useRouter();
 	useEffect(() => {
@@ -29,4 +29,4 @@ const ProfilePage = () => {
 	)
 };
 
-export default ProfilePage
+export default Page

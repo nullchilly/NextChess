@@ -1,10 +1,8 @@
-import {UserNetworkLink} from "@/helpers/types";
 import React, {useContext, useEffect, useState} from "react";
 import {UserContext} from "@/context/UserContext";
 import {useRouter} from "next/navigation";
 import {Button, ConfigProvider, DatePicker, Flex, Form, Input, Select, Spin} from "antd";
 import "./styles.css";
-import moment from "moment";
 import dayjs from "dayjs";
 
 const avatar = "https://www.chesskid.com/images/avatars/kids/100/kid-1162.png";
@@ -15,9 +13,7 @@ const AccountSettings = () => {
 	const [form] = Form.useForm()
 	const [isUpdating, setIsUpdating] = useState(false);
 	const [isUpdate, setIsUpdate] = useState(false)
-	const init = {
-		dateOfBirth: dayjs(),
-	};
+
 	const handleSubmitAccount = () => {
 		form
 			.validateFields()
@@ -54,7 +50,7 @@ const AccountSettings = () => {
 		setIsUpdating(true);
 		form.setFieldsValue({
 			name: name,
-			dateOfBirth: moment(dateOfBirth ? dateOfBirth : ""),
+			dateOfBirth: dayjs(dateOfBirth ? dateOfBirth : ""),
 			gender: gender,
 			email: email,
 		})
@@ -65,7 +61,6 @@ const AccountSettings = () => {
 		if (!localStorage.getItem('accessToken')) {
 			router.push('/login');
 		}
-		console.log(dateOfBirth)
 	}, []);
 	
 	useEffect(() => {

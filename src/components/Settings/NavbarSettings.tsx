@@ -18,7 +18,7 @@ const SettingsNavbar : React.FC<SettingsNavbarProps> = (props) => {
 					</div>
 					
 					<div key={0} className={`flex-grow text-slate-100 font-mono p-4 hover:bg-[#4f8536] transition-colors rounded-lg ${props.key ? '' : 'bg-[#58943c]'}`  }>
-						<Link href="/settings" className="">
+						<Link href="/settings/password" className="">
 							<div className="col-start-2 col-end-4 text-3xl text-slate-100 font-mono font-bold flex justify-center">
 								Change Password
 							</div>

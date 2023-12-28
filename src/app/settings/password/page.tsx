@@ -4,9 +4,9 @@ import {useContext, useEffect} from "react";
 import {UserContext} from "@/context/UserContext";
 import {useRouter} from "next/navigation";
 import SettingsNavbar from "@/components/Settings/NavbarSettings";
+import PasswordSettings from "@/components/Settings/PasswordSettings";
 
-const ProfilePage = () => {
-	const {name } = useContext(UserContext);
+const Page = () => {
 	const router = useRouter();
 	useEffect(() => {
 		const token = localStorage.getItem('accessToken');
@@ -20,13 +20,12 @@ const ProfilePage = () => {
 				{SettingsNavbar({key: false})}
 			</div>
 			<div className="rw-full sm:w-full md:w-full p-4">
-				<div className="bg-[#477330] rounded-lg p-4"></div>
-			</div>
-			<div className="rw-full sm:w-full md:w-full p-4">
-				<div className="bg-[#477330] rounded-lg p-4"></div>
+				<div className="bg-[#477330] rounded-lg p-4">
+					{PasswordSettings()}
+				</div>
 			</div>
 		</div>
 	)
 };
 
-export default ProfilePage
+export default Page
