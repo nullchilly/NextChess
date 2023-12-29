@@ -13,7 +13,7 @@ import socketio
 import chess.engine
 from .chess_timer import ChessTimer
 
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -263,11 +263,22 @@ async def disconnect(sid):
 @app.websocket("/puzzle/{gameID}/ws")
 async def websocket_puzzle(*, websocket: WebSocket, gameID: str, db: Session = Depends(db_session)):
     await manager.connect(websocket)
-    puzzle_list = PuzzleService().get_random_ten_puzzle(db).puzzles
+    puzzle_list = PuzzleService().get_random_ten_puzzle(db)
     # set puzzle solved by user is map of user_id -> set of puzzle_id
     puzzle_solved_by_user = dict()
+    list_player: List[str] = []
+    def get_opponent(player: str) -> List[str]:
+        if len(list_player) < 2:
+            return []
+        else:
+            return [s for s in list_player if s != player]
+
     """
 	two form of json data:
+	//
+	{
+	    
+	}
 	// type 1 request
 	{
 	"status": "start",
@@ -276,11 +287,13 @@ async def websocket_puzzle(*, websocket: WebSocket, gameID: str, db: Session = D
 	}
 	// type 1 response
 	{
+	    
 		"status": "start",
 		"message": {
 			"user_id" : 1,
 			"game_id" : 1,
-			"puzzle": {
+			"opponent": []
+			"puzzle": [{
 				"id": 1,
 				"fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
 				"rating": 1000,
@@ -291,23 +304,26 @@ async def websocket_puzzle(*, websocket: WebSocket, gameID: str, db: Session = D
 				"game_url": "https://lichess.org/7hJ3U0YB",
 				"puzzle_url": "https://lichess.org/training/7hJ3U0YB",
 				"fen_url": "https://lichess.org/editor/rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-			},
-			"timer": {
-				"white": 600,
-				"black": 600
-			}
+			}]
 		} // puzzle list
 	}
-
+    
+    // noti message
+    {
+    "status": "noti",
+    "message": {
+        "content": "User 1 joined the game",
+    }
+    
 	// type 2
 	{
-		"status": "begin",
+		"status": "submit",
 		"message": {
 			"user_id": 1,
 			"submitPuzzleId": 18181,
 		}
 	}
-
+    
 	// response of type 2
 	{
 		"status": "success",
@@ -316,6 +332,33 @@ async def websocket_puzzle(*, websocket: WebSocket, gameID: str, db: Session = D
 			"remaining_quiz": 9,
 		}
 	}
+	
+	// response of type 2 notify to other player
+	{
+	    "status": "message",
+        "message": {
+            "user_id": 1,
+            "remaining_quiz": 9,
+            "solved": 18181,
+        }
+    }
+    
+    // request of message to end game
+    {
+        "status": "end",
+        "message": {
+            
+        }
+    }
+	
+	// response of message to end game
+	{
+	    "status": "end",
+	    "message": {
+            "user_id": 1,
+        }
+	}
+	
 	"""
     try:
         while True:
@@ -323,16 +366,24 @@ async def websocket_puzzle(*, websocket: WebSocket, gameID: str, db: Session = D
             response = json.loads(data)
             if response["status"] == "start":
                 user_id = response["message"]["user_id"]
-                response = {
+                sent_response = {
                     "status": "start",
                     "message": {
                         "user_id": user_id,
                         "game_id": gameID,
-                        "puzzle": puzzle_list,
+                        "opponent": get_opponent(user_id),
+                        "puzzle": puzzle_list.to_json()
                     }
                 }
-                await manager.send_personal_message(json.dumps(response), websocket)
-            elif response["status"] == "begin":
+                await manager.send_personal_message(json.dumps(sent_response), websocket)
+                sent_message = {
+                    "status": "noti",
+                    "message": {
+                        "content": f"User {user_id} joined the game",
+                    }
+                }
+                await manager.send_personal_message(json.dumps(sent_message), websocket)
+            elif response["status"] == "submit":
                 user_id = response["message"]["user_id"]
                 puzzle_id = response["message"]["submitPuzzleId"]
                 if user_id not in puzzle_solved_by_user:
@@ -352,10 +403,45 @@ async def websocket_puzzle(*, websocket: WebSocket, gameID: str, db: Session = D
                         "status": "success",
                         "message": {
                             "user_id": user_id,
-                            "remaining_quiz": len(puzzle_list) - len(puzzle_solved_by_user[user_id]),
+                            "remaining_quiz": len(puzzle_list.puzzles) - len(puzzle_solved_by_user[user_id]),
                         }
                     }
                     await manager.send_personal_message(json.dumps(response), websocket)
+                    response = {
+                        "status": "message",
+                        "message": {
+                            "user_id": user_id,
+                            "remaining_quiz": len(puzzle_list.puzzles) - len(puzzle_solved_by_user[user_id]),
+                            "solved": puzzle_id,
+                        }
+                    }
+                    await manager.send_personal_message(json.dumps(response), websocket)
+                    if len(puzzle_solved_by_user[user_id]) == len(puzzle_list.puzzles):
+                        response = {
+                            "status": "end",
+                            "message": {
+                                "user_id": user_id,
+                            }
+                        }
+                        await manager.send_personal_message(json.dumps(response), websocket)
+                        raise WebSocketDisconnect()
+            elif response["status"] == "end":
+                # find the win user
+                user_id_win = ""
+                max_solved = 0
+                for user_id in puzzle_solved_by_user:
+                    if len(puzzle_solved_by_user[user_id]) >= max_solved:
+                        max_solved = len(puzzle_solved_by_user[user_id])
+                        user_id_win = user_id
+                response = {
+                    "status": "end",
+                    "message": {
+                        "user_id": user_id_win,
+                    }
+                }
+                await manager.send_personal_message(json.dumps(response), websocket)
+                raise WebSocketDisconnect()
+
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         pass
