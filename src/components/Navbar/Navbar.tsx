@@ -63,7 +63,7 @@ const items: MenuProps["items"] = [
 const Navbar : React.FC = () => {
   const [isModalPlayBotOpen, setIsModalPlayBotOpen] = React.useState(false);
   const router = useRouter();
-  const {name, rate} = useContext(UserContext);
+  const {name, rate, accessToken} = useContext(UserContext);
   
   const showModal = () => {
     setIsModalPlayBotOpen(true);
@@ -78,6 +78,12 @@ const Navbar : React.FC = () => {
     }
   };
 
+  const onClickAvatar = () => {
+    const savedToken = localStorage.getItem('accessToken');
+    if(!accessToken || !savedToken) router.push("/login");
+    else router.push("/profile");
+  }
+
   return (
     <>
       <div
@@ -88,23 +94,27 @@ const Navbar : React.FC = () => {
           <StockChess />
         </Link>
         <div className="object-cover p-6 w-full flex items-center justify-center">
-          <Link href="/profile">
-            <img src={avatar} alt="image description" className="shadow rounded-full max-w-full h-auto border-4 border-[#518538]"/>
-          </Link>
+          <div>
+            <button onClick={onClickAvatar}>
+              <img src={avatar} alt="image description" className="shadow rounded-full max-w-full h-auto border-4 border-[#518538]"/>
+            </button>
+          </div>
           <Link href={"/settings"}>
             <SettingOutlined style={{ fontSize: "40px", color:'#f1f1f1' }} className='pl-5'/>
           </Link>
         </div>
         <div className="pb-6">
           <div className="object-cover max-w-full flex items-center justify-center bg-[#518538] rounded-3xl shadow-md h-auto m-1">
-            <Link href="/profile">
+            <div>
+              <button onClick={onClickAvatar}>
                 <div className="text-3xl text-slate-100 font-mono font-bold flex items-center pt-3">
                   {name ? name : "Guest"}
                 </div>
                 <div className="text-l text-slate-100 font-mono flex items-center pb-3 pt-0.5">
                   Rate: {rate ? rate : "xxx"}
                 </div>
-            </Link>
+              </button>
+            </div>
           </div>
         </div>
         <div>

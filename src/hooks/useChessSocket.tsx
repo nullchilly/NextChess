@@ -1,4 +1,4 @@
-import { useReducer, useState } from "react";
+import { useContext, useReducer, useState } from "react";
 import React from "react";
 import { Chess, Move, Square } from "chess.js";
 import { io, Socket } from "socket.io-client";
@@ -6,12 +6,14 @@ import { CustomSquares, ShortMove } from "@/types";
 import { useLocalStorage } from "./useLocalStorage";
 import { httpGetPlayerTimeLeft } from "@/modules/backend-client/httpGetPlayerTimeLeft";
 import { WINNER } from "@/helpers/types";
+import { UserContext } from "@/context/UserContext";
 
 export type ChessType = "random" | "computer" | "minimax";
 
 type Props = {
   id: string;
   type: ChessType;
+  userId?: number;
 };
 
 enum ConnectionStatus {
@@ -29,7 +31,7 @@ function squareReducer(squares: CustomSquares, action: Partial<CustomSquares>) {
   return { ...squares, ...action };
 }
 
-const useChessSocket = ({ type, id }: Props) => {
+const useChessSocket = ({ type, id, userId }: Props) => {
   // Start of socket
   const [socket, setSocket] = React.useState<Socket | null>(null);
   const [connectionStatus, setConnectionStatus] =
@@ -168,6 +170,7 @@ const useChessSocket = ({ type, id }: Props) => {
       }
     }
     getTime();
+    console.log("??: ", userId);
   }, []);
 
   // Send latest move over socket
@@ -185,7 +188,7 @@ const useChessSocket = ({ type, id }: Props) => {
 
   const onInitGame = () => {
     console.log("Running init...");
-    const initNewGame = { id: id }; // TODO: Add preferences (difficulty, timer, ...)
+    const initNewGame = { id: id, userId: userId ?? 0 }; // TODO: Add preferences (difficulty, timer, ...)
     socket?.emit("start-game", JSON.stringify(initNewGame));
   };
 
