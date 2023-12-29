@@ -39,6 +39,7 @@ class RatingInGetProfileResponse(CamelBaseModel):
     variant_id: int
 
 class GetProfileResponse(CamelBaseModel):
+    user_id: int
     name: str
     date_of_birth: date
     gender: UserGender

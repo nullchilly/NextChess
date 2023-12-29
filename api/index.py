@@ -1,6 +1,10 @@
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from api.app import create_app
+from api.app.service.insert_moves import insert_game_move, get_game_id_from_slug
+from api.app.helper.db import db_session
+from sqlalchemy.orm import Session
+from api.app.dto.core.insert_moves import InsertMoveRequest
 from .config import STOCKFISH_PATH
 from .socket import manager
 from fastapi.staticfiles import StaticFiles
@@ -116,7 +120,16 @@ async def play_chess(sid, msg):
         }
         game_states[gameID]['status'] = True
         game_states[gameID]['result'] = winner
-        # TODO: Insert moves into database
+        all_uci_moves = list(map(lambda move: move.uci(), game_states[gameID]['board'].move_stack))
+        with next(db_session()) as db:
+            game_id_num = await get_game_id_from_slug(db, slug=gameID)
+            insert_move_request = InsertMoveRequest(
+                game_id = game_id_num,
+                user_id = game_states[gameID]['userID'], #FIXME, or not...
+                move_details = all_uci_moves
+            )
+            await insert_game_move(db, request=insert_move_request)
+
         await sio.emit("play-chess", json.dumps(message), room=sid)
         return
 
@@ -136,7 +149,15 @@ async def play_chess(sid, msg):
         winner = 0 if winner_color is None else 1 if winner_color is True else 2
         game_states[gameID]['status'] = True
         game_states[gameID]['result'] = winner
-        # TODO: Insert moves into database
+        all_uci_moves = list(map(lambda move: move.uci(), game_states[gameID]['board'].move_stack))
+        with next(db_session()) as db:
+            game_id_num = await get_game_id_from_slug(db, slug=gameID)
+            insert_move_request = InsertMoveRequest(
+                game_id = game_id_num,
+                user_id = game_states[gameID]['userID'], #FIXME, or not...
+                move_details = all_uci_moves
+            )
+            await insert_game_move(db, request=insert_move_request)
 
     message = {
         "ok": True,
@@ -176,6 +197,15 @@ async def user_forfeit(sid, msg):
     if (gameID in game_states):
         game_states[gameID]['status'] = True
         game_states[gameID]['result'] = 2 # Black win
+        all_uci_moves = list(map(lambda move: move.uci(), game_states[gameID]['board'].move_stack))
+        with next(db_session()) as db:
+            game_id_num = await get_game_id_from_slug(db, slug=gameID)
+            insert_move_request = InsertMoveRequest(
+                game_id = game_id_num,
+                user_id = game_states[gameID]['userID'], #FIXME, or not...
+                move_details = all_uci_moves
+            )
+            await insert_game_move(db, request=insert_move_request)
 
     message = "White forfeited" # TODO: Return match info for modal rendering?
     await sio.emit("user-forfeit", message, room=sid)
@@ -185,6 +215,7 @@ async def start_game(sid, msg):
     try:
         data = json.loads(msg)
         gameID = data["id"]
+        userID = data["userId"]
         all_game_ids.discard(gameID)  # safe removal
         all_game_ids.add(gameID)
         engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
@@ -201,6 +232,7 @@ async def start_game(sid, msg):
         current_state['limit'] = limit
         current_state['status'] = False # Unfinished game
         current_state['result'] = 3 # Unknown result
+        current_state['userID'] = userID
 
         timer_dict = dict()
         timer_dict['wPlayer'] = wTimer

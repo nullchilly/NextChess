@@ -8,13 +8,14 @@ import MoveList from "../MoveList/MoveList";
 import useChessSocket, { ChessType } from "@/hooks/useChessSocket";
 import PlayerCard from "@/components/Card/PlayerCard";
 import PrepareCard from "@/components/Card/PrepareCard";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { BotProps } from "@/types";
 
 import PlayerTimer from "@/components/PlayerTimer/PlayerTimer";
 import ModalEndGame from "../Modal/ModalEndGame";
 
 import { CaretLeftFilled, CaretRightFilled } from "@ant-design/icons";
+import { UserContext } from "@/context/UserContext";
 
 type ChessGameType = {
   id: string;
@@ -22,6 +23,7 @@ type ChessGameType = {
 };
 
 const ChessGame = ({ id, type }: ChessGameType) => {
+  const { userId } = useContext(UserContext);
   const {
     game,
     // moves,
@@ -44,7 +46,7 @@ const ChessGame = ({ id, type }: ChessGameType) => {
     prevMove,
     nextMove
 
-  } = useChessSocket({ type, id });
+  } = useChessSocket({ type, id, userId });
 
   const [botList, setBotList] = useState<BotProps[]>([]);
   const [bot, setBot] = useState<BotProps>({ id: "0", name: "shark" });
