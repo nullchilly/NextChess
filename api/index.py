@@ -374,7 +374,7 @@ async def puzzle_duel(sid, msg):
         remaining_puzzle = [puzzle for puzzle in puzzle_list_per_game_id[game_id].puzzles
                             if puzzle.id not in puzzle_solved_by_user[game_id][user_id]]
         response = {
-            "status": "submit",
+            "status": "solved",
             "message": {
                 "num_remaining": total_remaining_puzzle,
                 "remaining_puzzle": [puzzle.to_json() for puzzle in remaining_puzzle],
@@ -399,7 +399,7 @@ async def puzzle_duel(sid, msg):
             }
             await sio.emit("puzzle-duel", json.dumps(response))
             return
-    elif msg["status"] == "end":
+    elif msg["status"] == "end_game":
         user_id_win = ""
         game_id = msg["message"]["gameId"]
         max_puzzle_solved = 0
