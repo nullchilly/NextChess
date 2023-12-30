@@ -70,11 +70,12 @@ class UserService:
         for res in q.all():
             ratings.append(RatingInGetProfileResponse(rating=res.rating, variant_id=res.variant_id))
         return GetProfileResponse(user_id=user_profile.id, name=user_profile.name, date_of_birth=user_profile.date_of_birth,
-                                  gender=user_profile.gender, email=user_profile.email, ratings=ratings)
+                                  gender=user_profile.gender, email=user_profile.email, ratings=ratings, is_admin=user.is_admin)
 
     @classmethod
     def get_user_profile_by_id(cls, db: Session, id: int) -> GetProfileResponse:
         user_profile = db.query(Profile).filter(Profile.user_id == id).first()
+        user = db.query(User).filter(User.id == id).first()
         if user_profile is None or user_profile.deleted_at is not None:
             raise HTTPException(status_code=404, detail="User not found")
         q = db.query(UserRating.rating, UserRating.variant_id).filter(UserRating.user_id == id).order_by(
@@ -82,8 +83,8 @@ class UserService:
         ratings = []
         for res in q.all():
             ratings.append(RatingInGetProfileResponse(rating=res.rating, variant_id=res.variant_id))
-        return GetProfileResponse(name=user_profile.name, date_of_birth=user_profile.date_of_birth,
-                                  gender=user_profile.gender, email=user_profile.email, ratings=ratings)
+        return GetProfileResponse(user_id=id, name=user_profile.name, date_of_birth=user_profile.date_of_birth,
+                                  gender=user_profile.gender, email=user_profile.email, ratings=ratings, is_admin=user.is_admin)
 
     @classmethod
     def update_profile(cls, db: Session, user: User, request: UpdateProfileRequest):
