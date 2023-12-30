@@ -45,6 +45,7 @@ class GetProfileResponse(CamelBaseModel):
     gender: UserGender
     email: str
     ratings: List[RatingInGetProfileResponse]
+    is_admin: bool
 
 class UpdateProfileRequest(CamelBaseModel):
     name: Optional[str]
