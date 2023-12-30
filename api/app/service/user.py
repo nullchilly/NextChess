@@ -126,7 +126,7 @@ class UserService:
             res.append(game_history_resp)
         return GetUserGameHistoryResponse(games=res)
 
-    def get_current_user_game_history(cls, db: Session, user_id: int):
+    def get_user_game_history(cls, db: Session, user_id: int):
         move_by_user = db.query(Move).filter(Move.user_id == user_id, Move.deleted_at == None).all()
         move_by_game = defaultdict(list)
         for move in move_by_user:
