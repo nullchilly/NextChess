@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from api.app.dto.core.puzzle import MultiPuzzleResponse, PuzzleResponse, SubmitPuzzleRequest, SubmitPuzzleResponse
-from api.app.helper.base_response import DataResponse, ResponseSchemaBase
 from api.app.helper.db import db_session
 from api.app.helper.middleware import get_current_user
 from api.app.model import User

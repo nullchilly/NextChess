@@ -1,19 +1,24 @@
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from socketio import AsyncServer
+from sqlalchemy.orm import Session
+
 from api.app import create_app
+from .app.helper.db import db_session
+from .app.service.puzzle import PuzzleService
 from api.app.service.insert_moves import insert_game_move, get_game_id_from_slug
 from api.app.helper.db import db_session
 from sqlalchemy.orm import Session
 from api.app.dto.core.insert_moves import InsertMoveRequest
 from .config import STOCKFISH_PATH
-from .socket import manager
+from .socket import manager, WebSocketConnectionManager
 from fastapi.staticfiles import StaticFiles
 import json
 import socketio
 import chess.engine
 from .chess_timer import ChessTimer
 
-from typing import Annotated
+from typing import Annotated, Dict, List, Set
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -60,8 +65,10 @@ async def websocket_endpoint(websocket: WebSocket):
         manager.disconnect(websocket)
         pass
 
+
 all_game_ids = set()
 game_states = dict()
+
 
 # Return each player time left
 @app.get("/api/get-timer-info/{gameID}")
@@ -78,6 +85,7 @@ def get_timer_info(gameID: str):
         }
     else:
         return {"status": 422, "error": "Game not exist"}
+
 
 @sio.on("play-chess")
 async def play_chess(sid, msg):
@@ -102,7 +110,7 @@ async def play_chess(sid, msg):
     game_states[gameID]['board'].push(chess.Move.from_uci(move))
 
     # Winner check
-    winner = 3 # Unknown
+    winner = 3  # Unknown
     reason = ""
 
     outcome = game_states[gameID]['board'].outcome()
@@ -124,9 +132,9 @@ async def play_chess(sid, msg):
         with next(db_session()) as db:
             game_id_num = await get_game_id_from_slug(db, slug=gameID)
             insert_move_request = InsertMoveRequest(
-                game_id = game_id_num,
-                user_id = game_states[gameID]['userID'], #FIXME, or not...
-                move_details = all_uci_moves
+                game_id=game_id_num,
+                user_id=game_states[gameID]['userID'],  # FIXME, or not...
+                move_details=all_uci_moves
             )
             await insert_game_move(db, request=insert_move_request)
 
@@ -153,9 +161,9 @@ async def play_chess(sid, msg):
         with next(db_session()) as db:
             game_id_num = await get_game_id_from_slug(db, slug=gameID)
             insert_move_request = InsertMoveRequest(
-                game_id = game_id_num,
-                user_id = game_states[gameID]['userID'], #FIXME, or not...
-                move_details = all_uci_moves
+                game_id=game_id_num,
+                user_id=game_states[gameID]['userID'],  # FIXME, or not...
+                move_details=all_uci_moves
             )
             await insert_game_move(db, request=insert_move_request)
 
@@ -177,6 +185,7 @@ async def play_chess(sid, msg):
     game_states[gameID]['time']['bPlayer'].pause_time()
     await sio.emit("play-chess", json.dumps(message), room=sid)
 
+
 # Clean up after game is ended, TODO: Check auth-user?
 @sio.on("end-game")
 async def end_game(sid, msg):
@@ -190,25 +199,27 @@ async def end_game(sid, msg):
     message = "Successfully cleaned up"
     await sio.emit("end-game", message, room=sid)
 
+
 @sio.on("user-forfeit")
 async def user_forfeit(sid, msg):
     data = json.loads(msg)
     gameID = data["id"]
     if (gameID in game_states):
         game_states[gameID]['status'] = True
-        game_states[gameID]['result'] = 2 # Black win
+        game_states[gameID]['result'] = 2  # Black win
         all_uci_moves = list(map(lambda move: move.uci(), game_states[gameID]['board'].move_stack))
         with next(db_session()) as db:
             game_id_num = await get_game_id_from_slug(db, slug=gameID)
             insert_move_request = InsertMoveRequest(
-                game_id = game_id_num,
-                user_id = game_states[gameID]['userID'], #FIXME, or not...
-                move_details = all_uci_moves
+                game_id=game_id_num,
+                user_id=game_states[gameID]['userID'],  # FIXME, or not...
+                move_details=all_uci_moves
             )
             await insert_game_move(db, request=insert_move_request)
 
-    message = "White forfeited" # TODO: Return match info for modal rendering?
+    message = "White forfeited"  # TODO: Return match info for modal rendering?
     await sio.emit("user-forfeit", message, room=sid)
+
 
 @sio.on("start-game")
 async def start_game(sid, msg):
@@ -230,8 +241,8 @@ async def start_game(sid, msg):
         current_state['engine'] = engine
         current_state['board'] = board
         current_state['limit'] = limit
-        current_state['status'] = False # Unfinished game
-        current_state['result'] = 3 # Unknown result
+        current_state['status'] = False  # Unfinished game
+        current_state['result'] = 3  # Unknown result
         current_state['userID'] = userID
 
         timer_dict = dict()
@@ -286,6 +297,114 @@ async def broadcast(sid, msg):
 @sio.on("disconnect")
 async def disconnect(sid):
     print("on disconnect")
+
+
+puzzle_list_per_game_id = dict()
+participant: Dict[int, Set[int]] = dict()
+puzzle_solved_by_user: Dict[int, Dict[int, Set[int]]] = dict()
+
+
+@sio.on("puzzle-duel")
+async def puzzle_duel(sid, msg):
+    print('connect', sid)
+    data = msg
+    if msg["status"] == "start":
+        game_id = data["message"]["gameId"]
+        if puzzle_list_per_game_id.get(game_id) is None:
+            with next(db_session()) as db:
+                puzzle_list = PuzzleService.get_random_ten_puzzle(db)
+                puzzle_list_per_game_id[game_id] = puzzle_list
+            participant[game_id] = set()
+            puzzle_solved_by_user[game_id] = dict()
+        puzzle_list = puzzle_list_per_game_id[game_id]
+        user_id = msg["message"]["userId"]
+        response = {
+            "status": "ready",
+            "message": {
+                "puzzle": puzzle_list.to_json(),
+                "user_id": user_id,
+                "game_id": game_id
+            }
+        }
+        participant[game_id].add(user_id)
+        puzzle_solved_by_user[game_id][user_id] = set()
+        await sio.emit("puzzle-duel", json.dumps(response))
+        response = {
+            "status": "noti",
+            "message": {
+                "content": f"User {user_id} joined"
+            }
+        }
+        await sio.emit("puzzle-duel", json.dumps(response))
+    elif msg["status"] == "submit":
+        user_id = msg["message"]["userId"]
+        game_id = msg["message"]["gameId"]
+        puzzle_id = msg["message"]["puzzleId"]
+        if user_id not in participant[game_id]:
+            response = {
+                "status": "error",
+                "message": {
+                    "content": f"User {user_id} not in game"
+                }
+            }
+            await sio.emit("puzzle-duel", json.dumps(response))
+            return
+        if puzzle_id not in puzzle_list_per_game_id[game_id].puzzles:
+            response = {
+                "status": "error",
+                "message": {
+                    "content": f"Puzzle {puzzle_id} not in game"
+                }
+            }
+            await sio.emit("puzzle-duel", json.dumps(response))
+            return
+        puzzle_solved_by_user[game_id][user_id].add(puzzle_id)
+        total_remaining_puzzle = (len(puzzle_list_per_game_id[game_id].puzzles)
+                                  - len(puzzle_solved_by_user[game_id][user_id]))
+        remaining_puzzle = [puzzle for puzzle in puzzle_list_per_game_id[game_id].puzzles
+                            if puzzle.id not in puzzle_solved_by_user[game_id][user_id]]
+        response = {
+            "status": "submit",
+            "message": {
+                "num_remaining": total_remaining_puzzle,
+                "remaining_puzzle": [puzzle.to_json() for puzzle in remaining_puzzle],
+                "user_id": user_id,
+                "game_id": game_id
+            }
+        }
+        await sio.emit("puzzle-duel", json.dumps(response))
+        response = {
+            "status": "noti",
+            "message": {
+                "content": f"User {user_id} solved puzzle {puzzle_id}"
+            }
+        }
+        await sio.emit("puzzle-duel", json.dumps(response))
+        if total_remaining_puzzle == 0:
+            response = {
+                "status": "end",
+                "message": {
+                    "content": f"User {user_id} won"
+                }
+            }
+            await sio.emit("puzzle-duel", json.dumps(response))
+            return
+    elif msg["status"] == "end":
+        user_id_win = ""
+        game_id = msg["message"]["gameId"]
+        max_puzzle_solved = 0
+        for user_id in participant[game_id]:
+            if len(puzzle_solved_by_user[game_id][user_id]) >= max_puzzle_solved:
+                user_id_win = user_id
+                max_puzzle_solved = len(puzzle_solved_by_user[game_id][user_id])
+        response = {
+            "status": "end",
+            "message": {
+                "content": f"User {user_id_win} won"
+            }
+        }
+        await sio.emit("puzzle-duel", json.dumps(response))
+        return
 
 app.mount("/", socketio.ASGIApp(sio))
 

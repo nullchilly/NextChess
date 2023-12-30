@@ -24,6 +24,21 @@ class PuzzleResponse(CamelBaseModel):
 	fen: str
 	created_at: str
 
+	def to_json(self):
+		return {
+			'id': self.id,
+			'name': self.name,
+			'rating': self.rating,
+			'moves': self.moves,
+			'fen': self.fen,
+			'created_at': self.created_at
+		}
+
 
 class MultiPuzzleResponse(CamelBaseModel):
 	puzzles: list[PuzzleResponse]
+
+	def to_json(self):
+		return {
+			'puzzles': [puzzle.to_json() for puzzle in self.puzzles]
+		}
