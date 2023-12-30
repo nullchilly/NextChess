@@ -70,6 +70,7 @@ class PuzzleInGetUserPuzzleHistoryResponse(CamelBaseModel):
     puzzle_name: str
     date_solved: Optional[datetime]
     rating_change: int
+    is_solved: Optional[bool]
 
 class GetUserPuzzleHistoryResponse(CamelBaseModel):
     puzzles : List[PuzzleInGetUserPuzzleHistoryResponse]

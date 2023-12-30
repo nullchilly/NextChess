@@ -159,10 +159,12 @@ class UserService:
             if puzzle_by_user.get(puzzle.id) is not None:
                 date_solved = puzzle_by_user.get(puzzle.id).get("date_solved")
                 rating_change = puzzle_by_user.get(puzzle.id).get("rating_change")
+                is_solved = True
             else:
                 date_solved = None
                 rating_change = 0
+                is_solved = False
             res.append(PuzzleInGetUserPuzzleHistoryResponse(puzzle_id=puzzle.id, puzzle_name=puzzle.name,
-                                                            date_solved=date_solved, rating_change=rating_change))
+                                                            date_solved=date_solved, rating_change=rating_change, is_solved=is_solved))
         return GetUserPuzzleHistoryResponse(puzzles=res)
 
