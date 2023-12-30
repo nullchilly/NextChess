@@ -53,3 +53,16 @@ class UpdateProfileRequest(CamelBaseModel):
     gender: Optional[UserGender]
     email: Optional[str]
 
+class GameInGetUserGameHistoryResponse(CamelBaseModel):
+    game_id: int
+    variant_id: int
+    time_mode: int
+    result: int
+    move: List[str]
+    rating_change: int
+
+
+class GetUserGameHistoryResponse(CamelBaseModel):
+    Games: List[GameInGetUserGameHistoryResponse]
+
+

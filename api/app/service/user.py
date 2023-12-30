@@ -1,13 +1,15 @@
 import logging
+from collections import defaultdict
 from datetime import datetime
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from api.app.dto.core.user import SignUpRequest, SignUpResponse, UserRole, LoginRequest, ChangePasswordRequest, \
-    LoginResponse, GetProfileResponse, UpdateProfileRequest, RatingInGetProfileResponse
+    LoginResponse, GetProfileResponse, UpdateProfileRequest, RatingInGetProfileResponse, \
+    GetUserGameHistoryResponse, GameInGetUserGameHistoryResponse
 from api.app.helper import auth
-from api.app.model import User, Game
+from api.app.model import User, Game, Move
 from api.app.model import Profile
 from api.app.model.game_user import GameUser
 from api.app.model.user_rating import UserRating
@@ -102,4 +104,41 @@ class UserService:
                 })
         db.commit()
 
+    @classmethod
+    def get_current_user_game_history(cls, db: Session, user_id: int):
+        move_by_user = db.query(Move).filter(Move.user_id == user_id, Move.deleted_at == None).all()
+        move_by_game = defaultdict(list)
+        for move in move_by_user:
+            move_by_game[move.game_id].append(move.move_detail)
+
+
+        q = db.query(Game.id.label("game_id"), Game.variant_id, GameUser.win, Game.status, Game.deleted_at, Game.time_mode, GameUser.rating_change)\
+            .join(GameUser, Game.id == GameUser.game_id)\
+            .filter(GameUser.user_id == user_id, Game.deleted_at == None, GameUser.deleted_at == None)
+        res = []
+        for game_history in q.all():
+            print(game_history.rating_change)
+            game_history_resp = GameInGetUserGameHistoryResponse(game_id=game_history.game_id, user_id=user_id, variant_id=game_history.variant_id,
+                                                move=move_by_game[game_history.game_id], time_mode=game_history.time_mode,
+                                                rating_change=game_history.rating_change, result=game_history.win)
+            res.append(game_history_resp)
+        return GetUserGameHistoryResponse(games=res)
+
+    def get_current_user_game_history(cls, db: Session, user_id: int):
+        move_by_user = db.query(Move).filter(Move.user_id == user_id, Move.deleted_at == None).all()
+        move_by_game = defaultdict(list)
+        for move in move_by_user:
+            move_by_game[move.game_id].append(move.move_detail)
+
+
+        q = db.query(Game.id.label("game_id"), Game.variant_id, GameUser.win, Game.status, Game.deleted_at, Game.time_mode, GameUser.rating_change)\
+            .join(GameUser, Game.id == GameUser.game_id)\
+            .filter(GameUser.user_id == user_id, Game.deleted_at == None, GameUser.deleted_at == None)
+        res = []
+        for game_history in q.all():
+            game_history_resp = GameInGetUserGameHistoryResponse(game_id=game_history.game_id, variant_id=game_history.variant_id,
+                                                move=move_by_game[game_history.game_id], time_mode=game_history.time_mode,
+                                                rating_change=game_history.rating_change, result=game_history.win)
+            res.append(game_history_resp)
+        return GetUserGameHistoryResponse(games=res)
 
