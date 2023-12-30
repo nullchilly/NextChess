@@ -4,11 +4,12 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from api.app.dto.core.user import SignUpResponse, SignUpRequest, LoginRequest, LoginResponse, ChangePasswordRequest, \
-    GetProfileResponse, UpdateProfileRequest, GetUserGameHistoryResponse
+    GetProfileResponse, UpdateProfileRequest, GetUserGameHistoryResponse, GetUserPuzzleHistoryResponse
 from api.app.helper.base_response import DataResponse, ResponseSchemaBase
 from api.app.helper.db import db_session
 from api.app.helper.middleware import get_current_user
 from api.app.model import User
+from api.app.service.puzzle import PuzzleService
 from api.app.service.user import UserService
 
 user_router = APIRouter()
@@ -45,11 +46,20 @@ async def update_profile(db: Session = Depends(db_session), *, request: Request,
 
 @user_router.get('/game/history', response_model=DataResponse[GetUserGameHistoryResponse])
 def get_game_history(db: Session = Depends(db_session), user: User = Depends(get_current_user), *, req: Request):
-    return DataResponse().success_response(data=UserService().get_current_user_game_history(db=db, user_id=user.id))
+    return DataResponse().success_response(data=UserService().get_user_game_history(db=db, user_id=user.id))
 
 @user_router.get('/game/history/{id}', response_model=DataResponse[GetUserGameHistoryResponse])
 def get_game_history(db: Session = Depends(db_session), *, req: Request, id: int):
-    return DataResponse().success_response(data=UserService().get_current_user_game_history(db=db, user_id=id))
+    return DataResponse().success_response(data=UserService().get_user_game_history(db=db, user_id=id))
+
+
+@user_router.get('/puzzle/history', response_model=DataResponse[GetUserPuzzleHistoryResponse])
+def get_game_history(db: Session = Depends(db_session), user: User = Depends(get_current_user), *, req: Request):
+    return DataResponse().success_response(data=UserService().get_user_puzzle_history(db=db, user_id=user.id))
+
+@user_router.get('/puzzle/history/{id}', response_model=DataResponse[GetUserPuzzleHistoryResponse])
+def get_game_history(db: Session = Depends(db_session), *, req: Request, id: int):
+    return DataResponse().success_response(data=UserService().get_user_puzzle_history(db=db, user_id=id))
 
 
 

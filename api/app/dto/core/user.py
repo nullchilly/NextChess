@@ -63,6 +63,15 @@ class GameInGetUserGameHistoryResponse(CamelBaseModel):
 
 
 class GetUserGameHistoryResponse(CamelBaseModel):
-    Games: List[GameInGetUserGameHistoryResponse]
+    games: List[GameInGetUserGameHistoryResponse]
+
+class PuzzleInGetUserPuzzleHistoryResponse(CamelBaseModel):
+    puzzle_id: int
+    puzzle_name: str
+    date_solved: Optional[datetime]
+    rating_change: int
+
+class GetUserPuzzleHistoryResponse(CamelBaseModel):
+    puzzles : List[PuzzleInGetUserPuzzleHistoryResponse]
 
 

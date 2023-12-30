@@ -7,11 +7,13 @@ from sqlalchemy.orm import Session
 
 from api.app.dto.core.user import SignUpRequest, SignUpResponse, UserRole, LoginRequest, ChangePasswordRequest, \
     LoginResponse, GetProfileResponse, UpdateProfileRequest, RatingInGetProfileResponse, \
-    GetUserGameHistoryResponse, GameInGetUserGameHistoryResponse
+    GetUserGameHistoryResponse, GameInGetUserGameHistoryResponse, PuzzleInGetUserPuzzleHistoryResponse, \
+    GetUserPuzzleHistoryResponse
 from api.app.helper import auth
-from api.app.model import User, Game, Move
+from api.app.model import User, Game, Move, Puzzle
 from api.app.model import Profile
 from api.app.model.game_user import GameUser
+from api.app.model.puzzle_user import PuzzleUser
 from api.app.model.user_rating import UserRating
 
 
@@ -141,4 +143,26 @@ class UserService:
                                                 rating_change=game_history.rating_change, result=game_history.win)
             res.append(game_history_resp)
         return GetUserGameHistoryResponse(games=res)
+
+    def get_user_puzzle_history(cls, db: Session, user_id: int):
+        puzzles = db.query(Puzzle).all()
+        puzzle_by_user = {}
+        q = db.query(PuzzleUser).filter(PuzzleUser.user_id == user_id)
+        res = []
+        for puzzle in q.all():
+            puzzle_by_user[puzzle.puzzle_id] = {
+                "rating_change": puzzle.gained_rating,
+                "date_solved": puzzle.created_at
+
+            }
+        for puzzle in puzzles:
+            if puzzle_by_user.get(puzzle.id) is not None:
+                date_solved = puzzle_by_user.get(puzzle.id).get("date_solved")
+                rating_change = puzzle_by_user.get(puzzle.id).get("rating_change")
+            else:
+                date_solved = None
+                rating_change = 0
+            res.append(PuzzleInGetUserPuzzleHistoryResponse(puzzle_id=puzzle.id, puzzle_name=puzzle.name,
+                                                            date_solved=date_solved, rating_change=rating_change))
+        return GetUserPuzzleHistoryResponse(puzzles=res)
 
