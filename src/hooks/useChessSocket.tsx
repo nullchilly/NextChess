@@ -1,12 +1,11 @@
-import { useContext, useReducer, useState } from "react";
+import { useReducer, useState } from "react";
 import React from "react";
 import { Chess, Move, Square } from "chess.js";
 import { io, Socket } from "socket.io-client";
 import { CustomSquares, ShortMove } from "@/types";
 import { useLocalStorage } from "./useLocalStorage";
 import { httpGetPlayerTimeLeft } from "@/modules/backend-client/httpGetPlayerTimeLeft";
-import { WINNER } from "@/helpers/types";
-import { UserContext } from "@/context/UserContext";
+import { GameConfig, WINNER } from "@/helpers/types";
 
 export type ChessType = "random" | "computer" | "minimax";
 
@@ -14,6 +13,7 @@ type Props = {
   id: string;
   type: ChessType;
   userId?: number;
+  gameConfig?: GameConfig;
 };
 
 enum ConnectionStatus {
@@ -31,24 +31,31 @@ function squareReducer(squares: CustomSquares, action: Partial<CustomSquares>) {
   return { ...squares, ...action };
 }
 
-const useChessSocket = ({ type, id, userId }: Props) => {
+function getChessPosisition(variant?: number) {
+  return variant === 1 || !variant
+    ? new Chess()
+    : new Chess("bnnqrkrb/pppppppp/8/8/8/8/PPPPPPPP/BNNQRKRB w KQkq - 0 1");
+}
+
+const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
   // Start of socket
   const [socket, setSocket] = React.useState<Socket | null>(null);
   const [connectionStatus, setConnectionStatus] =
     React.useState<ConnectionStatus>(ConnectionStatus.Disconnected);
 
-  const [wPlayerTimeLeft, setWPlayerTimeLeft] = React.useState<number>(120000); // 120s
+  const [wPlayerTimeLeft, setWPlayerTimeLeft] = React.useState<number>(
+    (gameConfig?.timeMode ?? 0) * 60000
+  );
   const [isWPlayerActive, setWPlayerActive] = React.useState<boolean>(false);
 
-  const [bPlayerTimeLeft, setBPlayerTimeLeft] = React.useState<number>(120000); // 120s
+  const [bPlayerTimeLeft, setBPlayerTimeLeft] = React.useState<number>(
+    (gameConfig?.timeMode ?? 0) * 60000
+  );
   const [isBPlayerActive, setBPlayerActive] = React.useState<boolean>(false);
 
   const [winner, setWinner] = React.useState<WINNER>("unknown");
 
   // Handle prev-next move button in game review
-  // const [prevGame, setPrevGame] = React.useState(new Chess());
-  const [nextGame, setNextGame] = React.useState(new Chess());
-  // const [finalGameMoves, setFinalGameMoves] = React.useState<Move[]>([]);
   const [moveIndex, setMoveIndex] = React.useState(0);
   const [allGameStates, setAllGameStates] = React.useState<Chess[]>([]);
 
@@ -66,12 +73,20 @@ const useChessSocket = ({ type, id, userId }: Props) => {
     setBPlayerActive(false);
 
     // Save all moves for review
-    const allMoves = game.history({verbose: true});
-    let allStates: Chess[] = [new Chess()];
+    const allMoves = game.history({ verbose: true });
+    let allStates: Chess[] = [getChessPosisition(gameConfig?.variant)];
+    console.log("handle state: ", allGameStates);
+
     for (let i = 0; i < allMoves.length; i++) {
-      let tempState: Chess = new Chess();
+      let tempState: Chess = getChessPosisition(gameConfig?.variant);
+      console.log(`tempSate: ${i}`, tempState.fen());
       for (let j = 0; j <= i; j++) {
-        tempState.move(allMoves[j]);
+        try {
+          tempState.move(allMoves[j]);
+        } catch (error) {
+          // console.log("[ERR]: ", i, j, allMoves[j], tempState.fen(), error);
+          console.log("[ERR]: ", error);
+        }
       }
       allStates.push(tempState);
     }
@@ -106,8 +121,10 @@ const useChessSocket = ({ type, id, userId }: Props) => {
               const winner_id = message["result"]["winner"];
               const reason = message["result"]["reason"];
               console.log("Reason: ", reason);
-              await new Promise(r => setTimeout(r, 1200));
-              handleGameEnd(winner_id === 0 ? "draw" : winner_id === 1 ? "white" : "black");
+              await new Promise((r) => setTimeout(r, 1200));
+              handleGameEnd(
+                winner_id === 0 ? "draw" : winner_id === 1 ? "white" : "black"
+              );
             }
           } else {
             console.error("[!!!] Play chess socket error: ", message["error"]);
@@ -146,7 +163,8 @@ const useChessSocket = ({ type, id, userId }: Props) => {
     );
     if (savedMoves) {
       const parsedSavedMoves = JSON.parse(savedMoves) as Move[];
-      const newGame = new Chess();
+      const newGame = getChessPosisition(gameConfig?.variant);
+      console.log("[NEW]: ", newGame, newGame.fen());
       try {
         parsedSavedMoves.forEach((move) => newGame.move(move));
       } catch (error) {
@@ -170,7 +188,6 @@ const useChessSocket = ({ type, id, userId }: Props) => {
       }
     }
     getTime();
-    console.log("??: ", userId);
   }, []);
 
   // Send latest move over socket
@@ -188,7 +205,8 @@ const useChessSocket = ({ type, id, userId }: Props) => {
 
   const onInitGame = () => {
     console.log("Running init...");
-    const initNewGame = { id: id, userId: userId ?? 0 }; // TODO: Add preferences (difficulty, timer, ...)
+    // NOTE: We leave a default user-id = 1, so guest can play without having logged in
+    const initNewGame = { id: id, userId: userId ?? 1, config: gameConfig }; // TODO: Add preferences (difficulty, timer, ...)
     socket?.emit("start-game", JSON.stringify(initNewGame));
   };
 
@@ -207,7 +225,7 @@ const useChessSocket = ({ type, id, userId }: Props) => {
   };
 
   // End of socket
-  const [game, setGame] = useState(new Chess());
+  const [game, setGame] = useState(getChessPosisition(gameConfig?.variant));
   const [playing, setPlaying] = useLocalStorage({
     name: `${id}-is-playing`,
     defaultValue: false,
@@ -284,6 +302,9 @@ const useChessSocket = ({ type, id, userId }: Props) => {
   const resetGame = () => {
     const gameCopy = game;
     gameCopy.reset();
+    if (gameConfig?.variant === 2) {
+      gameCopy.load("bnnqrkrb/pppppppp/8/8/8/8/PPPPPPPP/BNNQRKRB w KQkq - 0 1");
+    }
     setGame(gameCopy);
     cleanOldGame();
     setMoves([]);
@@ -291,8 +312,8 @@ const useChessSocket = ({ type, id, userId }: Props) => {
     if (currentTimeout) clearTimeout(currentTimeout);
     setPlaying(false);
 
-    setWPlayerTimeLeft(120000);
-    setBPlayerTimeLeft(120000);
+    setWPlayerTimeLeft((gameConfig?.timeMode ?? 0) * 60000);
+    setBPlayerTimeLeft((gameConfig?.timeMode ?? 0) * 60000);
     setBPlayerActive(false);
     setWPlayerActive(false);
 
@@ -329,10 +350,11 @@ const useChessSocket = ({ type, id, userId }: Props) => {
   const prevMove = () => {
     const newMoveIndex = Math.max(moveIndex - 1, 0);
     const currentGame = allGameStates[newMoveIndex];
+    // console.log("ALL: ", moveIndex, allGameStates);
     setMoveIndex(newMoveIndex);
     setGame(currentGame);
     updateCustomSquares({ check: undefined }); // Reset style
-  }
+  };
 
   const nextMove = () => {
     const newMoveIndex = Math.min(moveIndex + 1, allGameStates.length - 1);
@@ -340,7 +362,7 @@ const useChessSocket = ({ type, id, userId }: Props) => {
     setMoveIndex(newMoveIndex);
     setGame(currentGame);
     updateCustomSquares({ check: undefined }); // Reset style
-  }
+  };
 
   return {
     game,
