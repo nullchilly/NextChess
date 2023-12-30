@@ -97,7 +97,7 @@ class PuzzleService:
 				user_id=profile.user_id,
 				puzzle_id=puzzle.id,
 				state=1,
-				gained_rating=True,
+				gained_rating=puzzle.rating,
 			)
 			db.add(puzzle_user)
 			puzzle_user = db.query(PuzzleUser).filter(PuzzleUser.puzzle_id == req.tactics_problem_id,
