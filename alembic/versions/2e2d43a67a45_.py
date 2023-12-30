@@ -18,9 +18,18 @@ depends_on = None
 
 def upgrade():
     op.add_column('game_user', sa.Column('rating_change', sa.Integer(), nullable=False))
+    op.drop_table('user_rating')
     pass
 
 
 def downgrade():
     op.drop_column('game_user', 'rating_change')
+    op.create_table('user_rating',
+                    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+                    sa.Column('user_id', sa.Integer(), nullable=False),
+                    sa.Column('rating', sa.Integer(), nullable=False),
+                    sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
+                    sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
+                    sa.Column('deleted_at', sa.DateTime(), nullable=True),
+                    sa.PrimaryKeyConstraint('id'))
     pass
