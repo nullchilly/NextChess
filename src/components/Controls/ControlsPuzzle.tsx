@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import { Puzzle } from "@/types";
 import { Button, Row } from "antd";
 import "./styles.css";
@@ -13,6 +13,7 @@ import {
   RedoOutlined,
   StepForwardOutlined,
 } from "@ant-design/icons";
+import {UserContext} from "@/context/UserContext";
 
 type ControlsPuzzleProps = {
   puzzleData: Puzzle;
@@ -33,7 +34,8 @@ const ControlsPuzzle: React.FC<ControlsPuzzleProps> = ({
   onRetry,
   onNext,
 }) => {
-
+  const {name} = useContext(UserContext);
+  
   return (
     <div>
       <Row
