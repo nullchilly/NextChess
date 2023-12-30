@@ -187,14 +187,7 @@ const Analyst = () => {
 }
 
 const ProfilePage = () => {
-  const {name } = useContext(UserContext);
-  const router = useRouter();
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      router.push('/login');
-    }
-  },[])
+  const { name } = useContext(UserContext);
     return (
         <div className="flex flex-col">
             <div className="rw-full sm:w-full md:w-full p-4">

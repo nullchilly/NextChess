@@ -69,7 +69,7 @@ class UserService:
         ratings = []
         for res in q.all():
             ratings.append(RatingInGetProfileResponse(rating=res.rating, variant_id=res.variant_id))
-        return GetProfileResponse(name=user_profile.name, date_of_birth=user_profile.date_of_birth,
+        return GetProfileResponse(user_id=user_profile.id, name=user_profile.name, date_of_birth=user_profile.date_of_birth,
                                   gender=user_profile.gender, email=user_profile.email, ratings=ratings)
 
     @classmethod
