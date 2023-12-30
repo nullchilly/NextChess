@@ -43,10 +43,6 @@ async def update_profile(db: Session = Depends(db_session), *, request: Request,
     UserService().update_profile(db=db, user=user, request=UpdateProfileRequest(**request_body))
     return ResponseSchemaBase().success_response()
 
-@auth_router.delete('/profile', response_model=ResponseSchemaBase)
-async def delete_profile(db: Session = Depends(db_session), *, request: Request, user: User = Depends(get_current_user)):
-    req_body = await request.json()
-    UserService().delete_account(user, db, req_body['userId'])
-    return ResponseSchemaBase().success_response()
+
 
 

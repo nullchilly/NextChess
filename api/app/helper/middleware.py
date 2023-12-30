@@ -11,7 +11,7 @@ async def get_current_user(request: Request, db: Session = Depends(db_session)):
     if access_token is None:
         raise HTTPException(status_code=403, detail="Forbidden")
     user_name = auth.decodeJWT(access_token)
-    user = db.query(User).filter(User.user_name == user_name).first()
+    user = db.query(User).filter(User.user_name == user_name, User.deleted_at == None).first()
     if user is None:
         raise HTTPException(status_code=401, detail="Unauthenticated")
     return user

@@ -7,8 +7,9 @@ from sqlalchemy.orm import Session
 from api.app.dto.core.user import SignUpRequest, SignUpResponse, UserRole, LoginRequest, ChangePasswordRequest, \
     LoginResponse, GetProfileResponse, UpdateProfileRequest, RatingInGetProfileResponse
 from api.app.helper import auth
-from api.app.model import User
+from api.app.model import User, Game
 from api.app.model import Profile
+from api.app.model.game_user import GameUser
 from api.app.model.user_rating import UserRating
 
 
@@ -75,14 +76,16 @@ class UserService:
     @classmethod
     def get_user_profile_by_id(cls, db: Session, id: int) -> GetProfileResponse:
         user_profile = db.query(Profile).filter(Profile.user_id == id).first()
-        user = db.query(User).filter(User.id == id).first()
-        if user_profile is None or user_profile.deleted_at is not None:
+        user = db.query(User).filter(User.id == id, User.deleted_at == None).first()
+        if user_profile is None:
             raise HTTPException(status_code=404, detail="User not found")
-        q = db.query(UserRating.rating, UserRating.variant_id).filter(UserRating.user_id == id).order_by(
-            UserRating.id)
+        q = (db.query(GameUser.user_id, GameUser.rating_change, GameUser.game_id, Game.variant_id, Game.id)
+             .join(Game, Game.id == GameUser.game_id).filter(GameUser.user_id == id))
         ratings = []
+        rating_by_variant = {}
         for res in q.all():
-            ratings.append(RatingInGetProfileResponse(rating=res.rating, variant_id=res.variant_id))
+            rating_by_variant[res.variant_id] = rating_by_variant.get(res.variant_id, 0) + res.rating_change
+            ratings.append(RatingInGetProfileResponse(rating=rating_by_variant[res.variant_id], variant_id=res.variant_id))
         return GetProfileResponse(user_id=id, name=user_profile.name, date_of_birth=user_profile.date_of_birth,
                                   gender=user_profile.gender, email=user_profile.email, ratings=ratings, is_admin=user.is_admin)
 
@@ -99,20 +102,4 @@ class UserService:
                 })
         db.commit()
 
-    @classmethod
-    def delete_account(cls, user: User, db: Session, user_id: int):
-        if user.is_admin is False:
-            raise HTTPException(status_code=403, detail="Forbidden")
-        user = db.query(User).filter(User.id == user_id).first()
-        if user is None:
-            raise HTTPException(status_code=404, detail="User not found")
-        db.query(User).filter(User.id == user_id). \
-            update({
-            "deleted_at": datetime.now()
-        })
-        db.query(Profile).filter(Profile.user_id == user_id). \
-            update({
-            "deleted_at": datetime.now()
-        })
-        db.commit()
 
