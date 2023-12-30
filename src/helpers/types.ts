@@ -51,6 +51,12 @@ export enum TimeMode {
     SevenMins="7 minutes",
 }
 
+export enum StatePuzzleDuel {
+  wait,
+  pending,
+  success
+}
+
 export type DataPoint = {
     x: string;
     y: number;
