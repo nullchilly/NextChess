@@ -394,6 +394,8 @@ async def puzzle_duel(sid, msg):
             response = {
                 "status": "end",
                 "message": {
+                    "gameId": game_id,
+                    "userId": user_id,
                     "content": f"User {user_id} won"
                 }
             }
@@ -410,6 +412,8 @@ async def puzzle_duel(sid, msg):
         response = {
             "status": "end",
             "message": {
+                "gameId": game_id,
+                "userId": user_id_win,
                 "content": f"User {user_id_win} won"
             }
         }
