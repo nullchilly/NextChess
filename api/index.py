@@ -227,6 +227,11 @@ async def start_game(sid, msg):
         data = json.loads(msg)
         gameID = data["id"]
         userID = data["userId"]
+        config = data["config"]
+        strength = config["strength"]
+        variant = config["variant"]
+        gameTime = config["timeMode"] * 60
+
         all_game_ids.discard(gameID)  # safe removal
         all_game_ids.add(gameID)
         engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
@@ -234,8 +239,12 @@ async def start_game(sid, msg):
         limit = chess.engine.Limit(time=1.2)
         board = chess.Board()
 
-        wTimer = ChessTimer(time_left=120)  # 120s
-        bTimer = ChessTimer(time_left=120)  # 120s
+        if (variant == 2):
+            # Hardcode Chess960 starting FEN
+            board.set_fen("bnnqrkrb/pppppppp/8/8/8/8/PPPPPPPP/BNNQRKRB w KQkq - 0 1")
+
+        wTimer = ChessTimer(time_left=gameTime)
+        bTimer = ChessTimer(time_left=gameTime)
 
         current_state = dict()
         current_state['engine'] = engine
@@ -250,7 +259,8 @@ async def start_game(sid, msg):
         timer_dict['bPlayer'] = bTimer
 
         current_state['time'] = timer_dict
-        current_state['time']['wPlayer'].run_clock()
+        if (gameTime > 0):
+            current_state['time']['wPlayer'].run_clock()
 
         game_states[gameID] = current_state
 

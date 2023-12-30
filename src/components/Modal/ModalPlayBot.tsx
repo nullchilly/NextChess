@@ -4,7 +4,7 @@ import React from "react";
 import Black from "@/components/icons/bK";
 import White from "@/components/icons/wK";
 import Random from "@/components/icons/wbK";
-import { ChessVariants, TimeMode } from "@/helpers/types";
+import { ChessVariants, GameConfig, TimeMode } from "@/helpers/types";
 import { useRouter } from "next/navigation";
 import { httpPostCreateBotGame } from "@/modules/backend-client/httpPostCreateBotGame";
 import { tryUntil } from "@/modules/async-utils";
@@ -82,6 +82,8 @@ export default function ModalPlayBot({ isOpen, setOpen }: Props) {
       console.error("Can't index game slug: ", cause);
     });
 
+    const gameConfig: GameConfig = {strength, variant, timeMode};
+    localStorage.setItem(`config-${slug}`, JSON.stringify(gameConfig));
     setOpen(false);
     setConfirmLoading(false);
     router.push(`/computer/${slug}`);

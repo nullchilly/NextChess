@@ -57,7 +57,6 @@ const UserProvider: React.FC<Props> = (props) => {
 			})
 			const data = await response.json();
 			if (data?.code === 200) {
-				console.log("DATA PROF: ", data.data);
 				setDataUser(data.data)
 			}
 		} else {

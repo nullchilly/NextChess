@@ -96,4 +96,10 @@ export type PuzzleInfo = {
   themes: string[];
 };
 
+export type GameConfig = {
+  strength: number;
+  variant: number;
+  timeMode: number;
+}
+
 export type WINNER = "black" | "white" | "draw" | "unknown";

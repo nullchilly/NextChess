@@ -16,6 +16,7 @@ import ModalEndGame from "../Modal/ModalEndGame";
 
 import { CaretLeftFilled, CaretRightFilled } from "@ant-design/icons";
 import { UserContext } from "@/context/UserContext";
+import { GameConfig } from "@/helpers/types";
 
 type ChessGameType = {
   id: string;
@@ -24,6 +25,17 @@ type ChessGameType = {
 
 const ChessGame = ({ id, type }: ChessGameType) => {
   const { userId } = useContext(UserContext);
+  let gameConfig: GameConfig | undefined;
+  const ISSERVER = typeof window === "undefined";
+  try {
+    if (!ISSERVER) {
+      gameConfig = JSON.parse(
+        localStorage.getItem(`config-${id}`) ?? ""
+      ) as GameConfig;
+    }
+  } catch (error) {
+    console.error("Can't parse game config: ", error, ISSERVER);
+  }
   const {
     game,
     // moves,
@@ -44,9 +56,8 @@ const ChessGame = ({ id, type }: ChessGameType) => {
     forfeitGame,
 
     prevMove,
-    nextMove
-
-  } = useChessSocket({ type, id, userId });
+    nextMove,
+  } = useChessSocket({ type, id, userId, gameConfig });
 
   const [botList, setBotList] = useState<BotProps[]>([]);
   const [bot, setBot] = useState<BotProps>({ id: "0", name: "shark" });
@@ -72,11 +83,13 @@ const ChessGame = ({ id, type }: ChessGameType) => {
       <div className="flex justify-center w-2/3">
         <div className="w-[450px]">
           <div className="">
-            <PlayerTimer
-              timeLeft={bPlayerTimeLeft}
-              going={isBPlayerActive && playing}
-              turnIndicator={false}
-            />
+            {gameConfig?.timeMode ? (
+              <PlayerTimer
+                timeLeft={bPlayerTimeLeft}
+                going={isBPlayerActive && playing}
+                turnIndicator={false}
+              />
+            ) : null}
             <PlayerCard
               name={bot ? bot.name : "none"}
               link={bot ? "/home" : "/profile/chien"}
@@ -98,11 +111,13 @@ const ChessGame = ({ id, type }: ChessGameType) => {
           />
           <div className="">
             <PlayerCard name={"Chien"} link={"/profile/chien"} />
-            <PlayerTimer
-              timeLeft={wPlayerTimeLeft}
-              going={isWPlayerActive && playing}
-              turnIndicator={true}
-            />
+            {gameConfig?.timeMode ? (
+              <PlayerTimer
+                timeLeft={wPlayerTimeLeft}
+                going={isWPlayerActive && playing}
+                turnIndicator={true}
+              />
+            ) : null}
           </div>
         </div>
       </div>
@@ -114,12 +129,18 @@ const ChessGame = ({ id, type }: ChessGameType) => {
                 moves={game.history({ verbose: true }).reverse()}
                 bot={bot ? bot : { id: "0", name: "shark" }}
               />
-              {winner !== "unknown" ? 
+              {winner !== "unknown" ? (
                 <div className="flex justify-center">
-                  <CaretLeftFilled style={{fontSize: "32px"}} onClick={prevMove} />
-                  <CaretRightFilled style={{fontSize: "32px"}} onClick={nextMove} />
+                  <CaretLeftFilled
+                    style={{ fontSize: "32px" }}
+                    onClick={prevMove}
+                  />
+                  <CaretRightFilled
+                    style={{ fontSize: "32px" }}
+                    onClick={nextMove}
+                  />
                 </div>
-              : null}
+              ) : null}
             </>
           ) : (
             <PrepareCard
