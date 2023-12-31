@@ -205,10 +205,9 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
 
   const onInitGame = () => {
     console.log("Running init...");
-    // NOTE: We leave a default user-id = 1, so guest can play without having logged in
     const initNewGame = {
-      id: id,
-      userId: !userId ? 1 : userId,
+      id,
+      userId,
       config: gameConfig,
     }; // TODO: Add preferences (difficulty, timer, ...)
     socket?.emit("start-game", JSON.stringify(initNewGame));

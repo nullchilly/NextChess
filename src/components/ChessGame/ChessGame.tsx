@@ -24,7 +24,7 @@ type ChessGameType = {
 };
 
 const ChessGame = ({ id, type }: ChessGameType) => {
-  const { userId } = useContext(UserContext);
+  const { userId, name } = useContext(UserContext);
   let gameConfig: GameConfig | undefined;
   const ISSERVER = typeof window === "undefined";
   try {
@@ -92,7 +92,7 @@ const ChessGame = ({ id, type }: ChessGameType) => {
             ) : null}
             <PlayerCard
               name={bot ? bot.name : "none"}
-              link={bot ? "/home" : "/profile/chien"}
+              link={bot ? "/home" : "/profile/guest"}
             />
           </div>
           {!playing && (
@@ -110,7 +110,7 @@ const ChessGame = ({ id, type }: ChessGameType) => {
             customSquareStyles={{ ...customSquares.check }}
           />
           <div className="">
-            <PlayerCard name={"Chien"} link={"/profile/chien"} />
+            <PlayerCard name={name ?? "Guest"} link={"/profile/guest"} />
             {gameConfig?.timeMode ? (
               <PlayerTimer
                 timeLeft={wPlayerTimeLeft}
