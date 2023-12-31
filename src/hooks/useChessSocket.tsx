@@ -152,6 +152,38 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
       socket.on("user-forfeit", (msg) => {
         console.log("user-forfeit socket message: ", msg);
       });
+
+      socket.on("fetch-saved-game", (msg) => {
+        try {
+          const response = JSON.parse(msg);
+          if (response["ok"] && Number.isInteger(response["winner"])) {
+            let savedWinner: WINNER = "unknown";
+            switch (response["winner"]) {
+              case 0:
+                savedWinner = "draw";
+                break;
+              case 1:
+                savedWinner = "white";
+              case 2:
+                savedWinner = "black";
+              default:
+                console.log("Fetched winner: ", response["winner"]);
+                break;
+            }
+            if (savedWinner !== "unknown") {
+              handleGameEnd(savedWinner);
+            }
+            setWinner(savedWinner);
+          } else {
+            console.error(
+              "[!!!] Error when fetching saved data: ",
+              response["error"] ?? ""
+            );
+          }
+        } catch (error) {
+          console.error("[!!!] Can't fetch saved game data");
+        }
+      });
     }
   }, [disconnectSocket, setConnectionStatus, socket]);
 
@@ -219,12 +251,19 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
   };
 
   const connectSocket = () => {
+    // TODO: Auto disconnect after a while?
     const socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`, {
       autoConnect: false,
       reconnection: true,
     });
     // onInitGame(socket);
+    fetchSavedGame(socket);
     setSocket(socket);
+  };
+
+  const fetchSavedGame = (socket: Socket) => {
+    const savedGame = { id };
+    socket.emit("fetch-saved-game", JSON.stringify(savedGame));
   };
 
   // End of socket

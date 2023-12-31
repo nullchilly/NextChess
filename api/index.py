@@ -9,8 +9,10 @@ from .app.model import Game
 from .app.model.game_user import GameUser
 from .app.service.puzzle import PuzzleService
 from api.app.service.insert_moves import insert_game_move, get_game_id_from_slug
+from api.app.service.insert_game_user import insert_game_user
 from api.app.helper.db import db_session
 from sqlalchemy.orm import Session
+from api.app.dto.core.insert_game_user import InsertGameUserRequest
 from api.app.dto.core.insert_moves import InsertMoveRequest
 from .config import STOCKFISH_PATH
 from .socket import manager, WebSocketConnectionManager
@@ -130,7 +132,8 @@ async def play_chess(sid, msg):
         }
         game_states[gameID]['status'] = True
         game_states[gameID]['result'] = winner
-        all_uci_moves = list(map(lambda move: move.uci(), game_states[gameID]['board'].move_stack))
+        all_uci_moves = list(
+            map(lambda move: move.uci(), game_states[gameID]['board'].move_stack))
         if (game_states[gameID]['userID'] > 0):
             with next(db_session()) as db:
                 game_id_num = await get_game_id_from_slug(db, slug=gameID)
@@ -138,6 +141,12 @@ async def play_chess(sid, msg):
                     game_id=game_id_num,
                     user_id=game_states[gameID]['userID'],  # FIXME, or not...
                     move_details=all_uci_moves
+                )
+                insert_game_user_request = InsertGameUserRequest(
+                    game_id=game_id_num,
+                    user_id=game_states[gameID]['userID'],  # FIXME, or not...
+                    win=winner,
+                    rating_change=0,  # Bot-game doesn't affect rating
                 )
                 await insert_game_move(db, request=insert_move_request)
 
@@ -160,7 +169,8 @@ async def play_chess(sid, msg):
         winner = 0 if winner_color is None else 1 if winner_color is True else 2
         game_states[gameID]['status'] = True
         game_states[gameID]['result'] = winner
-        all_uci_moves = list(map(lambda move: move.uci(), game_states[gameID]['board'].move_stack))
+        all_uci_moves = list(
+            map(lambda move: move.uci(), game_states[gameID]['board'].move_stack))
         if (game_states[gameID]['userID'] > 0):
             with next(db_session()) as db:
                 game_id_num = await get_game_id_from_slug(db, slug=gameID)
@@ -169,6 +179,14 @@ async def play_chess(sid, msg):
                     user_id=game_states[gameID]['userID'],  # FIXME, or not...
                     move_details=all_uci_moves
                 )
+                insert_game_user_request = InsertGameUserRequest(
+                    game_id=game_id_num,
+                    user_id=game_states[gameID]['userID'],  # FIXME, or not...
+                    win=winner,
+                    rating_change=0,  # Bot-game doesn't affect rating
+                )
+
+                await insert_game_user(db, request=insert_game_user_request)
                 await insert_game_move(db, request=insert_move_request)
 
     message = {
@@ -211,7 +229,8 @@ async def user_forfeit(sid, msg):
     if (gameID in game_states):
         game_states[gameID]['status'] = True
         game_states[gameID]['result'] = 2  # Black win
-        all_uci_moves = list(map(lambda move: move.uci(), game_states[gameID]['board'].move_stack))
+        all_uci_moves = list(
+            map(lambda move: move.uci(), game_states[gameID]['board'].move_stack))
         if (game_states[gameID]['userID'] > 0):
             with next(db_session()) as db:
                 game_id_num = await get_game_id_from_slug(db, slug=gameID)
@@ -220,6 +239,14 @@ async def user_forfeit(sid, msg):
                     user_id=game_states[gameID]['userID'],  # FIXME, or not...
                     move_details=all_uci_moves
                 )
+                insert_game_user_request = InsertGameUserRequest(
+                    game_id=game_id_num,
+                    user_id=game_states[gameID]['userID'],  # FIXME, or not...
+                    win=2,
+                    rating_change=0,  # Bot-game doesn't affect rating
+                )
+
+                await insert_game_user(db, request=insert_game_user_request)
                 await insert_game_move(db, request=insert_move_request)
 
     message = "White forfeited"  # TODO: Return match info for modal rendering?
@@ -246,7 +273,8 @@ async def start_game(sid, msg):
 
         if (variant == 2):
             # Hardcode Chess960 starting FEN
-            board.set_fen("bnnqrkrb/pppppppp/8/8/8/8/PPPPPPPP/BNNQRKRB w KQkq - 0 1")
+            board.set_fen(
+                "bnnqrkrb/pppppppp/8/8/8/8/PPPPPPPP/BNNQRKRB w KQkq - 0 1")
 
         wTimer = ChessTimer(time_left=gameTime)
         bTimer = ChessTimer(time_left=gameTime)
@@ -290,6 +318,25 @@ async def undo(sid, msg):
         except IndexError:
             print("No move yet!")
 
+
+@sio.on("fetch-saved-game")
+async def fetch_saved_game(sid, msg):
+    try:
+        data = json.loads(msg)
+        gameID = data["id"]
+        print("GAME_ID: ", gameID, gameID in game_states);
+        if (gameID in game_states):
+            response = {"ok": True, "winner": game_states[gameID]["result"]}
+            await sio.emit("fetch-saved-game", json.dumps(response), room=sid)
+            return
+        else:
+            response = {"ok": False, "error": "Game not exist"}
+            await sio.emit("fetch-saved-game", json.dumps(response), room=sid)
+            return
+    except Exception as e:
+        failMessage = {"ok": False,
+                       "error": "Error when fetching saved data"}
+        await sio.emit("fetch-saved-game", json.dumps(failMessage), room=sid)
 
 @sio.on("connect")
 async def connect(sid, env):
@@ -432,7 +479,8 @@ async def puzzle_duel(sid, msg):
         for user_id in participant[game_id]:
             if len(puzzle_solved_by_user[game_id][user_id]) >= max_puzzle_solved:
                 user_id_win = user_id
-                max_puzzle_solved = len(puzzle_solved_by_user[game_id][user_id])
+                max_puzzle_solved = len(
+                    puzzle_solved_by_user[game_id][user_id])
         response = {
             "status": "end",
             "message": {
