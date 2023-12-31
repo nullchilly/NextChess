@@ -4,8 +4,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from api.app.dto.core.puzzle import GetPuzzleGameResponse, MultiPuzzleResponse, PuzzleResponse, SubmitPuzzleRequest, \
-	SubmitPuzzleResponse
+from api.app.dto.core.puzzle import *
 from api.app.helper.db import db_session
 from api.app.helper.middleware import get_current_user
 from api.app.model import User
@@ -51,3 +50,8 @@ async def submit_puzzle(db: Session = Depends(db_session), *, request: SubmitPuz
 @puzzle_router.get('/puzzle/game', response_model=GetPuzzleGameResponse)
 async def get_puzzle_game(db: Session = Depends(db_session)):
 	return PuzzleService().find_puzzle_game(db)
+
+
+@puzzle_router.get('/puzzle/recent', response_model=PuzzleDuelResultList)
+async def get_recent_puzzle_duel_result(db: Session = Depends(db_session)):
+	return PuzzleService().get_recent_puzzle_duel_result(db)

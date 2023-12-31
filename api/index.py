@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 
 from api.app import create_app
 from .app.helper.db import db_session
+from .app.model import Game
+from .app.model.game_user import GameUser
 from .app.service.puzzle import PuzzleService
 from api.app.service.insert_moves import insert_game_move, get_game_id_from_slug
 from api.app.helper.db import db_session
@@ -331,6 +333,20 @@ async def puzzle_duel(sid, msg):
             puzzle_solved_by_user[game_id] = dict()
         puzzle_list = puzzle_list_per_game_id[game_id]
         user_id = msg["message"]["userId"]
+        with next(db_session()) as db:
+            # update number player of game gameId in db
+            game = db.query(Game).filter(Game.id == game_id).first()
+            game.number_player += 1
+            # add new game_user to game_user table
+            game_user = GameUser(
+                user_id=user_id,
+                game_id=game_id,
+                win=0,
+                rating_change=0
+            )
+            db.add(game_user)
+            db.commit()
+
         response = {
             "status": "ready",
             "message": {
@@ -402,6 +418,11 @@ async def puzzle_duel(sid, msg):
                     "content": f"User {user_id} won"
                 }
             }
+            with next(db_session()) as db:
+                game_user = db.query(GameUser).filter(GameUser.user_id == user_id,
+                                                      GameUser.game_id == game_id).first()
+                game_user.win = 1
+                db.commit()
             await sio.emit("puzzle-duel", json.dumps(response))
             return
     elif msg["status"] == "end_game":
@@ -420,6 +441,11 @@ async def puzzle_duel(sid, msg):
                 "content": f"User {user_id_win} won"
             }
         }
+        with next(db_session()) as db:
+            game_user = db.query(GameUser).filter(GameUser.user_id == user_id_win,
+                                                  GameUser.game_id == game_id).first()
+            game_user.win = 1
+            db.commit()
         await sio.emit("puzzle-duel", json.dumps(response))
         return
 
