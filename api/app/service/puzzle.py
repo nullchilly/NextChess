@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from api.app.dto.core.puzzle import *
-from api.app.model import Profile, User
+from api.app.model import Game, Profile, User
 from api.app.model.puzzle import Puzzle
 from api.app.model.puzzle_user import PuzzleUser
 
@@ -109,3 +109,12 @@ class PuzzleService:
 			new_rating=profile.rating,
 			rating_change=puzzle.rating
 		)
+
+	@classmethod
+	def find_puzzle_game(cls, db: Session) -> GetPuzzleGameResponse:
+		id = db.query(Game).filter(Game.variant_id == 3 and Game.number_player < 2).first()
+		if id is None:
+			# create new puzzle-duel game
+			db.add(Game(variant_id=3, number_player=0, status=False, result=0, slug='duel', time_mode=0))
+			id = db.query(Game).filter(Game.variant_id == 3 and Game.number_player < 2).first()
+		return GetPuzzleGameResponse(id=id.id)

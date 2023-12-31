@@ -42,3 +42,7 @@ class MultiPuzzleResponse(CamelBaseModel):
 		return {
 			'puzzles': [puzzle.to_json() for puzzle in self.puzzles]
 		}
+
+
+class GetPuzzleGameResponse(CamelBaseModel):
+	id: int
