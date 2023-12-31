@@ -4,3 +4,4 @@ from .variants import Variants
 from .puzzle import Puzzle
 from .profile import Profile
 from .move import Move
+from .game_user import GameUser
