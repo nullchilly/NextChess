@@ -139,8 +139,8 @@ async def play_chess(sid, msg):
                 )
                 await insert_game_move(db, request=insert_move_request)
 
-            await sio.emit("play-chess", json.dumps(message), room=sid)
-            return
+        await sio.emit("play-chess", json.dumps(message), room=sid)
+        return
 
     result = game_states[gameID]['engine'].play(
         game_states[gameID]['board'], game_states[gameID]['limit'])
