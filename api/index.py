@@ -415,6 +415,16 @@ async def puzzle_duel(sid, msg):
         user_id = msg["message"]["userId"]
         game_id = msg["message"]["gameId"]
         puzzle_id = msg["message"]["puzzleId"]
+        solved = msg["message"]["solved"]
+        if not solved:
+            response = {
+                "status": "noti",
+                "message": {
+                    "content": f"User {user_id} failed puzzle {puzzle_id}"
+                }
+            }
+            await sio.emit("puzzle-duel", json.dumps(response))
+            return
         if user_id not in participant[game_id]:
             response = {
                 "status": "error",
