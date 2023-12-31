@@ -131,7 +131,9 @@ class PuzzleService:
 			list_user = []
 			for j in range(len(game_user_data)):
 				user = db.query(User).filter(User.id == game_user_data[j].user_id).first()
-				list_user.append(user.username)
+				if user is None:
+					continue
+				list_user.append(user.user_name)
 
 			res.append(PuzzleDuelResult(
 				puzzle_id=result[i].id,
