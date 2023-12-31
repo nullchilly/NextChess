@@ -118,7 +118,7 @@ class UserService:
             move_by_game[move.game_id].append(move.move_detail)
 
 
-        q = db.query(Game.id.label("game_id"), Game.variant_id, GameUser.win, Game.status, Game.deleted_at, Game.time_mode, GameUser.rating_change)\
+        q = db.query(Game.id.label("game_id"), Game.variant_id, Game.slug, GameUser.win, Game.status, Game.deleted_at, Game.time_mode, GameUser.rating_change)\
             .join(GameUser, Game.id == GameUser.game_id)\
             .filter(GameUser.user_id == user_id, Game.deleted_at == None, GameUser.deleted_at == None)
         res = []
@@ -126,7 +126,7 @@ class UserService:
             print(game_history.rating_change)
             game_history_resp = GameInGetUserGameHistoryResponse(game_id=game_history.game_id, user_id=user_id, variant_id=game_history.variant_id,
                                                 move=move_by_game[game_history.game_id], time_mode=game_history.time_mode,
-                                                rating_change=game_history.rating_change, result=game_history.win)
+                                                rating_change=game_history.rating_change, result=game_history.win, slug=game_history.slug)
             res.append(game_history_resp)
         return GetUserGameHistoryResponse(games=res)
 
@@ -137,14 +137,14 @@ class UserService:
             move_by_game[move.game_id].append(move.move_detail)
 
 
-        q = db.query(Game.id.label("game_id"), Game.variant_id, GameUser.win, Game.status, Game.deleted_at, Game.time_mode, GameUser.rating_change)\
+        q = db.query(Game.id.label("game_id"), Game.variant_id, Game.slug, GameUser.win, Game.status, Game.deleted_at, Game.time_mode, GameUser.rating_change)\
             .join(GameUser, Game.id == GameUser.game_id)\
             .filter(GameUser.user_id == user_id, Game.deleted_at == None, GameUser.deleted_at == None)
         res = []
         for game_history in q.all():
             game_history_resp = GameInGetUserGameHistoryResponse(game_id=game_history.game_id, variant_id=game_history.variant_id,
                                                 move=move_by_game[game_history.game_id], time_mode=game_history.time_mode,
-                                                rating_change=game_history.rating_change, result=game_history.win)
+                                                rating_change=game_history.rating_change, result=game_history.win, slug=game_history.slug)
             res.append(game_history_resp)
         return GetUserGameHistoryResponse(games=res)
 

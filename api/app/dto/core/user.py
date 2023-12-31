@@ -60,6 +60,7 @@ class GameInGetUserGameHistoryResponse(CamelBaseModel):
     result: int
     move: List[str]
     rating_change: int
+    slug: str
 
 
 class GetUserGameHistoryResponse(CamelBaseModel):

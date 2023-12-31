@@ -226,7 +226,7 @@ async def end_game(sid, msg):
 async def user_forfeit(sid, msg):
     data = json.loads(msg)
     gameID = data["id"]
-    if (gameID in game_states):
+    if (gameID in game_states and not game_states[gameID]['status']):
         game_states[gameID]['status'] = True
         game_states[gameID]['result'] = 2  # Black win
         all_uci_moves = list(
@@ -324,7 +324,6 @@ async def fetch_saved_game(sid, msg):
     try:
         data = json.loads(msg)
         gameID = data["id"]
-        print("GAME_ID: ", gameID, gameID in game_states);
         if (gameID in game_states):
             response = {"ok": True, "winner": game_states[gameID]["result"]}
             await sio.emit("fetch-saved-game", json.dumps(response), room=sid)
