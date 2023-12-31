@@ -5,7 +5,8 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from api.app.dto.core.puzzle import *
-from api.app.model import Profile, User
+from api.app.model import Game, Profile, User
+from api.app.model.game_user import GameUser
 from api.app.model.puzzle import Puzzle
 from api.app.model.puzzle_user import PuzzleUser
 
@@ -110,4 +111,37 @@ class PuzzleService:
 			rating_change=puzzle.rating
 		)
 
-		pass
+	@classmethod
+	def find_puzzle_game(cls, db: Session) -> GetPuzzleGameResponse:
+		id = db.query(Game).filter(Game.variant_id == 3).filter(Game.number_player < 2).first()
+		if id is None:
+			# create new puzzle-duel game
+			db.add(Game(variant_id=3, number_player=0, status=False, result=0, slug='duel', time_mode=0))
+			id = db.query(Game).filter(Game.variant_id == 3 and Game.number_player < 2).first()
+			db.commit()
+		return GetPuzzleGameResponse(id=id.id)
+
+	#default limit is 5
+	@classmethod
+	def get_recent_puzzle_duel_result(cls, db: Session, limit: int = 10) -> PuzzleDuelResultList:
+		result = db.query(Game).filter(Game.variant_id == 3).order_by(Game.created_at.desc()).limit(limit).all()
+		res = []
+		for i in range(len(result)):
+			game_user_data = db.query(GameUser).filter(GameUser.game_id == result[i].id).all()
+			list_user = []
+			for j in range(len(game_user_data)):
+				user = db.query(User).filter(User.id == game_user_data[j].user_id).first()
+				if user is None:
+					continue
+				list_user.append(user.user_name)
+
+			res.append(PuzzleDuelResult(
+				puzzle_id=result[i].id,
+				status=result[i].status,
+				result=result[i].result,
+				slug=result[i].slug,
+				number_player=result[i].number_player,
+				created_at=str(result[i].created_at),
+				list_user=list_user
+			))
+		return PuzzleDuelResultList(result=res)

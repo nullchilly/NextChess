@@ -42,3 +42,19 @@ class MultiPuzzleResponse(CamelBaseModel):
 		return {
 			'puzzles': [puzzle.to_json() for puzzle in self.puzzles]
 		}
+
+
+class GetPuzzleGameResponse(CamelBaseModel):
+	id: int
+
+class PuzzleDuelResult(CamelBaseModel):
+	puzzle_id: int
+	created_at: str
+	status: int
+	result: int
+	slug: str
+	number_player: int
+	list_user: list[int]
+
+class PuzzleDuelResultList(CamelBaseModel):
+	result: list[PuzzleDuelResult]
