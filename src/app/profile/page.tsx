@@ -220,8 +220,8 @@ const ProfilePage = () => {
   const { name, accessToken } = useContext(UserContext);
   const [gamesPlayed, setGamesPlayed] = useState([]);
   useEffect(() => {
+    const savedToken = localStorage.getItem("accessToken");
     async function fetchUserGame() {
-      const savedToken = localStorage.getItem("accessToken");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}` + "/api/game/history",
         {
@@ -242,7 +242,9 @@ const ProfilePage = () => {
         setGamesPlayed(allGamesSlug);
       }
     }
-    fetchUserGame();
+    if (savedToken || accessToken){
+      fetchUserGame();
+    }
   }, []);
   return (
     <div className="flex flex-col">
