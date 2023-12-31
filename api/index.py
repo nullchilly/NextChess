@@ -129,17 +129,18 @@ async def play_chess(sid, msg):
         game_states[gameID]['status'] = True
         game_states[gameID]['result'] = winner
         all_uci_moves = list(map(lambda move: move.uci(), game_states[gameID]['board'].move_stack))
-        with next(db_session()) as db:
-            game_id_num = await get_game_id_from_slug(db, slug=gameID)
-            insert_move_request = InsertMoveRequest(
-                game_id=game_id_num,
-                user_id=game_states[gameID]['userID'],  # FIXME, or not...
-                move_details=all_uci_moves
-            )
-            await insert_game_move(db, request=insert_move_request)
+        if (game_states[gameID]['userID'] > 0):
+            with next(db_session()) as db:
+                game_id_num = await get_game_id_from_slug(db, slug=gameID)
+                insert_move_request = InsertMoveRequest(
+                    game_id=game_id_num,
+                    user_id=game_states[gameID]['userID'],  # FIXME, or not...
+                    move_details=all_uci_moves
+                )
+                await insert_game_move(db, request=insert_move_request)
 
-        await sio.emit("play-chess", json.dumps(message), room=sid)
-        return
+            await sio.emit("play-chess", json.dumps(message), room=sid)
+            return
 
     result = game_states[gameID]['engine'].play(
         game_states[gameID]['board'], game_states[gameID]['limit'])
@@ -158,14 +159,15 @@ async def play_chess(sid, msg):
         game_states[gameID]['status'] = True
         game_states[gameID]['result'] = winner
         all_uci_moves = list(map(lambda move: move.uci(), game_states[gameID]['board'].move_stack))
-        with next(db_session()) as db:
-            game_id_num = await get_game_id_from_slug(db, slug=gameID)
-            insert_move_request = InsertMoveRequest(
-                game_id=game_id_num,
-                user_id=game_states[gameID]['userID'],  # FIXME, or not...
-                move_details=all_uci_moves
-            )
-            await insert_game_move(db, request=insert_move_request)
+        if (game_states[gameID]['userID'] > 0):
+            with next(db_session()) as db:
+                game_id_num = await get_game_id_from_slug(db, slug=gameID)
+                insert_move_request = InsertMoveRequest(
+                    game_id=game_id_num,
+                    user_id=game_states[gameID]['userID'],  # FIXME, or not...
+                    move_details=all_uci_moves
+                )
+                await insert_game_move(db, request=insert_move_request)
 
     message = {
         "ok": True,
@@ -208,14 +210,15 @@ async def user_forfeit(sid, msg):
         game_states[gameID]['status'] = True
         game_states[gameID]['result'] = 2  # Black win
         all_uci_moves = list(map(lambda move: move.uci(), game_states[gameID]['board'].move_stack))
-        with next(db_session()) as db:
-            game_id_num = await get_game_id_from_slug(db, slug=gameID)
-            insert_move_request = InsertMoveRequest(
-                game_id=game_id_num,
-                user_id=game_states[gameID]['userID'],  # FIXME, or not...
-                move_details=all_uci_moves
-            )
-            await insert_game_move(db, request=insert_move_request)
+        if (game_states[gameID]['userID'] > 0):
+            with next(db_session()) as db:
+                game_id_num = await get_game_id_from_slug(db, slug=gameID)
+                insert_move_request = InsertMoveRequest(
+                    game_id=game_id_num,
+                    user_id=game_states[gameID]['userID'],  # FIXME, or not...
+                    move_details=all_uci_moves
+                )
+                await insert_game_move(db, request=insert_move_request)
 
     message = "White forfeited"  # TODO: Return match info for modal rendering?
     await sio.emit("user-forfeit", message, room=sid)
