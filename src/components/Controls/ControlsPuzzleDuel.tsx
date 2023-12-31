@@ -1,7 +1,8 @@
 import React, {useContext, useEffect, useState} from "react";
-import {Col, Row, Statistic} from "antd";
-import {StarFilled} from "@ant-design/icons";
+import {Col, Row, Statistic, Image, Divider, Button} from "antd";
+import {ArrowRightOutlined, SettingOutlined, StarFilled} from "@ant-design/icons";
 import {StatePuzzleDuel} from "@/helpers/types";
+import PuzzleDuelHistory from "@/components/Controls/PuzzleDuelHistory";
 
 const { Countdown } = Statistic;
 
@@ -13,9 +14,13 @@ type ControlsPuzzleDuelProps = {
 	resultL?: number[];
 	resultR?: number[];
 	state?: number;
+	history?: string[];
+	onFinish: () => void;
+	onPlay: () => void;
 }
 
 const avatar = "https://www.chesskid.com/images/avatars/kids/100/kid-1162.png";
+const dueling = "https://www.chesskid.com/images/pieces/dueling.png";
 
 const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 	const [deadline, setDeadline] = useState<number>(0);
@@ -25,12 +30,11 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 	}
 	
 	const onTimeoutDuel = () => {
-	
+		props.onFinish();
 	}
 	
 	useEffect(() => {
 		startGame();
-		
 	}, []);
 	
 	return (
@@ -105,13 +109,49 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 							</Col>
 						</Row>
 					</div>
-					: props.state === StatePuzzleDuel.wait ?
-						<div>
-						
+					:
+					<div className={"items-center"}>
+						<div className="object-cover p-3 w-full flex justify-center">
+							<div>
+									<img src={avatar} alt="image description" className="shadow rounded-full max-w-full h-auto border-4 border-[#518538]"/>
+							</div>
 						</div>
-					: <div>
-						
+						<div className={`text-center text-slate-100 font-mono text-3xl font-bold`}>
+							{props.name ? props.name : "Guest"}
 						</div>
+						<Divider className={`bg-slate-100`}/>
+						<div className={`text-left text-slate-100 font-mono text-3xl font-bold pl-3`}>
+							Latest Results:
+						</div>
+						<div className={`text-center pt-4`}>
+							{props.history?.map((e, index) => (
+									<PuzzleDuelHistory
+										state={e}
+									/>
+							))}
+						</div>
+						<div className={`flex items-center justify-center pt-4`}>
+							<img
+								src={dueling}
+								alt={"dueling"}
+							/>
+						</div>
+						<Divider className={`bg-slate-100`}/>
+						<div className={`text-center h-full`}>
+							<button
+								className="hintButton buttonSize border-transparent w-9/12 p-1"
+								onClick={props.onPlay}
+								style={{
+									background: "#f4892e",
+									borderRadius: "5px"
+								}}
+							>
+								<div className={`text-center text-slate-100 font-mono text-3xl font-bold`}>
+									Play
+								</div>
+							</button>
+						</div>
+					</div>
 			}
 		</div>
 	)

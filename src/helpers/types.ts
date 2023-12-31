@@ -51,10 +51,18 @@ export enum TimeMode {
     SevenMins="7 minutes",
 }
 
+export enum DuelHistory {
+  win='win',
+  lose='lose',
+  draw='draw',
+  unknown='unKnown',
+}
+
 export enum StatePuzzleDuel {
   wait,
   pending,
-  success
+  success,
+  finding,
 }
 
 export type DataPoint = {
