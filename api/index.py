@@ -405,9 +405,11 @@ async def puzzle_duel(sid, msg):
         puzzle_solved_by_user[game_id][user_id] = set()
         await sio.emit("puzzle-duel", json.dumps(response))
         response = {
-            "status": "noti",
+            "status": "join_noti",
             "message": {
-                "content": f"User {user_id} joined"
+                "content": f"User {user_id} joined game {game_id}",
+                "game_id": game_id,
+                "user_id": user_id
             }
         }
         await sio.emit("puzzle-duel", json.dumps(response))
@@ -418,9 +420,12 @@ async def puzzle_duel(sid, msg):
         solved = msg["message"]["solved"]
         if not solved:
             response = {
-                "status": "noti",
+                "status": "submit_noti",
                 "message": {
-                    "content": f"User {user_id} failed puzzle {puzzle_id}"
+                    "content": f"User {user_id} failed puzzle {puzzle_id}",
+                    "game_id": game_id,
+                    "user_id": user_id,
+                    "solved": solved
                 }
             }
             await sio.emit("puzzle-duel", json.dumps(response))
@@ -459,9 +464,12 @@ async def puzzle_duel(sid, msg):
         }
         await sio.emit("puzzle-duel", json.dumps(response))
         response = {
-            "status": "noti",
+            "status": "submit_noti",
             "message": {
-                "content": f"User {user_id} solved puzzle {puzzle_id}"
+                "content": f"User {user_id} solved puzzle {puzzle_id}",
+                "game_id": game_id,
+                "user_id": user_id,
+                "solved": solved
             }
         }
         await sio.emit("puzzle-duel", json.dumps(response))
