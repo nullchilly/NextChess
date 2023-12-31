@@ -17,10 +17,10 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('user_rating', sa.Column('variant_id', sa.Integer(), nullable=False))
+    # op.add_column('user_rating', sa.Column('variant_id', sa.Integer(), nullable=False))
     pass
 
 
 def downgrade():
-    op.drop_column('user_rating', 'variant_id')
+    # op.drop_column('user_rating', 'variant_id')
     pass
