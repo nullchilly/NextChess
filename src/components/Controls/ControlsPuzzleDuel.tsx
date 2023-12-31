@@ -52,7 +52,7 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 												{props.name ? props.name : "Guest"}
 											</div>
 											{props.resultL?.map((e, index) => (
-												<div>
+												<div key = {index}>
 													<StarFilled
 														style={e == 1 ? {color: `#fadb14`, fontSize: '20px'} : e == -1 ? {color: `#ed4337`, fontSize: '20px'} : {color: `#f1f5f9`, fontSize: '20px'}}
 														className={`bg-[#57903C] pt-2`}
@@ -76,7 +76,7 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 												{props.competitor ? props.competitor : "Not found"}
 											</div>
 											{props.resultR?.map((e, index) => (
-												<div>
+												<div key={index}>
 													<StarFilled
 														style={e == 1 ? {color: `#fadb14`, fontSize: '20px'} : e == -1 ? {color: `#ed4337`, fontSize: '20px'} : {color: `#f1f5f9`, fontSize: '20px'}}
 														className={`bg-[#57903C] pt-2`}
@@ -126,6 +126,7 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 						<div className={`text-center pt-4`}>
 							{props.history?.map((e, index) => (
 									<PuzzleDuelHistory
+                    key={index}
 										state={e}
 									/>
 							))}
