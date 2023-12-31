@@ -2,7 +2,7 @@
 import React, {ComponentType, useState, useEffect} from "react";
 
 type UserContextType = {
-	userId?: number,
+	userId: number,
 	name?: string,
 	dateOfBirth?: string,
 	gender?: string,
