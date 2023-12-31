@@ -70,10 +70,14 @@ class UserService:
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
         user_profile = db.query(Profile).filter(Profile.user_id == user.id).first()
-        q = db.query(UserRating.rating, UserRating.variant_id).filter(UserRating.user_id == user.id).order_by(UserRating.id)
+        q = (db.query(GameUser.user_id, GameUser.rating_change, GameUser.game_id, Game.variant_id, Game.id)
+             .join(Game, Game.id == GameUser.game_id).filter(GameUser.user_id == id))
         ratings = []
+        rating_by_variant = {}
         for res in q.all():
-            ratings.append(RatingInGetProfileResponse(rating=res.rating, variant_id=res.variant_id))
+            rating_by_variant[res.variant_id] = rating_by_variant.get(res.variant_id, 0) + res.rating_change
+            ratings.append(
+                RatingInGetProfileResponse(rating=rating_by_variant[res.variant_id], variant_id=res.variant_id))
         return GetProfileResponse(user_id=user_profile.id, name=user_profile.name, date_of_birth=user_profile.date_of_birth,
                                   gender=user_profile.gender, email=user_profile.email, ratings=ratings, is_admin=user.is_admin)
 
