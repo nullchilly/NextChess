@@ -109,5 +109,3 @@ class PuzzleService:
 			new_rating=profile.rating,
 			rating_change=puzzle.rating
 		)
-
-		pass

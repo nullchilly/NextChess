@@ -11,5 +11,6 @@ class Game(BareBaseModel):
     status = Column(Boolean, nullable=False)
     result = Column(Integer, nullable=False)
     slug = Column(String(8), nullable=False)
+    number_player = Column(Integer, default=0)
 
     variant = relationship('Variants')  # Create a relationship with the Variants table
