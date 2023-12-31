@@ -53,3 +53,26 @@ class UpdateProfileRequest(CamelBaseModel):
     gender: Optional[UserGender]
     email: Optional[str]
 
+class GameInGetUserGameHistoryResponse(CamelBaseModel):
+    game_id: int
+    variant_id: int
+    time_mode: int
+    result: int
+    move: List[str]
+    rating_change: int
+
+
+class GetUserGameHistoryResponse(CamelBaseModel):
+    games: List[GameInGetUserGameHistoryResponse]
+
+class PuzzleInGetUserPuzzleHistoryResponse(CamelBaseModel):
+    puzzle_id: int
+    puzzle_name: str
+    date_solved: Optional[datetime]
+    rating_change: int
+    is_solved: Optional[bool]
+
+class GetUserPuzzleHistoryResponse(CamelBaseModel):
+    puzzles : List[PuzzleInGetUserPuzzleHistoryResponse]
+
+
