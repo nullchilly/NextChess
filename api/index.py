@@ -368,8 +368,8 @@ puzzle_solved_by_user: Dict[int, Dict[int, Set[int]]] = dict()
 @sio.on("puzzle-duel")
 async def puzzle_duel(sid, msg):
     print('connect', sid)
-    data = msg
-    if msg["status"] == "start":
+    data = json.loads(msg)
+    if data["status"] == "start":
         game_id = data["message"]["gameId"]
         if puzzle_list_per_game_id.get(game_id) is None:
             with next(db_session()) as db:
@@ -378,7 +378,7 @@ async def puzzle_duel(sid, msg):
             participant[game_id] = set()
             puzzle_solved_by_user[game_id] = dict()
         puzzle_list = puzzle_list_per_game_id[game_id]
-        user_id = msg["message"]["userId"]
+        user_id = data["message"]["userId"]
         with next(db_session()) as db:
             # update number player of game gameId in db
             game = db.query(Game).filter(Game.id == game_id).first()
@@ -413,11 +413,11 @@ async def puzzle_duel(sid, msg):
             }
         }
         await sio.emit("puzzle-duel", json.dumps(response))
-    elif msg["status"] == "submit":
-        user_id = msg["message"]["userId"]
-        game_id = msg["message"]["gameId"]
-        puzzle_id = msg["message"]["puzzleId"]
-        solved = msg["message"]["solved"]
+    elif data["status"] == "submit":
+        user_id = data["message"]["userId"]
+        game_id = data["message"]["gameId"]
+        puzzle_id = data["message"]["puzzleId"]
+        solved = data["message"]["solved"]
         if not solved:
             response = {
                 "status": "submit_noti",
@@ -489,9 +489,9 @@ async def puzzle_duel(sid, msg):
                 db.commit()
             await sio.emit("puzzle-duel", json.dumps(response))
             return
-    elif msg["status"] == "end_game":
+    elif data["status"] == "end_game":
         user_id_win = ""
-        game_id = msg["message"]["gameId"]
+        game_id = data["message"]["gameId"]
         max_puzzle_solved = 0
         for user_id in participant[game_id]:
             if len(puzzle_solved_by_user[game_id][user_id]) >= max_puzzle_solved:
