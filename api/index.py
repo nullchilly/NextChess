@@ -397,8 +397,8 @@ async def puzzle_duel(sid, msg):
             "status": "ready",
             "message": {
                 "puzzle": puzzle_list.to_json(),
-                "user_id": user_id,
-                "game_id": game_id
+                "userId": user_id,
+                "gameId": game_id
             }
         }
         participant[game_id].add(user_id)
@@ -408,8 +408,8 @@ async def puzzle_duel(sid, msg):
             "status": "join_noti",
             "message": {
                 "content": f"User {user_id} joined game {game_id}",
-                "game_id": game_id,
-                "user_id": user_id
+                "gameId": game_id,
+                "userId": user_id
             }
         }
         await sio.emit("puzzle-duel", json.dumps(response))
@@ -423,8 +423,8 @@ async def puzzle_duel(sid, msg):
                 "status": "submit_noti",
                 "message": {
                     "content": f"User {user_id} failed puzzle {puzzle_id}",
-                    "game_id": game_id,
-                    "user_id": user_id,
+                    "gameId": game_id,
+                    "userId": user_id,
                     "solved": solved
                 }
             }
@@ -456,10 +456,10 @@ async def puzzle_duel(sid, msg):
         response = {
             "status": "solved",
             "message": {
-                "num_remaining": total_remaining_puzzle,
-                "remaining_puzzle": [puzzle.to_json() for puzzle in remaining_puzzle],
-                "user_id": user_id,
-                "game_id": game_id
+                "numRemaining": total_remaining_puzzle,
+                "remainingPuzzle": [puzzle.to_json() for puzzle in remaining_puzzle],
+                "userId": user_id,
+                "gameId": game_id
             }
         }
         await sio.emit("puzzle-duel", json.dumps(response))
@@ -467,8 +467,8 @@ async def puzzle_duel(sid, msg):
             "status": "submit_noti",
             "message": {
                 "content": f"User {user_id} solved puzzle {puzzle_id}",
-                "game_id": game_id,
-                "user_id": user_id,
+                "gameId": game_id,
+                "userId": user_id,
                 "solved": solved
             }
         }
