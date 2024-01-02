@@ -116,8 +116,9 @@ class PuzzleService:
 		id = db.query(Game).filter(Game.variant_id == 3).filter(Game.number_player < 2).first()
 		if id is None:
 			# create new puzzle-duel game
-			db.add(Game(variant_id=3, number_player=0, status=False, result=0, slug='duel', time_mode=0))
-			id = db.query(Game).filter(Game.variant_id == 3 and Game.number_player < 2).first()
+			new_game = Game(variant_id=3, number_player=0, status=False, result=0, slug='duel', time_mode=0)
+			db.add(new_game)
+			id = db.query(Game).filter(Game.variant_id == 3, Game.number_player < 2).first()
 			db.commit()
 		return GetPuzzleGameResponse(id=id.id)
 

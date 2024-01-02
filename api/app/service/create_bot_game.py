@@ -16,6 +16,6 @@ class CreateBotGameService:
 
     @classmethod
     def all_game_slugs(cls, db: Session):
-        statement = select(Game.slug);
-        rows = db.scalars(statement).all();
-        return rows;
+        statement = select(Game.slug)
+        rows = db.scalars(statement).all()
+        return rows
