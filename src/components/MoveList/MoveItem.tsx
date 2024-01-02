@@ -13,10 +13,10 @@ const MoveItem = ({ move }: MoveItemType) => {
           <ChessPiece name={move.piece} color={move.color} height={45} width={45} />
         </div>
         <div className="min-w-0 flex-auto">
-          <p className="text-sm font-semibold leading-6 text-gray-900">
+          <p className={`text-sm font-semibold leading-6 ${move.color === 'b' ? 'text-black' : 'text-white'}`}>
             {move.color === 'b' ? 'Black' : 'White'} Move
           </p>
-          <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+          <p className={`mt-1 truncate text-xs leading-5 ${move.color === 'b' ? 'text-black' : 'text-white'}`}>
             From: {move.from} | To: {move.to}
           </p>
         </div>

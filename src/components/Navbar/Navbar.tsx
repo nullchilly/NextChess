@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, {useContext} from "react";
 
 import StockChess from "@/components/icons/StockChess";
 import ChessBoard from "@/components/icons/ChessBoard";
@@ -14,8 +14,12 @@ import { Menu } from "antd";
 import type { MenuProps } from "antd";
 import Link from "next/link";
 import ModalPlayBot from "../Modal/ModalPlayBot";
+import Icon, {BulbOutlined, SettingOutlined} from "@ant-design/icons";
+import {UserContext} from "@/context/UserContext";
 
 type MenuItem = Required<MenuProps>["items"][number];
+
+const avatar = 'https://www.chesskid.com/images/avatars/kids/100/kid-1162.png'
 
 function getItem(
   label: React.ReactNode,
@@ -42,8 +46,8 @@ const items: MenuProps["items"] = [
   // TODO: Change path to the corresponding component
   getItem("Puzzle", "sub2", <Puzzle />, [
     // Why `puzzleData`, thought this should be `puzzle`?
-    getItem("Play Puzzle", "/puzzleData", <Puzzle />),
-    getItem("Puzzle Duel", "/puzzleData-duel", <Duel />),
+    getItem("Play Puzzle", "/puzzle", <Puzzle />),
+    getItem("Puzzle Duel", "/puzzle-duel", <Duel />),
   ]),
 
   getItem("Learn", "sub3", <Learn />, [
@@ -51,10 +55,16 @@ const items: MenuProps["items"] = [
   ]),
 ];
 
-const Navbar = () => {
+// type NavbarProps = {
+//   name?: string;
+//   rate?: string;
+// }
+
+const Navbar : React.FC = () => {
   const [isModalPlayBotOpen, setIsModalPlayBotOpen] = React.useState(false);
   const router = useRouter();
-
+  const {name, rate, accessToken} = useContext(UserContext);
+  
   const showModal = () => {
     setIsModalPlayBotOpen(true);
   };
@@ -68,6 +78,12 @@ const Navbar = () => {
     }
   };
 
+  const onClickAvatar = () => {
+    const savedToken = localStorage.getItem('accessToken');
+    if(!accessToken || !savedToken) router.push("/login");
+    else router.push("/profile");
+  }
+
   return (
     <>
       <div
@@ -77,6 +93,30 @@ const Navbar = () => {
         <Link href="/">
           <StockChess />
         </Link>
+        <div className="object-cover p-6 w-full flex items-center justify-center">
+          <div>
+            <button onClick={onClickAvatar}>
+              <img src={avatar} alt="image description" className="shadow rounded-full max-w-full h-auto border-4 border-[#518538]"/>
+            </button>
+          </div>
+          <Link href={"/settings"}>
+            <SettingOutlined style={{ fontSize: "40px", color:'#f1f1f1' }} className='pl-5'/>
+          </Link>
+        </div>
+        <div className="pb-6">
+          <div className="object-cover max-w-full flex items-center justify-center bg-[#518538] rounded-3xl shadow-md h-auto m-1">
+            <div>
+              <button onClick={onClickAvatar}>
+                <div className="text-3xl text-slate-100 font-mono font-bold flex items-center pt-3">
+                  {name ? name : "Guest"}
+                </div>
+                <div className="text-l text-slate-100 font-mono flex items-center pb-3 pt-0.5">
+                  Rate: {rate ? rate : "xxx"}
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
         <div>
           <Menu
             onClick={onClickMenuDrawer}
@@ -86,7 +126,7 @@ const Navbar = () => {
           />
         </div>
       </div>
-      <ModalPlayBot isOpen={isModalPlayBotOpen} setOpen={setIsModalPlayBotOpen}/>
+      <ModalPlayBot isOpen={isModalPlayBotOpen} setOpen={setIsModalPlayBotOpen} />
     </>
   );
 };

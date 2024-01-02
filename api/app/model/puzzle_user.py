@@ -8,7 +8,7 @@ class PuzzleUser(BareBaseModel):
     puzzle_id = Column(Integer, ForeignKey('puzzle.id'), nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     state = Column(Integer, nullable=False)
-    gained_rating = Column(Boolean, nullable=False)
+    gained_rating = Column(Integer, nullable=False, default=0)
 
     puzzle = relationship('Puzzle')  # Create a relationship with the Puzzle table
     user = relationship('User')  # Create a relationship with the User table

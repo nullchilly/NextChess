@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Navbar from "@/components/Navbar/Navbar";
+import {UserProvider} from "@/context/UserContext";
 
 export const metadata: Metadata = {
   title: "Next-Chess",
@@ -15,18 +16,20 @@ type LayoutType = {
 
 const Layout = ({ children }: LayoutType) => {
   return (
-    <html lang="en">
-      <body>
-        <ThemeProvider attribute="class" defaultTheme="light">
-          <div style={{display: 'flex', height: '100vh'}}>
-            <Navbar />
-            <div style={{flexGrow: 9, backgroundColor: '#57903C'}}>
-              {children}
+    <UserProvider>
+      <html lang="en">
+        <body>
+          <ThemeProvider attribute="class" defaultTheme="light">
+            <div style={{display: 'flex', minHeight: '100vh'}}>
+              <Navbar />
+              <div style={{flexGrow: 9, backgroundColor: '#57903C'}}>
+                {children}
+              </div>
             </div>
-          </div>
-        </ThemeProvider>
-      </body>
-    </html>
+          </ThemeProvider>
+       </body>
+     </html>
+    </UserProvider>
   );
 };
 

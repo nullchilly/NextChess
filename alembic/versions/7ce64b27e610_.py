@@ -75,6 +75,7 @@ def upgrade():
                     sa.Column('created_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP')),
                     sa.Column('end_at', sa.DateTime(), nullable=True),
                     sa.Column('status', sa.Boolean(), nullable=False),
+                    # 2: Black win, 1: White win, 0: Draw
                     sa.Column('result', sa.Integer(), nullable=False),
                     sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
                     sa.Column('deleted_at', sa.DateTime(), nullable=True),
