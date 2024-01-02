@@ -371,6 +371,7 @@ async def puzzle_duel(sid, msg):
     data = json.loads(msg)
     if data["status"] == "start":
         game_id = data["message"]["gameId"]
+        await sio.enter_room(sid=sid, room=game_id)
         if puzzle_list_per_game_id.get(game_id) is None:
             with next(db_session()) as db:
                 puzzle_list = PuzzleService.get_random_ten_puzzle(db)
@@ -403,7 +404,8 @@ async def puzzle_duel(sid, msg):
         }
         participant[game_id].add(user_id)
         puzzle_solved_by_user[game_id][user_id] = set()
-        await sio.emit("puzzle-duel", json.dumps(response))
+        print(response)
+        await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
         response = {
             "status": "join_noti",
             "message": {
@@ -412,7 +414,7 @@ async def puzzle_duel(sid, msg):
                 "userId": user_id
             }
         }
-        await sio.emit("puzzle-duel", json.dumps(response))
+        await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
     elif data["status"] == "submit":
         user_id = data["message"]["userId"]
         game_id = data["message"]["gameId"]
@@ -428,7 +430,7 @@ async def puzzle_duel(sid, msg):
                     "solved": solved
                 }
             }
-            await sio.emit("puzzle-duel", json.dumps(response))
+            await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
             return
         if user_id not in participant[game_id]:
             response = {
@@ -437,7 +439,7 @@ async def puzzle_duel(sid, msg):
                     "content": f"User {user_id} not in game"
                 }
             }
-            await sio.emit("puzzle-duel", json.dumps(response))
+            await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
             return
         if puzzle_id not in puzzle_list_per_game_id[game_id].puzzles:
             response = {
@@ -446,7 +448,7 @@ async def puzzle_duel(sid, msg):
                     "content": f"Puzzle {puzzle_id} not in game"
                 }
             }
-            await sio.emit("puzzle-duel", json.dumps(response))
+            await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
             return
         puzzle_solved_by_user[game_id][user_id].add(puzzle_id)
         total_remaining_puzzle = (len(puzzle_list_per_game_id[game_id].puzzles)
@@ -462,7 +464,7 @@ async def puzzle_duel(sid, msg):
                 "gameId": game_id
             }
         }
-        await sio.emit("puzzle-duel", json.dumps(response))
+        await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
         response = {
             "status": "submit_noti",
             "message": {
@@ -472,7 +474,7 @@ async def puzzle_duel(sid, msg):
                 "solved": solved
             }
         }
-        await sio.emit("puzzle-duel", json.dumps(response))
+        await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
         if total_remaining_puzzle == 0:
             response = {
                 "status": "end",
@@ -487,7 +489,7 @@ async def puzzle_duel(sid, msg):
                                                       GameUser.game_id == game_id).first()
                 game_user.win = 1
                 db.commit()
-            await sio.emit("puzzle-duel", json.dumps(response))
+            await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
             return
     elif data["status"] == "end_game":
         user_id_win = ""
@@ -511,7 +513,7 @@ async def puzzle_duel(sid, msg):
                                                   GameUser.game_id == game_id).first()
             game_user.win = 1
             db.commit()
-        await sio.emit("puzzle-duel", json.dumps(response))
+        await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
         return
 
 app.mount("/", socketio.ASGIApp(sio))

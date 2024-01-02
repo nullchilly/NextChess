@@ -41,7 +41,7 @@ class RatingInGetProfileResponse(CamelBaseModel):
 class GetProfileResponse(CamelBaseModel):
     user_id: int
     name: str
-    date_of_birth: date
+    date_of_birth: Optional[date]
     gender: UserGender
     email: str
     ratings: List[RatingInGetProfileResponse]
