@@ -1,6 +1,6 @@
-import React, {useContext, useEffect, useState} from "react";
-import {Col, Row, Statistic, Image, Divider, Button} from "antd";
-import {ArrowRightOutlined, SettingOutlined, StarFilled} from "@ant-design/icons";
+import React, {useEffect, useState} from "react";
+import {Col, Divider, Row, Statistic} from "antd";
+import {StarFilled} from "@ant-design/icons";
 import {StatePuzzleDuel} from "@/helpers/types";
 import PuzzleDuelHistory from "@/components/Controls/PuzzleDuelHistory";
 
@@ -13,7 +13,7 @@ type ControlsPuzzleDuelProps = {
 	currentPuzzle?: number;
 	resultL?: number[];
 	resultR?: number[];
-	state?: number;
+	state?: StatePuzzleDuel;
 	history?: string[];
 	onFinish: () => void;
 	onPlay: () => void;
@@ -34,7 +34,9 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 	}
 	
 	useEffect(() => {
-		startGame();
+		if (props.state === StatePuzzleDuel.pending) {
+			startGame();
+		}
 	}, []);
 	
 	return (

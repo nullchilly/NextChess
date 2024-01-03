@@ -1,8 +1,9 @@
 import {io, Socket} from "socket.io-client";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useContext, useEffect, useState} from "react";
 import {Puzzle} from "@/types";
 import {StatePuzzleDuel} from "@/helpers/types";
 import {delay} from "@/helpers/chess";
+import {UserContext} from "@/context/UserContext";
 
 enum ConnectionStatus {
 	Open = "open",
@@ -10,12 +11,12 @@ enum ConnectionStatus {
 	Disconnected = "disconnected",
 }
 
-const usePuzzleDuelSocket = (userId: number) => {
+const usePuzzleDuelSocket = () => {
 	const [socket, setSocket] = useState<Socket | null>(null);
 	const [connectionStatus, setConnectionStatus] =
 		useState<ConnectionStatus>(ConnectionStatus.Disconnected)
 	const [dataPuzzles, setDataPuzzles] = useState<Puzzle[]>([]);
-	const [opposite, setOpposite] = useState<number>()
+	const [opposite, setOpposite] = useState<string>()
 	const [start, setStart] = useState(false)
 	const [resultOpposite, setResultOpposite] = useState(false)
 	const [getResult, setGetResult] = useState(false)
@@ -24,6 +25,12 @@ const usePuzzleDuelSocket = (userId: number) => {
 	const [gameId, setGameId] = useState<number>()
 	const [state, setState] = useState<StatePuzzleDuel>(StatePuzzleDuel.wait)
 	const [puzzleData, setPuzzleData] = useState<Puzzle>();
+	const [current, setCurrent] = useState(0);
+	const [currentO, setCurrentO] = useState(0);
+	const [userId, setUserId] = useState(0);
+	const [resultL, setResultL] = useState<number[]>(Array(10).fill(0))
+	const [resultR, setResultR] = useState<number[]>(Array(10).fill(0))
+	
 	
 	const fetchGameId = async () => {
 		try {
@@ -60,16 +67,18 @@ const usePuzzleDuelSocket = (userId: number) => {
 			autoConnect: false,
 			reconnection: true,
 		});
+		console.log(socket)
 		fetchGameId();
 		setSocket(socket);
 	};
 	
 	useEffect(() => {
-		connectSocket();
-	}, []);
+		if (userId) {
+			connectSocket();
+		}
+	}, [userId]);
 	
 	useEffect(() => {
-		console.log(1)
 		if (socket) {
 			socket.connect();
 			socket.on("connect", () => {
@@ -111,21 +120,33 @@ const usePuzzleDuelSocket = (userId: number) => {
 							}
 						})
 						setDataPuzzles(puzzles)
-						console.log(puzzles)
+						setPuzzleData(puzzles[0]);
 					} else if (response["status"] === "join_noti") {
-						if (response.message.user_id !== userId) {
-							setOpposite(response.message.user_id);
+						if (response.message.userId !== userId) {
 							setState(StatePuzzleDuel.pending);
 							setStart(true);
+							const profile = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profile/${response.message.userId}`, {
+								method: 'GET',
+								headers: {
+									'Content-Type': 'application/json',
+								},
+							});
+							const json = await profile.json();
+							setOpposite(json.data.name)
 						}
 					} else if (response["status"] === "submit_noti") {
-						if (response.message.user_id !== userId) {
+						if (response.message.userId !== userId) {
 							setGetResult(true);
 							if (response.message.solved) {
-								setResultOpposite(true);
+								const newList = resultR;
+								newList[current] = 1
+								setResultR(newList);
 							} else {
-								setResultOpposite(false);
+								const newList = resultR;
+								newList[current] = -1
+								setResultR(newList);
 							}
+							setCurrentO(currentO + 1);
 						}
 					} else if (response["status"] === "solved") {
 					
@@ -142,17 +163,29 @@ const usePuzzleDuelSocket = (userId: number) => {
 		}
 	}, [disconnectSocket, setConnectionStatus, socket]);
 	
-	const submitPuzzle = (id: number) => {
+	const submitPuzzle = (id: string, solved: boolean) => {
 		const raw = JSON.stringify({
 			"status": "submit",
 			"message": {
 				"userId": userId,
 				"gameId": gameId,
-				"puzzleId": id
+				"puzzleId": id,
+				"solved": solved,
 			}
 		});
+		console.log(raw)
+		if (solved) {
+			const newList = resultL;
+			newList[current] = 1
+			setResultL(newList);
+		} else {
+			const newList = resultL;
+			newList[current] = -1
+			setResultL(newList);
+		}
 		if (dataPuzzles.length) {
-			setPuzzleData(dataPuzzles.at(0));
+			setPuzzleData(dataPuzzles.at(current + 1));
+			setCurrent(current + 1)
 		} else {
 			endGamePuzzle();
 		}
@@ -180,24 +213,27 @@ const usePuzzleDuelSocket = (userId: number) => {
 		});
 		if (gameId) {
 			console.log(raw)
+			console.log(socket)
 			socket?.emit("puzzle-duel", raw);
 		}
 	}
 	
 	return {
 		start,
+		state,
 		puzzleData,
 		opposite,
 		resultOpposite,
 		getResult,
 		onPlay,
-		
+		setUserId,
 		dataPuzzles,
 		socket,
-		
+		current,
 		isEndGame,
 		winner,
-		
+		resultL,
+		resultR,
 		submitPuzzle,
 		endGamePuzzle
 	}
