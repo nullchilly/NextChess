@@ -337,6 +337,113 @@ async def fetch_saved_game(sid, msg):
                        "error": "Error when fetching saved data"}
         await sio.emit("fetch-saved-game", json.dumps(failMessage), room=sid)
 
+
+@sio.on("human-new-player-join")
+async def human_new_player_join(sid, msg):
+    try:
+        data = json.loads(msg)
+        gameID = data["id"]
+        userID = data["userId"]
+        current_player_number = 0
+        current_state = dict()
+
+        with next(db_session()) as db:
+            game = db.query(Game).filter(Game.slug == gameID).first()
+            game_user = db.query(GameUser).filter(
+                GameUser.game_id == game.id, GameUser.user_id == userID).first()
+            if (game.number_player >= 2):
+                if (game_user is None):
+                    failMessage = {"ok": False, "error": "Maximum players reached",
+                                   "playable": True, "color": game_states[gameID]["color"][userID]}
+                    await sio.emit("human-new-player-join", json.dumps(failMessage), room=sid)
+                else:
+                    failMessage = {
+                        "ok": False, "error": "You already joined", "playable": True, "color": game_states[gameID]["color"][userID]}
+                    await sio.emit("human-new-player-join", json.dumps(failMessage), room=sid)
+                return
+            else:
+                current_player_number = game.number_player
+                if (game_user is None):  # User hasn't join before``
+                    # Update number player
+                    game.number_player += 1
+                    current_player_number += 1
+                    pieceColor = dict()
+                    if current_player_number == 1:
+                        pieceColor[userID] = "w"
+                        current_state["color"] = pieceColor
+                        current_state["wSid"] = sid
+                        current_state['board'] = chess.Board()
+                        current_state['status'] = False
+                        game_states[gameID] = current_state
+                    else:
+                        all_game_ids.add(gameID)
+                        game_states[gameID]["color"][userID] = "b"
+                        game_states[gameID]["bSid"] = sid
+                    # Add game user
+                    game_user = GameUser(
+                        user_id=userID,
+                        game_id=game.id,
+                        win=0,
+                        rating_change=0
+                    )
+                    db.add(game_user)
+                    db.commit()
+
+        config = {"color": ("w" if current_player_number == 1 else "b")}
+        response = {"ok": True,
+                    "numberPlayer": current_player_number, "config": config}
+        await sio.emit("human-new-player-join", json.dumps(response), room=sid)
+        if (current_player_number == 2):
+            # Ping 1st player that 2nd player joined
+            response["config"]["color"] = "w"
+            await sio.emit("human-new-player-join", json.dumps(response), room=game_states[gameID]["wSid"])
+        return
+
+    except Exception as e:
+        print("[ERROR]: ", e)
+        failMessage = {"ok": False,
+                       "error": "Error new player join"}
+        await sio.emit("human-new-player-join", json.dumps(failMessage), room=sid)
+
+
+@sio.on("human-play-chess")
+async def human_play_chess(sid, msg):
+    try:
+        data = json.loads(msg)
+        gameID = data["id"]
+        move = data["move"]
+        user_turn = data["turn"]
+        current_turn = "w" if game_states[gameID]['board'].turn else "b"
+        opponent_turn = "w" if current_turn == "b" else "b"
+        opponent_sid = game_states[gameID]["wSid"] if opponent_turn == "w" else game_states[gameID]["bSid"]
+        print("TURN: ", user_turn, current_turn)
+        if (gameID not in all_game_ids):
+            message = {"ok": False, "error": "Can't find game ID"}
+            await sio.emit("human-play-chess", json.dumps(message), room=sid)
+            return
+
+        if (game_states[gameID]['status'] is True):
+            message = {"ok": False, "error": "Game ended"}
+            await sio.emit("human-play-chess", json.dumps(message), room=sid)
+            return
+
+        if (user_turn == current_turn):
+            game_states[gameID]['board'].push(chess.Move.from_uci(move))
+            message = {"ok": True, "move": move, "turn": current_turn};
+            await sio.emit("human-play-chess", json.dumps(message), room=opponent_sid)
+            return
+        else:
+            message = {"ok": False, "error": "Invalid turn"}
+            await sio.emit("human-play-chess", json.dumps(message), room=sid)
+            return
+
+    except Exception as e:
+        print("[ERROR]: ", e)
+        failMessage = {"ok": False,
+                       "error": "Error human play chess"}
+        await sio.emit("human-new-player-join", json.dumps(failMessage), room=sid)
+
+
 @sio.on("connect")
 async def connect(sid, env):
     print("Fucking connected")

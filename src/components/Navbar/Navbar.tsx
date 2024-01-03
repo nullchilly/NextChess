@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import React, {useContext} from "react";
+import React, { useContext } from "react";
 
 import StockChess from "@/components/icons/StockChess";
 import ChessBoard from "@/components/icons/ChessBoard";
@@ -14,12 +14,12 @@ import { Menu } from "antd";
 import type { MenuProps } from "antd";
 import Link from "next/link";
 import ModalPlayBot from "../Modal/ModalPlayBot";
-import Icon, {BulbOutlined, SettingOutlined} from "@ant-design/icons";
-import {UserContext} from "@/context/UserContext";
+import { SettingOutlined } from "@ant-design/icons";
+import { UserContext } from "@/context/UserContext";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
-const avatar = 'https://www.chesskid.com/images/avatars/kids/100/kid-1162.png'
+const avatar = "https://www.chesskid.com/images/avatars/kids/100/kid-1162.png";
 
 function getItem(
   label: React.ReactNode,
@@ -39,7 +39,7 @@ function getItem(
 
 const items: MenuProps["items"] = [
   getItem("Play", "sub1", <ChessBoard />, [
-    getItem("Play vs Human", "/login", <Human />),
+    getItem("Play vs Human", "/human", <Human />),
     getItem("Play vs Bot", "/computer", <ChessBot />),
   ]),
 
@@ -60,11 +60,11 @@ const items: MenuProps["items"] = [
 //   rate?: string;
 // }
 
-const Navbar : React.FC = () => {
+const Navbar: React.FC = () => {
   const [isModalPlayBotOpen, setIsModalPlayBotOpen] = React.useState(false);
   const router = useRouter();
-  const {name, rate, accessToken} = useContext(UserContext);
-  
+  const { name, rate, accessToken } = useContext(UserContext);
+
   const showModal = () => {
     setIsModalPlayBotOpen(true);
   };
@@ -79,10 +79,10 @@ const Navbar : React.FC = () => {
   };
 
   const onClickAvatar = () => {
-    const savedToken = localStorage.getItem('accessToken');
-    if(!accessToken || !savedToken) router.push("/login");
+    const savedToken = localStorage.getItem("accessToken");
+    if (!accessToken || !savedToken) router.push("/login");
     else router.push("/profile");
-  }
+  };
 
   return (
     <>
@@ -96,11 +96,18 @@ const Navbar : React.FC = () => {
         <div className="object-cover p-6 w-full flex items-center justify-center">
           <div>
             <button onClick={onClickAvatar}>
-              <img src={avatar} alt="image description" className="shadow rounded-full max-w-full h-auto border-4 border-[#518538]"/>
+              <img
+                src={avatar}
+                alt="image description"
+                className="shadow rounded-full max-w-full h-auto border-4 border-[#518538]"
+              />
             </button>
           </div>
           <Link href={"/settings"}>
-            <SettingOutlined style={{ fontSize: "40px", color:'#f1f1f1' }} className='pl-5'/>
+            <SettingOutlined
+              style={{ fontSize: "40px", color: "#f1f1f1" }}
+              className="pl-5"
+            />
           </Link>
         </div>
         <div className="pb-6">
@@ -126,7 +133,10 @@ const Navbar : React.FC = () => {
           />
         </div>
       </div>
-      <ModalPlayBot isOpen={isModalPlayBotOpen} setOpen={setIsModalPlayBotOpen} />
+      <ModalPlayBot
+        isOpen={isModalPlayBotOpen}
+        setOpen={setIsModalPlayBotOpen}
+      />
     </>
   );
 };
