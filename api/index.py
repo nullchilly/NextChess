@@ -514,6 +514,23 @@ async def puzzle_duel(sid, msg):
         await sio.emit("puzzle-duel", json.dumps(response))
         return
 
+# Human convention
+@app.get("/api/games")
+def list_games():
+    return [1, 2, 3, 4]
+
+@app.patch("/api/games/{game_id}/{player_name}")
+def join_game(game_id: int, player_name: str):
+    return "sownfam"
+
+@app.get("/api/games/{game_id}")
+def retrieve_game(game_id: int):
+    return "F8uPusDz"
+
+@app.delete("/api/games/{game_id}")
+def delete_game(game_id: int):
+    return "deleted"
+
 app.mount("/", socketio.ASGIApp(sio))
 
 # app.mount("/", StaticFiles(directory="out", html=True), name="static")
