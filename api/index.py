@@ -515,9 +515,7 @@ async def puzzle_duel(sid, msg):
         if puzzle_list_per_game_id.get(game_id) is None:
             with next(db_session()) as db:
                 puzzle_list = PuzzleService.get_random_ten_puzzle(db)
-                puzzle_list_per_game_id[game_id] = []
-                for puzzle in puzzle_list.puzzles:
-                    puzzle_list_per_game_id[game_id].append(puzzle.id)
+                puzzle_list_per_game_id[game_id] = puzzle_list
             participant[game_id] = set()
             puzzle_solved_by_user[game_id] = dict()
         puzzle_list = puzzle_list_per_game_id[game_id]
@@ -583,7 +581,10 @@ async def puzzle_duel(sid, msg):
             }
             await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
             return
-        if puzzle_id not in puzzle_list_per_game_id[game_id].puzzles:
+        puzzle_id_list = []
+        for puzzle in puzzle_list_per_game_id[game_id].puzzles:
+            puzzle_id_list.append(puzzle.id)
+        if puzzle_id not in puzzle_id_list:
             response = {
                 "status": "error",
                 "message": {
