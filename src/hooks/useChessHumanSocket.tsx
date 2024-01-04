@@ -2,6 +2,7 @@ import { CustomSquares, ShortMove } from "@/types";
 import { Chess, Square } from "chess.js";
 import { useCallback, useEffect, useReducer, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import { GameConfig, WINNER } from "@/helpers/types";
 
 type Props = {
   id: string;
@@ -24,6 +25,11 @@ const useChessHumanSocket = ({ id, userId, name }: Props) => {
   const [customSquares, updateCustomSquares] = useReducer(squareReducer, {
     check: {},
   });
+  const [winner, setWinner] = useState<WINNER>("unknown");
+
+  function handleGameEnd(winner: WINNER) {
+    setWinner(winner);
+  }
 
   const disconnectSocket = useCallback(() => {
     socket?.close();
@@ -36,6 +42,10 @@ const useChessHumanSocket = ({ id, userId, name }: Props) => {
       socket.on("connect", () => {
         console.log("Connected", socket.id);
       });
+      socket.on("human-user-forfeit", async (msg) => {
+        console.log(msg)
+        handleGameEnd("white")
+      })
 
       socket.on("human-new-player-join", async (msg) => {
         console.log("JOINED:", msg);
@@ -69,6 +79,16 @@ const useChessHumanSocket = ({ id, userId, name }: Props) => {
         try {
           const response = JSON.parse(msg);
           if(response["ok"]) {
+            if (response["result"]) {
+              const winner_id = response["result"]["winner"];
+              const reason = response["result"]["reason"];
+              console.log("Reason: ", reason);
+              await new Promise((r) => setTimeout(r, 1200));
+              handleGameEnd(
+                winner_id === 0 ? "draw" : winner_id === 1 ? "white" : "black"
+              );
+              return;
+            }
             console.log("Opponent move: ", response["move"]);
             makeMove(response["move"]);
           } else {
@@ -155,8 +175,16 @@ const useChessHumanSocket = ({ id, userId, name }: Props) => {
     return true;
   };
 
+  const forfeitGame = () => {
+    const gameForfeited = { id: id, winner: opponentName };
+    socket?.emit("human-user-forfeit", JSON.stringify(gameForfeited));
+    handleGameEnd("black");
+  };
+
   return {
     socket,
+    winner,
+    forfeitGame,
     playable,
     pieceColor,
     onPieceDrop,
