@@ -555,6 +555,18 @@ async def puzzle_duel(sid, msg):
             }
         }
         await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
+        list_participant = list(participant[game_id])
+        if len(participant[game_id]) > 1:
+            response = {
+                "status": "start_noti",
+                "message": {
+                    "gameId": game_id,
+                    "userId1": list_participant[0],
+                    "userId2": list_participant[1]
+                }
+            }
+            await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
+
     elif data["status"] == "submit":
         user_id = data["message"]["userId"]
         game_id = data["message"]["gameId"]

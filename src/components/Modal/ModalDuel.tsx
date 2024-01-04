@@ -10,15 +10,15 @@ import {pawnLost, pawnWon} from "@/helpers/const";
 type Props = {
 	isWon: boolean;
 	isOpen: boolean;
-	setOpen: (isOpen: boolean) => void;
+	onCLose: (isOpen: boolean) => void;
 };
 
-export default function ModalDuel({ isWon, isOpen, setOpen }: Props) {
+export default function ModalDuel({ isWon, isOpen, onCLose }: Props) {
 	const [loading, setLoading] = useState(false);
-	// const [open, setOpen] = useState(false);
+	// const [open, onCLose] = useState(false);
 	
 	const handleCancel = () => {
-		setOpen(false);
+		onCLose(false);
 	};
 	
 	return (
@@ -34,7 +34,7 @@ export default function ModalDuel({ isWon, isOpen, setOpen }: Props) {
 				footer={[
 					<button
 						className="border-transparent w-fit p-1 pl-3 pr-3 items-center"
-						onClick={() => {}}
+						onClick={handleCancel}
 						style={{
 							background: "#f4892e",
 							borderRadius: "5px",

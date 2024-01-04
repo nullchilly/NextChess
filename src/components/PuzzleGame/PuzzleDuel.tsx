@@ -7,6 +7,7 @@ import {UserContext} from "@/context/UserContext";
 import ModalDuel from "@/components/Modal/ModalDuel";
 import usePuzzleDuelSocket from "@/hooks/usePuzzleDuelSocket";
 import {Chess} from "chess.js";
+import {StatePuzzleDuel} from "@/helpers/types";
 
 type PuzzleDuelType = {
 	type?: string;
@@ -14,7 +15,6 @@ type PuzzleDuelType = {
 
 const PuzzleDuel : React.FC<PuzzleDuelType> = () => {
 	const {name, userId} = useContext(UserContext);
-	const [isOpenModalResult, setIsOpenModalResult] = useState(false);
 	const {
 		start,
 		state,
@@ -31,6 +31,8 @@ const PuzzleDuel : React.FC<PuzzleDuelType> = () => {
 		winner,
 		resultL,
 		resultR,
+		isOpenModalResult,
+		setIsOpenModalResult,
 		submitPuzzle,
 		endGamePuzzle
 	} = usePuzzleDuelSocket();
@@ -124,10 +126,14 @@ const PuzzleDuel : React.FC<PuzzleDuelType> = () => {
 							<div className="max-h-[650px] h-[650px] w-[450px] border rounded-lg">
 								<ControlsPuzzleDuel
 									name={name}
+									player={puzzleData?.player}
 									competitor={opposite ? opposite : "Unknown"} //TODO: mock competitor
 									resultL={resultL}
 									resultR={resultR}
 									state={state}
+									// resultL={[1, 1, -1, 0, 0, 1, 1, -1, 0, 0]}
+									// resultR={[1, 1, -1, 0, 1, 1, -1, 0, 0, 1]}
+									// state={StatePuzzleDuel.finding}
 									history={["win", "win", "win", "win", "win"]}
 									onFinish={endGamePuzzle}
 									onPlay={onPlay}
@@ -137,7 +143,7 @@ const PuzzleDuel : React.FC<PuzzleDuelType> = () => {
 					</div>
 				</div>
 			</div>
-			{isOpenModalResult && <ModalDuel isWon={true} isOpen={isOpenModalResult} setOpen={setIsOpenModalResult}/>}
+			{isOpenModalResult && <ModalDuel isWon={winner === userId} isOpen={isOpenModalResult} onCLose={setIsOpenModalResult}/>}
 		</div>
 	)
 }
