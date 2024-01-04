@@ -1,8 +1,11 @@
 import React, {useEffect, useState} from "react";
-import {Col, Divider, Row, Statistic} from "antd";
-import {StarFilled} from "@ant-design/icons";
+import {Col, Divider, Row, Spin, Statistic} from "antd";
+import {CheckSquareOutlined, CloseSquareOutlined, LoadingOutlined, MinusSquareOutlined} from "@ant-design/icons";
 import {StatePuzzleDuel} from "@/helpers/types";
 import PuzzleDuelHistory from "@/components/Controls/PuzzleDuelHistory";
+import WhiteMove from "@/components/icons/WhiteMove";
+import BlackMove from "@/components/icons/BlackMove";
+import "./styles.css";
 
 const { Countdown } = Statistic;
 
@@ -10,6 +13,7 @@ type ControlsPuzzleDuelProps = {
 	type?: string;
 	name?: string;
 	competitor?: string;
+	player?: string;
 	currentPuzzle?: number;
 	resultL?: number[];
 	resultR?: number[];
@@ -26,7 +30,7 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 	const [deadline, setDeadline] = useState<number>(0);
 	
 	const startGame = () => {
-		setDeadline(Date.now() +  1000 * 30 * 3);
+		setDeadline(Date.now() +  1000 * 60 * 3);
 	}
 	
 	const onTimeoutDuel = () => {
@@ -37,13 +41,34 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 		if (props.state === StatePuzzleDuel.pending) {
 			startGame();
 		}
-	}, []);
+	}, [props.state]);
 	
 	return (
 		<div>
 			{
 				props.state === StatePuzzleDuel.pending ?
 					<div>
+						{
+							props.player === "White" ? (
+								<div className="bg-[#f1f1f1] w-full h-[100px] flex justify-center">
+									{/*	white first*/}
+									<span>
+										<WhiteMove />
+									</span>
+									<span className="headerControls text-[#321E2B]">
+										White to Move
+									</span>
+								</div>
+							) : (
+								<div className="bg-[#4B4847] w-full h-[100px] flex justify-center">
+									{/*	black first*/}
+									<span>
+								<BlackMove />
+							</span>
+									<span className="headerControls text-[#fff]">Black to Move</span>
+								</div>
+							)
+						}
 						<Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
 							<Col className="gutter-row" span={8}>
 								<div className={`mt-6 items-end `}>
@@ -55,10 +80,12 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 											</div>
 											{props.resultL?.map((e, index) => (
 												<div key = {index}>
-													<StarFilled
-														style={e == 1 ? {color: `#fadb14`, fontSize: '20px'} : e == -1 ? {color: `#ed4337`, fontSize: '20px'} : {color: `#f1f5f9`, fontSize: '20px'}}
-														className={`bg-[#57903C] pt-2`}
-													/>
+													{e == 1 ?
+														<CheckSquareOutlined style={{background: 'green', fontSize: '20px'}}/> :
+														e == -1 ?
+															<CloseSquareOutlined style={{background: 'red', fontSize: '20px'}}/> :
+															<MinusSquareOutlined style={{background: 'gray', fontSize: '20px'}}/>
+													}
 													<br/>
 												</div>
 											))}
@@ -66,33 +93,10 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 									</div>
 								</div>
 							</Col>
-							<Col className="gutter-row" span={8}>
-							
-							</Col>
-							<Col className="gutter-row" span={8}>
-								<div className={`mt-6 items-start`}>
-									<div className="object-cover h-full w-full flex items-center">
-										<div className={`items-center text-center`}>
-											<img src={avatar} alt="image description" className="shadow rounded-full max-w-full h-auto align-middle border-none"/>
-											<div className={`text-center text-slate-100 font-mono text-3xl font-bold mt-3	`}>
-												{props.competitor ? props.competitor : "Not found"}
-											</div>
-											{props.resultR?.map((e, index) => (
-												<div key={index}>
-													<StarFilled
-														style={e == 1 ? {color: `#fadb14`, fontSize: '20px'} : e == -1 ? {color: `#ed4337`, fontSize: '20px'} : {color: `#f1f5f9`, fontSize: '20px'}}
-														className={`bg-[#57903C] pt-2`}
-													/>
-													<br/>
-												</div>
-											))}
-										</div>
-									</div>
-								</div>
-							</Col>
-						</Row>
-						<Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} className={`pt-8`}>
-							<Col className={`text-center`} span={24}>
+							<Col className="gutter-row text-center self-center" span={8}>
+								<span className={'text-slate-100 font-mono text-5xl'}>
+									VS
+								</span>
 								<Countdown
 									value={deadline}
 									valueStyle={{
@@ -104,6 +108,32 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 									onFinish={onTimeoutDuel}
 								/>
 							</Col>
+							<Col className="gutter-row" span={8}>
+								<div className={`mt-6 items-start`}>
+									<div className="object-cover h-full w-full flex items-center">
+										<div className={`items-center text-center`}>
+											<img src={avatar} alt="image description" className="shadow rounded-full max-w-full h-auto align-middle border-none"/>
+											<div className={`text-center text-slate-100 font-mono text-3xl font-bold mt-3	`}>
+												{props.competitor ? props.competitor : "Not found"}
+											</div>
+											{props.resultR?.map((e, index) => (
+												<div key = {index}>
+													{e == 1 ?
+														<CheckSquareOutlined style={{background: 'green', fontSize: '20px'}}/> :
+														e == -1 ?
+															<CloseSquareOutlined style={{background: 'red', fontSize: '20px'}}/> :
+															<MinusSquareOutlined style={{background: 'gray', fontSize: '20px'}}/>
+													}
+													<br/>
+												</div>
+											))}
+										</div>
+									</div>
+								</div>
+							</Col>
+						</Row>
+						<Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} className={`pt-8`}>
+						
 						</Row>
 						<Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} className={`pt-2`}>
 							<Col className={`text-center text-slate-100 text-3xl font-bold`} span={24}>
@@ -141,18 +171,28 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 						</div>
 						<Divider className={`bg-slate-100`}/>
 						<div className={`text-center h-full`}>
-							<button
-								className="hintButton buttonSize border-transparent w-9/12 p-1"
-								onClick={props.onPlay}
-								style={{
-									background: "#f4892e",
-									borderRadius: "5px"
-								}}
-							>
-								<div className={`text-center text-slate-100 font-mono text-3xl font-bold`}>
-									Play
-								</div>
-							</button>
+							{
+								props.state === StatePuzzleDuel.wait ?
+									<button
+										className="hintButton buttonSize border-transparent w-9/12 p-1"
+										onClick={props.onPlay}
+										style={{
+											background: "#f4892e",
+											borderRadius: "5px"
+										}}
+									>
+										<div className={`text-center text-slate-100 font-mono text-3xl font-bold`}>
+											Play
+										</div>
+									</button>
+									:
+									<span>
+										<span className={`text-center text-slate-100 font-mono text-3xl font-bold pr-3`}>
+											Finding
+										</span>
+										<Spin indicator={<LoadingOutlined style={{ fontSize: 24, color: '#f1f5f9'}} spin />} />
+									</span>
+							}
 						</div>
 					</div>
 			}
