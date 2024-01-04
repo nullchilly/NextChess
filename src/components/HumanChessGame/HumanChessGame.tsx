@@ -7,6 +7,8 @@ import { Chessboard } from "react-chessboard";
 import { Piece, Square } from "react-chessboard/dist/chessboard/types";
 import PlayerCard from "../Card/PlayerCard";
 import MoveList from "../MoveList/MoveList";
+import ModalEndGame from "../Modal/ModalEndGame";
+import { Button } from '../ui/button';
 
 type Props = {
   id: string;
@@ -15,6 +17,7 @@ type Props = {
 const HumanChessGame = ({ id }: Props) => {
   const { userId, name } = useContext(UserContext);
   const [gameUrl, setGameUrl] = useState<string>("");
+  const [isModalEndGameOpen, setOpenModalEndGame] = useState<boolean>(true);
 
   useEffect(() => {
     const ISSERVER = typeof window === "undefined";
@@ -28,6 +31,8 @@ const HumanChessGame = ({ id }: Props) => {
   }, []);
   const {
     socket,
+    winner,
+    forfeitGame,
     playable,
     pieceColor,
     onPieceDrop,
@@ -76,34 +81,49 @@ const HumanChessGame = ({ id }: Props) => {
           </div>
         </div>
         <div className="flex justify-center w-1/3">
-        {playable ? (
-            <>
-              <MoveList
-                moves={game.history({ verbose: true }).reverse()}
-                bot={{ id: "0", name: "shark" }}
-              />
-              {/* {winner !== "unknown" ? (
-                <div className="flex justify-center">
-                  <CaretLeftFilled
-                    style={{ fontSize: "32px" }}
-                    onClick={prevMove}
-                  />
-                  <CaretRightFilled
-                    style={{ fontSize: "32px" }}
-                    onClick={nextMove}
-                  />
+          <div>
+          {playable ? (
+              <>
+                <MoveList
+                  moves={game.history({ verbose: true }).reverse()}
+                  bot={{ id: "0", name: "shark" }}
+                />
+                {/* {winner !== "unknown" ? (
+                  <div className="flex justify-center">
+                    <CaretLeftFilled
+                      style={{ fontSize: "32px" }}
+                      onClick={prevMove}
+                    />
+                    <CaretRightFilled
+                      style={{ fontSize: "32px" }}
+                      onClick={nextMove}
+                    />
+                  </div>
+                ) : null} */}
+                {/* Cannot make HumanControls work??? */}
+                <div className="flex gap-4 mt-4">
+                  <Button className="w-full" onClick={() => forfeitGame()}>
+                    Forfeit
+                  </Button>
                 </div>
-              ) : null} */}
-            </>
-          ) : (
-            null
-            // <PrepareCard
-            //   botList={botList}
-            //   onSelectBot={onSelectBot}
-            //   bot={bot ? bot : { id: "0", name: "shark" }}
-            // />
-          )}
+              </>
+            ) : (
+              null
+              // <PrepareCard
+              //   botList={botList}
+              //   onSelectBot={onSelectBot}
+              //   bot={bot ? bot : { id: "0", name: "shark" }}
+              // />
+            )}
+          </div>
         </div>
+        {winner === "unknown" ? null : (
+          <ModalEndGame
+            winner={winner}
+            isOpen={isModalEndGameOpen}
+            setOpen={setOpenModalEndGame}
+          />
+        )}
       </div>
     </>
   );

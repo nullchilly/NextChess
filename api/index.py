@@ -434,6 +434,26 @@ async def human_play_chess(sid, msg):
 
         if (user_turn == current_turn):
             game_states[gameID]['board'].push(chess.Move.from_uci(move))
+            outcome = game_states[gameID]['board'].outcome()
+            if (outcome):
+                reason = outcome.termination.name
+                winner_color = outcome.winner
+                winner = 0 if winner_color is None else 1 if winner_color is True else 2
+                print(reason, winner_color, winner)
+                message = {
+                    "ok": True,
+                    "result": {
+                        "winner": winner,
+                        "reason": reason
+                    }
+                }
+                if current_turn == "b": # Without loss of generality
+                    message["result"]["winner"] ^= 1 ^ 2
+                await sio.emit("human-play-chess", json.dumps(message), room=sid)
+                if (winner != 0):
+                    message["result"]["winner"] ^= 1 ^ 2
+                await sio.emit("human-play-chess", json.dumps(message), room=opponent_sid)
+                return
             message = {"ok": True, "move": move, "turn": current_turn};
             await sio.emit("human-play-chess", json.dumps(message), room=opponent_sid)
             return
@@ -448,6 +468,15 @@ async def human_play_chess(sid, msg):
                        "error": "Error human play chess"}
         await sio.emit("human-new-player-join", json.dumps(failMessage), room=sid)
 
+@sio.on("human-user-forfeit")
+async def user_forfeit(sid, msg):
+    data = json.loads(msg)
+    print(sid, data)
+    gameID = data["id"]
+    message = data["winner"]
+    opponent_sid = game_states[gameID]["bSid"] if sid == game_states[gameID]["wSid"] else game_states[gameID]["wSid"]
+    print(opponent_sid)
+    await sio.emit("human-user-forfeit", message, room=opponent_sid)
 
 @sio.on("connect")
 async def connect(sid, env):
