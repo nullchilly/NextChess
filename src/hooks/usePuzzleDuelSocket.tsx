@@ -11,6 +11,8 @@ enum ConnectionStatus {
 	Disconnected = "disconnected",
 }
 
+let nextId = 0;
+
 const usePuzzleDuelSocket = () => {
 	const [socket, setSocket] = useState<Socket | null>(null);
 	const [connectionStatus, setConnectionStatus] =
@@ -25,12 +27,13 @@ const usePuzzleDuelSocket = () => {
 	const [gameId, setGameId] = useState<number>()
 	const [state, setState] = useState<StatePuzzleDuel>(StatePuzzleDuel.wait)
 	const [puzzleData, setPuzzleData] = useState<Puzzle>();
-	const [current, setCurrent] = useState(0);
-	const [currentO, setCurrentO] = useState(0);
+	const [current, setCurrent] = useState<number>(0);
+	const [current0, setCurrent0] = useState(0);
 	const [userId, setUserId] = useState(0);
 	const [resultL, setResultL] = useState<number[]>(Array(10).fill(0))
 	const [resultR, setResultR] = useState<number[]>(Array(10).fill(0))
 	const [isOpenModalResult, setIsOpenModalResult] = useState(false);
+	const [change, setChange] = useState(0);
 	
 	const fetchGameId = async () => {
 		try {
@@ -143,15 +146,10 @@ const usePuzzleDuelSocket = () => {
 						if (response.message.userId !== userId) {
 							setGetResult(true);
 							if (response.message.solved) {
-								const newList = resultR;
-								newList[currentO] = 1
-								setResultR((prevState) => newList);
+								setChange(1);
 							} else {
-								const newList = resultR;
-								newList[currentO] = -1
-								setResultR((prevState) => newList);
+								setChange(-1)
 							}
-							setCurrentO((prevState) => prevState + 1);
 						}
 					} else if (response["status"] === "solved") {
 					
@@ -159,6 +157,11 @@ const usePuzzleDuelSocket = () => {
 						setWinner(response.message.userId);
 						setStart(false);
 						setIsOpenModalResult(true);
+						setState(StatePuzzleDuel.wait);
+						setCurrent0(0);
+						setCurrent(0);
+						setResultR(Array(10).fill(0));
+						setResultL(Array(10).fill(0));
 					} else if (response["status"] === "error") {
 					
 					}
@@ -168,6 +171,22 @@ const usePuzzleDuelSocket = () => {
 			});
 		}
 	}, [disconnectSocket, setConnectionStatus, socket]);
+	
+	useEffect(() => {
+		if (change == 1) {
+			const newList = resultR;
+			newList[current0] = 1
+			setResultR(newList);
+			setCurrent0(current0 + 1);
+		} else if (change == -1) {
+			const newList = resultR;
+			newList[current0] = -1
+			setResultR(newList);
+			setCurrent0(current0 + 1);
+		}
+		console.log(current0)
+		setChange(0);
+	}, [change]);
 	
 	const submitPuzzle = (id: string, solved: boolean) => {
 		const raw = JSON.stringify({
@@ -210,12 +229,6 @@ const usePuzzleDuelSocket = () => {
 		});
 		console.log(raw)
 		socket?.emit("puzzle-duel", raw);
-		setState(StatePuzzleDuel.wait);
-		setCurrentO(0);
-		setCurrent(0);
-		setResultR(Array(10).fill(0));
-		setResultL(Array(10).fill(0));
-		
 	}
 	
 	const joinGame = () => {

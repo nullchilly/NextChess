@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Col, Divider, Row, Spin, Statistic} from "antd";
+import {Col, Divider, Row, Spin, Statistic, Tooltip} from "antd";
 import {CheckSquareOutlined, CloseSquareOutlined, LoadingOutlined, MinusSquareOutlined} from "@ant-design/icons";
 import {StatePuzzleDuel} from "@/helpers/types";
 import PuzzleDuelHistory from "@/components/Controls/PuzzleDuelHistory";
@@ -28,6 +28,7 @@ const dueling = "https://www.chesskid.com/images/pieces/dueling.png";
 
 const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 	const [deadline, setDeadline] = useState<number>(0);
+	const [result, setResult] = useState([]);
 	
 	const startGame = () => {
 		setDeadline(Date.now() +  1000 * 60 * 3);
@@ -36,6 +37,10 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 	const onTimeoutDuel = () => {
 		props.onFinish();
 	}
+	
+	useEffect(() => {
+	
+	}, [props.resultR]);
 	
 	useEffect(() => {
 		if (props.state === StatePuzzleDuel.pending) {
@@ -75,9 +80,15 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 									<div className="object-cover h-full w-full flex items-center justify-end">
 										<div className={`items-center text-center`}>
 											<img src={avatar} alt="image description" className="shadow rounded-full max-w-full h-auto align-middle border-none"/>
-											<div className={`text-center text-slate-100 font-mono text-3xl font-bold mt-3	`}>
-												{props.name ? props.name : "Guest"}
-											</div>
+											<Tooltip title={
+												<div className={`text-center text-slate-100 font-mono text-3xl font-bold mt-3	`}>
+													{props.name ? props.name : "Guest"}
+												</div>
+											}>
+												<div className={`text-center text-slate-100 font-mono text-3xl font-bold mt-3	`}>
+													{props.name ? props.name.length > 7 ? props.name.slice(0, 5) + ".." : props.name : "Guest"}
+												</div>
+											</Tooltip>
 											{props.resultL?.map((e, index) => (
 												<div key = {index}>
 													{e == 1 ?
@@ -113,9 +124,15 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 									<div className="object-cover h-full w-full flex items-center">
 										<div className={`items-center text-center`}>
 											<img src={avatar} alt="image description" className="shadow rounded-full max-w-full h-auto align-middle border-none"/>
-											<div className={`text-center text-slate-100 font-mono text-3xl font-bold mt-3	`}>
-												{props.competitor ? props.competitor : "Not found"}
-											</div>
+											<Tooltip title={
+												<div className={`text-center text-slate-100 font-mono text-3xl font-bold mt-3	`}>
+													{props.competitor ? props.competitor : "Guest"}
+												</div>
+											}>
+												<div className={`text-center text-slate-100 font-mono text-3xl font-bold mt-3	`}>
+													{props.competitor ? props.competitor.length > 7 ? props.competitor.slice(0, 5) + ".." : props.competitor : "Guest"}
+												</div>
+											</Tooltip>
 											{props.resultR?.map((e, index) => (
 												<div key = {index}>
 													{e == 1 ?
