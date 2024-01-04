@@ -55,3 +55,8 @@ async def get_puzzle_game(db: Session = Depends(db_session)):
 @puzzle_router.get('/puzzle/recent', response_model=PuzzleDuelResultList)
 async def get_recent_puzzle_duel_result(db: Session = Depends(db_session)):
 	return PuzzleService().get_recent_puzzle_duel_result(db)
+
+
+@puzzle_router.get('/puzzle/recent/{userId}', response_model=PuzzleDuelResultList)
+async def get_recent_puzzle_duel_result_by_user(db: Session = Depends(db_session), *, userId: int):
+	return PuzzleService().get_recent_puzzle_by_user(db, userId)
