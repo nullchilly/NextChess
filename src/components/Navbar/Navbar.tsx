@@ -16,6 +16,7 @@ import Link from "next/link";
 import ModalPlayBot from "../Modal/ModalPlayBot";
 import { SettingOutlined } from "@ant-design/icons";
 import { UserContext } from "@/context/UserContext";
+import ModalPlayHuman from "../Modal/ModalPlayHuman";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -55,13 +56,9 @@ const items: MenuProps["items"] = [
   ]),
 ];
 
-// type NavbarProps = {
-//   name?: string;
-//   rate?: string;
-// }
-
 const Navbar: React.FC = () => {
   const [isModalPlayBotOpen, setIsModalPlayBotOpen] = React.useState(false);
+  const [isModalPlayHumanOpen, setIsModalPlayHumanOpen] = React.useState(false);
   const router = useRouter();
   const { name, rate, accessToken } = useContext(UserContext);
 
@@ -69,10 +66,17 @@ const Navbar: React.FC = () => {
     setIsModalPlayBotOpen(true);
   };
 
+  const showHumanModal = () => {
+    setIsModalPlayHumanOpen(true);
+  };
+
   const onClickMenuDrawer: MenuProps["onClick"] = (e) => {
     let href = e.keyPath[0]; // WARNING: This's hacky...
     if (href === "/computer") {
       showModal();
+    } else if (href === "/human") {
+      if (!accessToken) router.push("/login");
+      else showHumanModal();
     } else {
       router.push(href);
     }
@@ -136,6 +140,10 @@ const Navbar: React.FC = () => {
       <ModalPlayBot
         isOpen={isModalPlayBotOpen}
         setOpen={setIsModalPlayBotOpen}
+      />
+      <ModalPlayHuman
+        isOpen={isModalPlayHumanOpen}
+        setOpen={setIsModalPlayHumanOpen}
       />
     </>
   );

@@ -344,6 +344,7 @@ async def human_new_player_join(sid, msg):
         data = json.loads(msg)
         gameID = data["id"]
         userID = data["userId"]
+        user_name = data["name"]
         current_player_number = 0
         current_state = dict()
 
@@ -374,6 +375,7 @@ async def human_new_player_join(sid, msg):
                         current_state["wSid"] = sid
                         current_state['board'] = chess.Board()
                         current_state['status'] = False
+                        current_state["firstUsername"] = user_name
                         game_states[gameID] = current_state
                     else:
                         all_game_ids.add(gameID)
@@ -390,12 +392,15 @@ async def human_new_player_join(sid, msg):
                     db.commit()
 
         config = {"color": ("w" if current_player_number == 1 else "b")}
+        if (current_player_number == 2):
+            config["opponentName"] = game_states[gameID]["firstUsername"]
         response = {"ok": True,
                     "numberPlayer": current_player_number, "config": config}
         await sio.emit("human-new-player-join", json.dumps(response), room=sid)
         if (current_player_number == 2):
             # Ping 1st player that 2nd player joined
             response["config"]["color"] = "w"
+            response["config"]["opponentName"] = user_name
             await sio.emit("human-new-player-join", json.dumps(response), room=game_states[gameID]["wSid"])
         return
 
