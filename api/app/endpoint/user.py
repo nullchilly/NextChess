@@ -1,10 +1,11 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Query
 from sqlalchemy.orm import Session
 
 from api.app.dto.core.user import SignUpResponse, SignUpRequest, LoginRequest, LoginResponse, ChangePasswordRequest, \
-    GetProfileResponse, UpdateProfileRequest, GetUserGameHistoryResponse, GetUserPuzzleHistoryResponse
+    GetProfileResponse, UpdateProfileRequest, GetUserGameHistoryResponse, GetUserPuzzleHistoryResponse, \
+    GetUserGameResultResponse
 from api.app.helper.base_response import DataResponse, ResponseSchemaBase
 from api.app.helper.db import db_session
 from api.app.helper.middleware import get_current_user
@@ -60,6 +61,11 @@ def get_puzzle_history(db: Session = Depends(db_session), user: User = Depends(g
 @user_router.get('/puzzle/history/{id}', response_model=DataResponse[GetUserPuzzleHistoryResponse])
 def get_puzzle_history_by_id(db: Session = Depends(db_session), *, req: Request, id: int):
     return DataResponse().success_response(data=UserService().get_user_puzzle_history(db=db, user_id=id))
+
+@user_router.get('/game/result/{user_id}', response_model=DataResponse[GetUserGameResultResponse])
+def get_game_result(db: Session = Depends(db_session), *, user_id: int, variant_id: int = Query(default=1, alias="variantId"),
+                    limit: int = Query(default=5, alias="limit")):
+    return DataResponse().success_response(data=UserService().get_game_result(db, user_id, variant_id, limit))
 
 
 
