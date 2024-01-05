@@ -181,8 +181,7 @@ class UserService:
         res = []
         for game in q.all():
             res.append(game.win)
-        while len(res) < limit:
-            res.append(-1)
+        res.reverse()
         return GetUserGameResultResponse(result=res)
 
 
