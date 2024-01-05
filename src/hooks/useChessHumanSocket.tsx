@@ -87,7 +87,6 @@ const useChessHumanSocket = ({ id, userId, name }: Props) => {
               handleGameEnd(
                 winner_id === 0 ? "draw" : winner_id === 1 ? "white" : "black"
               );
-              return;
             }
             console.log("Opponent move: ", response["move"]);
             makeMove(response["move"]);

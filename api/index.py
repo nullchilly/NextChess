@@ -435,6 +435,8 @@ async def human_play_chess(sid, msg):
         if (user_turn == current_turn):
             game_states[gameID]['board'].push(chess.Move.from_uci(move))
             outcome = game_states[gameID]['board'].outcome()
+            message = {"ok": True, "move": move, "turn": current_turn};
+            await sio.emit("human-play-chess", json.dumps(message), room=opponent_sid)
             if (outcome):
                 reason = outcome.termination.name
                 winner_color = outcome.winner
@@ -453,9 +455,6 @@ async def human_play_chess(sid, msg):
                 if (winner != 0):
                     message["result"]["winner"] ^= 1 ^ 2
                 await sio.emit("human-play-chess", json.dumps(message), room=opponent_sid)
-                return
-            message = {"ok": True, "move": move, "turn": current_turn};
-            await sio.emit("human-play-chess", json.dumps(message), room=opponent_sid)
             return
         else:
             message = {"ok": False, "error": "Invalid turn"}
