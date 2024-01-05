@@ -1,21 +1,35 @@
-import { ShortMove } from "@/types";
+import { CustomSquares, ShortMove } from "@/types";
 import { Chess, Square } from "chess.js";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import { GameConfig, WINNER } from "@/helpers/types";
 
 type Props = {
   id: string;
   userId: number | undefined;
+  name: string | undefined;
 };
 
-const useChessHumanSocket = ({ id, userId }: Props) => {
-  // const { userId } = useContext(UserContext);
+function squareReducer(squares: CustomSquares, action: Partial<CustomSquares>) {
+  return { ...squares, ...action };
+}
+
+const useChessHumanSocket = ({ id, userId, name }: Props) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [_playersInLobby, setPlayersInLobby] = useState<number>(0); // May not using it anw
   const [pieceColor, setPieceColor] = useState<"w" | "b">("w");
   const [playable, setPlayable] = useState<boolean>(false); // True when there're 2 players in lobby
   const [game, setGame] = useState(new Chess());
   const [gameFen, setGameFen] = useState<string>("start");
+  const [opponentName, setOpponentName] = useState<string>("");
+  const [customSquares, updateCustomSquares] = useReducer(squareReducer, {
+    check: {},
+  });
+  const [winner, setWinner] = useState<WINNER>("unknown");
+
+  function handleGameEnd(winner: WINNER) {
+    setWinner(winner);
+  }
 
   const disconnectSocket = useCallback(() => {
     socket?.close();
@@ -28,6 +42,10 @@ const useChessHumanSocket = ({ id, userId }: Props) => {
       socket.on("connect", () => {
         console.log("Connected", socket.id);
       });
+      socket.on("human-user-forfeit", async (msg) => {
+        console.log(msg)
+        handleGameEnd("white")
+      })
 
       socket.on("human-new-player-join", async (msg) => {
         console.log("JOINED:", msg);
@@ -36,9 +54,13 @@ const useChessHumanSocket = ({ id, userId }: Props) => {
           if (response["ok"]) {
             const currentNumberPlayer = response["numberPlayer"];
             const color = response["config"]["color"];
+            const opponentName = response["config"]["opponentName"];
             setPlayersInLobby(currentNumberPlayer);
             setPlayable(currentNumberPlayer === 2);
             if (color === "w" || color === "b") setPieceColor(color);
+            if (typeof opponentName === "string") {
+              setOpponentName(opponentName);
+            }
           } else {
             if (typeof response["playable"] === "boolean") {
               setPlayable(response["playable"]);
@@ -57,6 +79,15 @@ const useChessHumanSocket = ({ id, userId }: Props) => {
         try {
           const response = JSON.parse(msg);
           if(response["ok"]) {
+            if (response["result"]) {
+              const winner_id = response["result"]["winner"];
+              const reason = response["result"]["reason"];
+              console.log("Reason: ", reason);
+              await new Promise((r) => setTimeout(r, 1200));
+              handleGameEnd(
+                winner_id === 0 ? "draw" : winner_id === 1 ? "white" : "black"
+              );
+            }
             console.log("Opponent move: ", response["move"]);
             makeMove(response["move"]);
           } else {
@@ -84,7 +115,7 @@ const useChessHumanSocket = ({ id, userId }: Props) => {
   };
 
   const onNewPlayer = (userId: number, socket: Socket) => {
-    const newPlayerData = { id, userId };
+    const newPlayerData = { id, userId, name };
     socket.emit("human-new-player-join", JSON.stringify(newPlayerData));
   };
 
@@ -94,9 +125,37 @@ const useChessHumanSocket = ({ id, userId }: Props) => {
     const result = gameCopy.move(move);
 
     if (result) {
-      console.log("RESULT OK: ", result, gameCopy.fen());
       setGameFen(gameCopy.fen());
       setGame(gameCopy);
+      let kingSquare = undefined;
+      console.log(game.inCheck())
+      if (game.inCheck()) {
+        const kingPos = game.board().reduce((acc, row, index) => {
+          const squareIndex = row.findIndex(
+            (square) => {
+              if (square?.type == "k") {
+                console.log(square)
+              }
+              return square && square.type === "k" && square.color === game.turn()
+            }
+          );
+          return squareIndex >= 0
+            ? `${String.fromCharCode(squareIndex + 97)}${8 - index}`
+            : acc;
+        }, "");
+        kingSquare = {
+          [kingPos]: {
+            background:
+              "radial-gradient(red, rgba(255,0,0,.8), transparent 70%)",
+            borderRadius: "50%",
+          },
+        };
+      }
+      console.log(kingSquare)
+      updateCustomSquares({
+        check: kingSquare,
+      });
+
     }
     return result;
   };
@@ -118,18 +177,27 @@ const useChessHumanSocket = ({ id, userId }: Props) => {
 
     if (move === null) return false;
     sendMove(move.from + move.to + (move.promotion ? move.promotion : ""));
-    console.log("STIIL OK?");
     return true;
+  };
+
+  const forfeitGame = () => {
+    const gameForfeited = { id: id, winner: opponentName };
+    socket?.emit("human-user-forfeit", JSON.stringify(gameForfeited));
+    handleGameEnd("black");
   };
 
   return {
     socket,
+    winner,
+    forfeitGame,
+    customSquares,
     playable,
     pieceColor,
     onPieceDrop,
     game,
     gameFen,
     setGameFen,
+    opponentName,
   };
 };
 
