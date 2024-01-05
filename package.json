@@ -5,7 +5,7 @@
   "scripts": {
     "fastapi-dev": "pip3 install --user -r requirements.txt && python3 -m uvicorn api.index:app --reload",
     "fastapi-start": "pip3 install --user -r requirements.txt && python3 -m uvicorn api.index:app --port 8000",
-    "next-dev": "next dev --turbo",
+    "next-dev": "next dev",
     "dev": "concurrently \"npm run fastapi-dev\" \"npm run next-dev\" ",
     "build": "next build",
     "start": "/etc/jupyter/bin/expose 3000 && concurrently \"npm run fastapi-start\" \"npm run next-start\" ",
