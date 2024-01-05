@@ -3,12 +3,13 @@ from collections import defaultdict
 from datetime import datetime
 
 from fastapi import HTTPException
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from api.app.dto.core.user import SignUpRequest, SignUpResponse, UserRole, LoginRequest, ChangePasswordRequest, \
     LoginResponse, GetProfileResponse, UpdateProfileRequest, RatingInGetProfileResponse, \
     GetUserGameHistoryResponse, GameInGetUserGameHistoryResponse, PuzzleInGetUserPuzzleHistoryResponse, \
-    GetUserPuzzleHistoryResponse
+    GetUserPuzzleHistoryResponse, GameInGetUserGameResultResponse
 from api.app.helper import auth
 from api.app.model import User, Game, Move, Puzzle
 from api.app.model import Profile
@@ -171,4 +172,15 @@ class UserService:
             res.append(PuzzleInGetUserPuzzleHistoryResponse(puzzle_id=puzzle.id, puzzle_name=puzzle.name,
                                                             date_solved=date_solved, rating_change=rating_change, is_solved=is_solved))
         return GetUserPuzzleHistoryResponse(puzzles=res)
+
+    @classmethod
+    def get_game_result(cls, db: Session,  variant_id: int, user_id: int, limit: int = 5):
+        q = db.query(GameUser).join(Game, Game.id == GameUser.game_id).filter(GameUser.user_id == user_id,
+                                                                              Game.variant_id == variant_id).order_by(desc(Game.id)).limit(limit)
+        res = []
+        for game in q.all():
+            res.append(GameInGetUserGameResultResponse(game_id=game.game_id, result=game.win))
+
+
+
 

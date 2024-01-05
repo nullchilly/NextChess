@@ -41,7 +41,7 @@ class RatingInGetProfileResponse(CamelBaseModel):
 class GetProfileResponse(CamelBaseModel):
     user_id: int
     name: str
-    date_of_birth: date
+    date_of_birth: Optional[date]
     gender: UserGender
     email: str
     ratings: List[RatingInGetProfileResponse]
@@ -75,5 +75,12 @@ class PuzzleInGetUserPuzzleHistoryResponse(CamelBaseModel):
 
 class GetUserPuzzleHistoryResponse(CamelBaseModel):
     puzzles : List[PuzzleInGetUserPuzzleHistoryResponse]
+
+class GameInGetUserGameResultResponse(CamelBaseModel):
+    game_id: int
+    result: int
+
+class GetUserGameResultResponse(CamelBaseModel):
+    games: List[GameInGetUserGameResultResponse]
 
 
