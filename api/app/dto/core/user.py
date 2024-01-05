@@ -77,7 +77,6 @@ class GetUserPuzzleHistoryResponse(CamelBaseModel):
     puzzles : List[PuzzleInGetUserPuzzleHistoryResponse]
 
 class GameInGetUserGameResultResponse(CamelBaseModel):
-    game_id: int
     result: int
 
 class GetUserGameResultResponse(CamelBaseModel):

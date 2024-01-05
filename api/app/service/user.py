@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from api.app.dto.core.user import SignUpRequest, SignUpResponse, UserRole, LoginRequest, ChangePasswordRequest, \
     LoginResponse, GetProfileResponse, UpdateProfileRequest, RatingInGetProfileResponse, \
     GetUserGameHistoryResponse, GameInGetUserGameHistoryResponse, PuzzleInGetUserPuzzleHistoryResponse, \
-    GetUserPuzzleHistoryResponse, GameInGetUserGameResultResponse
+    GetUserPuzzleHistoryResponse, GameInGetUserGameResultResponse, GetUserGameResultResponse
 from api.app.helper import auth
 from api.app.model import User, Game, Move, Puzzle
 from api.app.model import Profile
@@ -174,12 +174,16 @@ class UserService:
         return GetUserPuzzleHistoryResponse(puzzles=res)
 
     @classmethod
-    def get_game_result(cls, db: Session,  variant_id: int, user_id: int, limit: int = 5):
+    def get_game_result(cls, db: Session, user_id: int, variant_id: int, limit: int = 5):
         q = db.query(GameUser).join(Game, Game.id == GameUser.game_id).filter(GameUser.user_id == user_id,
-                                                                              Game.variant_id == variant_id).order_by(desc(Game.id)).limit(limit)
+                                                                              Game.variant_id == variant_id,
+                                                                              Game.status == 1).order_by(desc(Game.id)).limit(limit)
         res = []
         for game in q.all():
-            res.append(GameInGetUserGameResultResponse(game_id=game.game_id, result=game.win))
+            res.append(GameInGetUserGameResultResponse(result=game.win))
+        while len(res) < limit:
+            res.append(GameInGetUserGameResultResponse(result=-1))
+        return GetUserGameResultResponse(games=res)
 
 
 
