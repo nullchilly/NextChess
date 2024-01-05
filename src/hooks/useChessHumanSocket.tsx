@@ -129,11 +129,16 @@ const useChessHumanSocket = ({ id, userId, name }: Props) => {
       setGameFen(gameCopy.fen());
       setGame(gameCopy);
       let kingSquare = undefined;
+      console.log(game.inCheck())
       if (game.inCheck()) {
         const kingPos = game.board().reduce((acc, row, index) => {
           const squareIndex = row.findIndex(
-            (square) =>
-              square && square.type === "k" && square.color === game.turn()
+            (square) => {
+              if (square?.type == "k") {
+                console.log(square)
+              }
+              return square && square.type === "k" && square.color === game.turn()
+            }
           );
           return squareIndex >= 0
             ? `${String.fromCharCode(squareIndex + 97)}${8 - index}`
@@ -147,6 +152,7 @@ const useChessHumanSocket = ({ id, userId, name }: Props) => {
           },
         };
       }
+      console.log(kingSquare)
       updateCustomSquares({
         check: kingSquare,
       });
@@ -185,6 +191,7 @@ const useChessHumanSocket = ({ id, userId, name }: Props) => {
     socket,
     winner,
     forfeitGame,
+    customSquares,
     playable,
     pieceColor,
     onPieceDrop,

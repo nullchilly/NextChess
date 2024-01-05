@@ -33,6 +33,7 @@ const HumanChessGame = ({ id }: Props) => {
     socket,
     winner,
     forfeitGame,
+    customSquares,
     playable,
     pieceColor,
     onPieceDrop,
@@ -73,7 +74,7 @@ const HumanChessGame = ({ id }: Props) => {
                 borderRadius: "8px",
                 boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
               }}
-              // customSquareStyles={{ ...customSquares.check }}
+              customSquareStyles={{ ...customSquares.check }}
             />
             <div>
               <PlayerCard name={name ?? "Guest"} link="" />
