@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from api.app.dto.core.user import SignUpRequest, SignUpResponse, UserRole, LoginRequest, ChangePasswordRequest, \
     LoginResponse, GetProfileResponse, UpdateProfileRequest, RatingInGetProfileResponse, \
     GetUserGameHistoryResponse, GameInGetUserGameHistoryResponse, PuzzleInGetUserPuzzleHistoryResponse, \
-    GetUserPuzzleHistoryResponse, GameInGetUserGameResultResponse, GetUserGameResultResponse
+    GetUserPuzzleHistoryResponse, GetUserGameResultResponse
 from api.app.helper import auth
 from api.app.model import User, Game, Move, Puzzle
 from api.app.model import Profile
@@ -180,10 +180,10 @@ class UserService:
                                                                               Game.status == 1).order_by(desc(Game.id)).limit(limit)
         res = []
         for game in q.all():
-            res.append(GameInGetUserGameResultResponse(result=game.win))
+            res.append(game.win)
         while len(res) < limit:
-            res.append(GameInGetUserGameResultResponse(result=-1))
-        return GetUserGameResultResponse(games=res)
+            res.append(-1)
+        return GetUserGameResultResponse(result=res)
 
 
 
