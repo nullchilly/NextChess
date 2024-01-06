@@ -1,8 +1,1 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/api/hello": "pages/api/hello.js",
-  "/api/puzzle": "pages/api/puzzle.js",
-  "/api/puzzleData/[id]": "pages/api/puzzleData/[id].js",
-  "/_document": "pages/_document.js"
-}
+{"/_app":"pages/_app.js","/_error":"pages/_error.js","/api/hello":"pages/api/hello.js","/api/puzzle":"pages/api/puzzle.js","/api/puzzleData/[id]":"pages/api/puzzleData/[id].js","/_document":"pages/_document.js","/404":"pages/404.html"}

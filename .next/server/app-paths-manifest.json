@@ -1,11 +1,11 @@
 {
   "/_not-found": "app/_not-found.js",
   "/computer/page": "app/computer/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/forget/page": "app/forget/page.js",
   "/human/page": "app/human/page.js",
-  "/minimax/page": "app/minimax/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/login/page": "app/login/page.js",
+  "/minimax/page": "app/minimax/page.js",
   "/page": "app/page.js",
   "/playground/socketio/page": "app/playground/socketio/page.js",
   "/playground/websocket/page": "app/playground/websocket/page.js",

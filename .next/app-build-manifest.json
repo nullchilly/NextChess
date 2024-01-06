@@ -77,6 +77,14 @@
       "static/chunks/3570-f0dd378d095a2dab.js",
       "static/chunks/app/human/page-74722a5cf40b2877.js"
     ],
+    "/login/page": [
+      "static/chunks/webpack-636894e01e4f9b26.js",
+      "static/chunks/fd9d1056-8e515e4c454d5b9f.js",
+      "static/chunks/2472-7b9643c40f3d0d6c.js",
+      "static/chunks/main-app-7811098613d5ea8c.js",
+      "static/chunks/1396-ec287ba114c1ead4.js",
+      "static/chunks/app/login/page-538705d62a6718b8.js"
+    ],
     "/minimax/page": [
       "static/chunks/webpack-636894e01e4f9b26.js",
       "static/chunks/fd9d1056-8e515e4c454d5b9f.js",
@@ -104,14 +112,6 @@
       "static/chunks/8769-31ad8000e78c44b4.js",
       "static/chunks/8260-65af97af8530dc8c.js",
       "static/chunks/app/minimax/page-7605da4eb214235d.js"
-    ],
-    "/login/page": [
-      "static/chunks/webpack-636894e01e4f9b26.js",
-      "static/chunks/fd9d1056-8e515e4c454d5b9f.js",
-      "static/chunks/2472-7b9643c40f3d0d6c.js",
-      "static/chunks/main-app-7811098613d5ea8c.js",
-      "static/chunks/1396-ec287ba114c1ead4.js",
-      "static/chunks/app/login/page-538705d62a6718b8.js"
     ],
     "/page": [
       "static/chunks/webpack-636894e01e4f9b26.js",
@@ -189,7 +189,7 @@
       "static/chunks/4836-b0dd1c888d4d6bc3.js",
       "static/chunks/9385-23a43bf6409a3cf4.js",
       "static/css/e980621f5616e7f1.css",
-      "static/chunks/app/puzzle-duel/page-db35c5808d5d8de1.js"
+      "static/chunks/app/puzzle-duel/page-a0555eca94e79e1c.js"
     ],
     "/puzzle/page": [
       "static/chunks/webpack-636894e01e4f9b26.js",
