@@ -6,6 +6,7 @@ import Crown from "../icons/Crown";
 import { WINNER } from "@/helpers/types";
 import Handshake from "../icons/Handshake";
 import {pawnLost, pawnWon} from "@/helpers/const";
+import Image from 'next/image';
 
 type Props = {
 	isWon: boolean;
@@ -48,9 +49,11 @@ export default function ModalDuel({ isWon, isOpen, onCLose }: Props) {
 				]}
 			>
 				<div className="flex flex-col justify-center items-center">
-					<img
+					<Image
 						src={isWon ? pawnWon : pawnLost}
 						alt={"won"}
+						width={82}
+						height={140}
 					/>
 				</div>
 			</Modal>
