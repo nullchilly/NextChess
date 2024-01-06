@@ -33,6 +33,7 @@ export default function ModalDuel({ isWon, isOpen, onCLose }: Props) {
 				onCancel={handleCancel}
 				footer={[
 					<button
+						key="closeButton"
 						className="border-transparent w-fit p-1 pl-3 pr-3 items-center"
 						onClick={handleCancel}
 						style={{

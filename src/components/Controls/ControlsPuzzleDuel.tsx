@@ -154,7 +154,7 @@ const ControlsPuzzleDuel : React.FC<ControlsPuzzleDuelProps> = (props) => {
 						</Row>
 						<Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} className={`pt-2`}>
 							<Col className={`text-center text-slate-100 text-3xl font-bold`} span={24}>
-								Come on, let's go guys and get your reward
+								Come on, let&apos;s go guys and get your reward
 							</Col>
 						</Row>
 					</div>
