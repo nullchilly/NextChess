@@ -74,10 +74,32 @@ class PuzzleInGetUserPuzzleHistoryResponse(CamelBaseModel):
     is_solved: Optional[bool]
 
 class GetUserPuzzleHistoryResponse(CamelBaseModel):
-    puzzles : List[PuzzleInGetUserPuzzleHistoryResponse]
+    puzzles: List[PuzzleInGetUserPuzzleHistoryResponse]
 
 
 class GetUserGameResultResponse(CamelBaseModel):
     result: List[int]
 
+class UserInGetListUserResponse(CamelBaseModel):
+    user_id: int
+    name: str
+    date_of_birth: Optional[date]
+    gender: Optional[UserGender]
+    email: str
+
+class GetListUserResponse(CamelBaseModel):
+    users: List[UserInGetListUserResponse]
+
+class GameInGetListGameResponse(CamelBaseModel):
+    game_id: int
+    variant_id: int
+    time_mode: int
+    users_id: List[int]
+    created_at: datetime
+    moves: Optional[List[str]]
+    slug: str
+    result: Optional[int]
+
+class GetListGameResponse(CamelBaseModel):
+    games: List[GameInGetListGameResponse]
 

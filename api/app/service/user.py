@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from api.app.dto.core.user import SignUpRequest, SignUpResponse, UserRole, LoginRequest, ChangePasswordRequest, \
     LoginResponse, GetProfileResponse, UpdateProfileRequest, RatingInGetProfileResponse, \
     GetUserGameHistoryResponse, GameInGetUserGameHistoryResponse, PuzzleInGetUserPuzzleHistoryResponse, \
-    GetUserPuzzleHistoryResponse, GetUserGameResultResponse
+    GetUserPuzzleHistoryResponse, GetUserGameResultResponse, GameInGetListGameResponse
 from api.app.helper import auth
 from api.app.model import User, Game, Move, Puzzle
 from api.app.model import Profile
@@ -131,6 +131,7 @@ class UserService:
             res.append(game_history_resp)
         return GetUserGameHistoryResponse(games=res)
 
+    @classmethod
     def get_user_game_history(cls, db: Session, user_id: int):
         move_by_user = db.query(Move).filter(Move.user_id == user_id, Move.deleted_at == None).all()
         move_by_game = defaultdict(list)
@@ -149,6 +150,7 @@ class UserService:
             res.append(game_history_resp)
         return GetUserGameHistoryResponse(games=res)
 
+    @classmethod
     def get_user_puzzle_history(cls, db: Session, user_id: int):
         puzzles = db.query(Puzzle).all()
         puzzle_by_user = {}
@@ -183,6 +185,24 @@ class UserService:
             res.append(game.win)
         res.reverse()
         return GetUserGameResultResponse(result=res)
+
+    @classmethod
+    def get_game_by_id(cls, db: Session, game_id: int):
+        move_in_game = db.query(Move).filter(Move.game_id == game_id, Move.deleted_at == None).all()
+        user_in_game = []
+        result = 0
+        for game in db.query(GameUser).filter(GameUser.game_id == game_id).filter(GameUser.deleted_at == None).all():
+            user_in_game.append(game.user_id)
+            result = game.win
+        game_history = db.query(Game).filter(Game.id == game_id, Game.deleted_at == None).first()
+        if game_history is None:
+            raise HTTPException(status_code=404, detail="Game not found")
+        return GameInGetListGameResponse(game_id=game_history.id,
+                                         variant_id=game_history.variant_id,
+                                         moves=move_in_game, users_id=user_in_game,
+                                         created_at=game_history.created_at,
+                                         time_mode=game_history.time_mode,
+                                         result=result, slug=game_history.slug)
 
 
 
