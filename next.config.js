@@ -13,6 +13,9 @@ const nextConfig = {
        }
     ];
   },
+  images: {
+    domains: ['www.chesskid.com'],
+  },
 };
 
 module.exports = nextConfig;
