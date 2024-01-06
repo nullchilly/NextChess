@@ -3,9 +3,11 @@ from datetime import datetime
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from api.app.dto.core.user import LoginRequest, LoginResponse
+from api.app.dto.core.user import LoginRequest, LoginResponse, UserInGetListUserResponse, GetListUserResponse,\
+    GetListGameResponse
 from api.app.model import User, Profile, Game
 from api.app.model.game_user import GameUser
+from api.app.service.user import UserService
 
 
 class AdminService:
@@ -37,7 +39,19 @@ class AdminService:
         db.commit()
 
     @classmethod
-    def delete_game(cls, user, db: Session, game_id):
+    def get_list_user(cls, user: User, db: Session):
+        if user.is_admin is False:
+            raise HTTPException(status_code=403, detail="Forbidden")
+        q = db.query(Profile)
+        res = []
+        for profile in q.all():
+            res.append(UserInGetListUserResponse(user_id=profile.user_id, name=profile.name, date_of_birth=profile.date_of_birth,
+                                                 gender=profile.gender, email=profile.email))
+        return GetListUserResponse(users=res)
+
+
+    @classmethod
+    def delete_game(cls, user: User, db: Session, game_id: int):
         if user.is_admin is False:
             raise HTTPException(status_code=403, detail="Forbidden")
         game = db.query(Game).filter(Game.id == game_id, Game.deleted_at == None).first()
@@ -50,3 +64,14 @@ class AdminService:
             "deleted_at": datetime.now()
         })
         db.commit()
+
+    @classmethod
+    def get_list_match(cls, db: Session, user: User):
+        if user.is_admin is False:
+            raise HTTPException(status_code=403, detail="Forbidden")
+        q = db.query(Game).filter(Game.deleted_at == None)
+        games = []
+        for game in q.all():
+            games.append(UserService().get_game_by_id(db, game.id))
+        return GetListGameResponse(games=games)
+
