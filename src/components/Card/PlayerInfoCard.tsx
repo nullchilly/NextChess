@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useContext} from "react";
 import BotIcon from "@/components/icons/BotIcon";
+import {UserContext} from "@/context/UserContext";
 
 type PlayerInfoCardProps = {
 	id: string,
@@ -8,6 +9,7 @@ type PlayerInfoCardProps = {
 }
 
 const PlayerInfoCard: React.FC<PlayerInfoCardProps> = ({id, name, inGame}) => {
+	const {name: userName} = useContext(UserContext)
 	return (
 		<div className="bg-[#57903C]">
 			<div className="w-auto flex pl-4 flex-col items-center">
@@ -18,7 +20,7 @@ const PlayerInfoCard: React.FC<PlayerInfoCardProps> = ({id, name, inGame}) => {
 							fontSize: "25px",
 						}}
 					>
-						{name ? name : "none"}
+						{userName ? userName : "none"}
 					</div>
 				}
 				<div>

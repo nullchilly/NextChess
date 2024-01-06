@@ -2,7 +2,7 @@
 import React, {ComponentType, useState, useEffect} from "react";
 
 type UserContextType = {
-	userId?: number,
+	userId: number,
 	name?: string,
 	dateOfBirth?: string,
 	gender?: string,
@@ -58,6 +58,7 @@ const UserProvider: React.FC<Props> = (props) => {
 			const data = await response.json();
 			if (data?.code === 200) {
 				setDataUser(data.data)
+				console.log(data.data.userId)
 			}
 		} else {
 			setDataUser({
@@ -74,7 +75,7 @@ const UserProvider: React.FC<Props> = (props) => {
 	
 	return (
 		<UserContext.Provider value={{
-			userId: dataUser?.userId,
+			userId: dataUser.userId,
 			dateOfBirth: dataUser?.dateOfBirth,
 			email: dataUser?.email,
 			gender: dataUser?.gender,

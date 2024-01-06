@@ -1,11 +1,12 @@
 'use client';
 
 import { Chessboard } from 'react-chessboard';
-import React from "react";
+import React, {useContext} from "react";
 import usePuzzleData from "@/hooks/usePuzzleData";
 import usePuzzleChess from "@/hooks/usePuzzleChess";
 import ControlsPuzzle from "@/components/Controls/ControlsPuzzle";
 import LoadingModal from "@/components/Modal/LoadingModal";
+import {UserContext} from "@/context/UserContext";
 
 type PuzzleGameProps = {
   id: string

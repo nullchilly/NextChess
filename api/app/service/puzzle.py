@@ -2,6 +2,7 @@ from random import randint
 from typing import List, Type
 
 from fastapi import HTTPException
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from api.app.dto.core.puzzle import *
@@ -116,8 +117,9 @@ class PuzzleService:
 		id = db.query(Game).filter(Game.variant_id == 3).filter(Game.number_player < 2).first()
 		if id is None:
 			# create new puzzle-duel game
-			db.add(Game(variant_id=3, number_player=0, status=False, result=0, slug='duel', time_mode=0))
-			id = db.query(Game).filter(Game.variant_id == 3 and Game.number_player < 2).first()
+			new_game = Game(variant_id=3, number_player=0, status=False, result=0, slug='duel', time_mode=0)
+			db.add(new_game)
+			id = db.query(Game).filter(Game.variant_id == 3, Game.number_player < 2).first()
 			db.commit()
 		return GetPuzzleGameResponse(id=id.id)
 
@@ -134,6 +136,30 @@ class PuzzleService:
 				if user is None:
 					continue
 				list_user.append(user.user_name)
+
+			res.append(PuzzleDuelResult(
+				puzzle_id=result[i].id,
+				status=result[i].status,
+				result=result[i].result,
+				slug=result[i].slug,
+				number_player=result[i].number_player,
+				created_at=str(result[i].created_at),
+				list_user=list_user
+			))
+		return PuzzleDuelResultList(result=res)
+
+	@classmethod
+	def get_recent_puzzle_by_user(cls, db: Session, user_id: int, limit: int = 10) -> PuzzleDuelResultList:
+		result = db.execute(text("SELECT g.* FROM game_user gu JOIN game g ON gu.game_id = g.id WHERE gu.user_id = :user_id AND g.variant_id = 3 ORDER BY g.created_at DESC LIMIT :limit"), {"user_id": user_id, "limit": limit}).all()
+		res = []
+		for i in range(len(result)):
+			game_user_data = db.query(GameUser).filter(GameUser.game_id == result[i].id).all()
+			list_user = []
+			for j in range(len(game_user_data)):
+				user = db.query(User).filter(User.id == game_user_data[j].user_id).first()
+				if user is None:
+					continue
+				list_user.append(int(user.id))
 
 			res.append(PuzzleDuelResult(
 				puzzle_id=result[i].id,

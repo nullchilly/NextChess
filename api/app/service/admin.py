@@ -17,6 +17,8 @@ class AdminService:
             raise HTTPException(status_code=401, detail="Username or password is incorrect")
         if user.password != request.password:
             raise HTTPException(status_code=401, detail="Username or password is incorrect")
+        if user.is_admin is False:
+            raise HTTPException(status_code=403, detail="Forbidden")
         return LoginResponse(access_token=user.access_token)
 
     @classmethod

@@ -6,7 +6,6 @@ class Game(BareBaseModel):
     __tablename__ = 'game'
 
     variant_id = Column(Integer, ForeignKey('variants.id'), nullable=False)
-    created_at = Column(DateTime)
     time_mode = Column(SmallInteger)
     status = Column(Boolean, nullable=False)
     result = Column(Integer, nullable=False)
