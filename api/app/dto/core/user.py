@@ -82,7 +82,7 @@ class GetUserGameResultResponse(CamelBaseModel):
 
 class UserInGetListUserResponse(CamelBaseModel):
     user_id: int
-    name: int
+    name: str
     date_of_birth: Optional[date]
     gender: Optional[UserGender]
     email: str
