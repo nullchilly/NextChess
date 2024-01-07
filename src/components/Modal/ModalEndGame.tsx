@@ -31,7 +31,7 @@ export default function ModalEndGame({ winner, isOpen, setOpen }: Props) {
         open={isOpen}
         // Taking for granted that user always play as white
         title={
-          winner === "black" ? <span> You lost </span> : <span> You won </span>
+          winner === "black" ? <span> You lost </span> : (winner === "draw" ? <span> Draw </span> : <span> You won </span>)
         }
         onOk={handleOk}
         onCancel={handleCancel}

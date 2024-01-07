@@ -450,7 +450,8 @@ async def human_play_chess(sid, msg):
                     }
                 }
                 if current_turn == "b": # Without loss of generality
-                    message["result"]["winner"] ^= 1 ^ 2
+                    if (winner != 0):
+                        message["result"]["winner"] ^= 1 ^ 2
                 await sio.emit("human-play-chess", json.dumps(message), room=sid)
                 if (winner != 0):
                     message["result"]["winner"] ^= 1 ^ 2
