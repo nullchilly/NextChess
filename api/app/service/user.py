@@ -188,7 +188,11 @@ class UserService:
 
     @classmethod
     def get_game_by_id(cls, db: Session, game_id: int):
-        move_in_game = db.query(Move).filter(Move.game_id == game_id, Move.deleted_at == None).all()
+        move_in_game = []
+        # move_in_game = db.query(Move).filter(Move.game_id == game_id, Move.deleted_at == None).all()
+        q = db.query(Move).filter(Move.game_id == game_id, Move.deleted_at == None)
+        for move in q.all():
+            move_in_game.append(move.move_detail)
         user_in_game = []
         result = 0
         for game in db.query(GameUser).filter(GameUser.game_id == game_id).filter(GameUser.deleted_at == None).all():

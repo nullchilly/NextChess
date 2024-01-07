@@ -118,7 +118,7 @@ const AdminPage = () => {
 			render: (_, {usersId}) => (
 				<>
 					{usersId?.map((userId, index) => (
-						<Tag bordered={false} color={index % 2 ? 'red' : 'blue'}> {userId} </Tag>
+						<Tag key={index} bordered={false} color={index % 2 ? 'red' : 'blue'}> {userId} </Tag>
 					))}
 				</>
 			)
@@ -145,7 +145,7 @@ const AdminPage = () => {
 			render: (_, {moves}) => (
 				<>
 					{moves?.map((move, index) => (
-						index < 3 && <Tag bordered={false}> {move} </Tag>
+						index < 3 && <Tag key={index} bordered={false}> {move} </Tag>
 					))}
 					{
 						moves.length > 3 && "..."
@@ -461,7 +461,7 @@ const AdminPage = () => {
 							Moves:
 							{currentGame?.moves.length ?
 								currentGame?.moves?.map((move, index) => (
-									<Tag bordered={false}> {move} </Tag>
+									<Tag key={index} bordered={false}> {move} </Tag>
 								)) :
 									<TagNull/>
 							}
