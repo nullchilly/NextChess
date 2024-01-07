@@ -120,29 +120,29 @@ const Navbar: React.FC = () => {
             className="bg-transparent text-white font-['Albula'] text-lg"
           >
             <SubMenu title={"Play"} icon={<ChessBoard />}>
-              <Menu.Item key="register" icon={<Human />}>
-                <Link href="/human"> Play vs Human </Link>
+              <Menu.Item key="/human" icon={<Human />}>
+                <Link href="/"> Play vs Human </Link>
               </Menu.Item>
-              <Menu.Item key="register" icon={<ChessBot />}>
-                <Link href="/computer"> Play vs Bot </Link>
+              <Menu.Item key="/computer" icon={<ChessBot />}>
+                <Link href="/"> Play vs Bot </Link>
               </Menu.Item>
             </SubMenu>
             <SubMenu title={"Puzzle"} icon={<Puzzle />}>
-              <Menu.Item key="register" icon={<Puzzle />}>
+              <Menu.Item key="/puzzle" icon={<Puzzle />}>
                 <Link href="/puzzle"> Play Puzzle </Link>
               </Menu.Item>
-              <Menu.Item key="register" icon={<Duel />}>
+              <Menu.Item key="/puzzle-duel" icon={<Duel />}>
                 <Link href="/puzzle-duel"> Puzzle Duel </Link>
               </Menu.Item>
             </SubMenu>
             <SubMenu title={"Learn"} icon={<Learn />}>
-              <Menu.Item key="register" icon={<Video />}>
+              <Menu.Item key="/videos" icon={<Video />}>
                 <Link href="/videos"> Videos </Link>
               </Menu.Item>
             </SubMenu>
             {
               isAdmin &&
-              <Menu.Item key="admin" icon={<Admin/>}>
+              <Menu.Item key="/admin" icon={<Admin/>}>
                 <Link href="/admin"> Admin </Link>
               </Menu.Item>
             }

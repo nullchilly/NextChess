@@ -214,7 +214,7 @@ const AdminPage = () => {
 		setIsLoading(true);
 		setShowModalDeleteUser(false);
 		try {
-			const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/profile`;
+			const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/profile`;
 			const savedToken = localStorage.getItem("accessToken");
 			const raw = JSON.stringify({
 				"userId": currentUser?.userId
@@ -242,7 +242,7 @@ const AdminPage = () => {
 		setIsLoading(true);
 		setShowModalDeleteGame(false);
 		try {
-			const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/game`;
+			const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/game`;
 			const savedToken = localStorage.getItem("accessToken");
 			const raw = JSON.stringify({
 				"gameId": currentGame?.gameId
@@ -289,7 +289,7 @@ const AdminPage = () => {
 	const fetchDataUser = async () => {
 		setIsLoading(true);
 		try {
-			const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/users`;
+			const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/users`;
 			const savedToken = localStorage.getItem("accessToken");
 			const response = await fetch(url, {
 				method: "GET",
@@ -310,7 +310,7 @@ const AdminPage = () => {
 	const fetchDataGame = async () => {
 		setIsLoading(true);
 		try {
-			const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/game`;
+			const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/game`;
 			const savedToken = localStorage.getItem("accessToken");
 			const response = await fetch(url, {
 				method: "GET",
