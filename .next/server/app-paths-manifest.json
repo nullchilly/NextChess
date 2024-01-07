@@ -1,16 +1,17 @@
 {
   "/_not-found": "app/_not-found.js",
+  "/admin/page": "app/admin/page.js",
   "/computer/page": "app/computer/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/forget/page": "app/forget/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/human/page": "app/human/page.js",
   "/login/page": "app/login/page.js",
   "/minimax/page": "app/minimax/page.js",
   "/page": "app/page.js",
   "/playground/socketio/page": "app/playground/socketio/page.js",
   "/playground/websocket/page": "app/playground/websocket/page.js",
-  "/profile/page": "app/profile/page.js",
   "/puzzle-duel/page": "app/puzzle-duel/page.js",
+  "/profile/page": "app/profile/page.js",
   "/puzzle/page": "app/puzzle/page.js",
   "/random/page": "app/random/page.js",
   "/settings/page": "app/settings/page.js",
@@ -18,6 +19,6 @@
   "/signup/page": "app/signup/page.js",
   "/stat/page": "app/stat/page.js",
   "/videos/page": "app/videos/page.js",
-  "/human/[slug]/page": "app/human/[slug]/page.js",
-  "/computer/[slug]/page": "app/computer/[slug]/page.js"
+  "/computer/[slug]/page": "app/computer/[slug]/page.js",
+  "/human/[slug]/page": "app/human/[slug]/page.js"
 }
