@@ -92,6 +92,7 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
     }
     setAllGameStates(allStates);
     setMoveIndex(allStates.length - 1);
+    disconnectSocket();
   }
 
   React.useEffect(() => {
@@ -157,6 +158,7 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
         try {
           const response = JSON.parse(msg);
           if (response["ok"] && Number.isInteger(response["winner"])) {
+            console.log("Res win: ", response["winner"]);
             let savedWinner: WINNER = "unknown";
             switch (response["winner"]) {
               case 0:
@@ -263,6 +265,7 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
 
   const fetchSavedGame = (socket: Socket) => {
     const savedGame = { id };
+    console.log("Fetching saved game...");
     socket.emit("fetch-saved-game", JSON.stringify(savedGame));
   };
 
