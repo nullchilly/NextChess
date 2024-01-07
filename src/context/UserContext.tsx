@@ -1,5 +1,5 @@
 'use client';
-import React, {ComponentType, useState, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 
 type UserContextType = {
 	userId: number,
@@ -12,6 +12,7 @@ type UserContextType = {
 	accessToken: string,
 	isLoading?: boolean,
 	checkLogin: () => void,
+	isAdmin: boolean,
 }
 
 const defaultValue = {
@@ -24,6 +25,7 @@ const defaultValue = {
 	rating: [],
 	accessToken: "",
 	isLoading: false,
+	isAdmin: false,
 }
 
 const UserContext = React.createContext<UserContextType>({
@@ -46,6 +48,7 @@ const UserProvider: React.FC<Props> = (props) => {
 	const checkLogin = async () => {
 		setIsLoading(true);
 		const token = localStorage.getItem('accessToken');
+		console.log("token", token);
 		if (token) {
 			setCurrentUser(token);
 			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}` + '/api/profile', {
@@ -58,7 +61,6 @@ const UserProvider: React.FC<Props> = (props) => {
 			const data = await response.json();
 			if (data?.code === 200) {
 				setDataUser(data.data)
-				console.log(data.data.userId)
 			}
 		} else {
 			setDataUser({
@@ -84,6 +86,7 @@ const UserProvider: React.FC<Props> = (props) => {
 			rating: dataUser?.rating,
 			accessToken: currentUser,
 			isLoading: isLoading,
+			isAdmin: dataUser?.isAdmin,
 			checkLogin: checkLogin,
 		}}>
 			{props.children}

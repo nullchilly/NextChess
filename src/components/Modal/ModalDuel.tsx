@@ -1,10 +1,5 @@
-import { Button, Modal } from "antd";
+import { Modal } from "antd";
 import React, { useState } from "react";
-import Checkmate from "../icons/Checkmate";
-import { useRouter } from "next/navigation";
-import Crown from "../icons/Crown";
-import { WINNER } from "@/helpers/types";
-import Handshake from "../icons/Handshake";
 import {pawnLost, pawnWon} from "@/helpers/const";
 import Image from 'next/image';
 
@@ -15,9 +10,6 @@ type Props = {
 };
 
 export default function ModalDuel({ isWon, isOpen, onCLose }: Props) {
-	const [loading, setLoading] = useState(false);
-	// const [open, onCLose] = useState(false);
-	
 	const handleCancel = () => {
 		onCLose(false);
 	};

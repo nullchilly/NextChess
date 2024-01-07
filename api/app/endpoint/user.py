@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from api.app.dto.core.user import SignUpResponse, SignUpRequest, LoginRequest, LoginResponse, ChangePasswordRequest, \
     GetProfileResponse, UpdateProfileRequest, GetUserGameHistoryResponse, GetUserPuzzleHistoryResponse, \
-    GetUserGameResultResponse
+    GetUserGameResultResponse, GameInGetListGameResponse
 from api.app.helper.base_response import DataResponse, ResponseSchemaBase
 from api.app.helper.db import db_session
 from api.app.helper.middleware import get_current_user
@@ -67,5 +67,6 @@ def get_game_result(db: Session = Depends(db_session), *, user_id: int, variant_
                     limit: int = Query(default=5, alias="limit")):
     return DataResponse().success_response(data=UserService().get_game_result(db, user_id, variant_id, limit))
 
-
-
+@user_router.get('/game/{game_id}', response_model=DataResponse[GameInGetListGameResponse])
+def get_game_by_game_id(db: Session = Depends(db_session), *, game_id: int):
+    return DataResponse().success_response(data=UserService.get_game_by_id(db, game_id))

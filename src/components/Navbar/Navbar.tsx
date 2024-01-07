@@ -17,6 +17,8 @@ import ModalPlayBot from "../Modal/ModalPlayBot";
 import { SettingOutlined } from "@ant-design/icons";
 import { UserContext } from "@/context/UserContext";
 import ModalPlayHuman from "../Modal/ModalPlayHuman";
+import SubMenu from "antd/lib/menu/SubMenu";
+import Admin from "@/components/icons/Admin";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -38,30 +40,12 @@ function getItem(
   } as MenuItem;
 }
 
-const items: MenuProps["items"] = [
-  getItem("Play", "sub1", <ChessBoard />, [
-    getItem("Play vs Human", "/human", <Human />),
-    getItem("Play vs Bot", "/computer", <ChessBot />),
-  ]),
-
-  // TODO: Change path to the corresponding component
-  getItem("Puzzle", "sub2", <Puzzle />, [
-    // Why `puzzleData`, thought this should be `puzzle`?
-    getItem("Play Puzzle", "/puzzle", <Puzzle />),
-    getItem("Puzzle Duel", "/puzzle-duel", <Duel />),
-  ]),
-
-  getItem("Learn", "sub3", <Learn />, [
-    getItem("Videos", "/videos", <Video />),
-  ]),
-];
-
 const Navbar: React.FC = () => {
   const [isModalPlayBotOpen, setIsModalPlayBotOpen] = React.useState(false);
   const [isModalPlayHumanOpen, setIsModalPlayHumanOpen] = React.useState(false);
   const router = useRouter();
-  const { name, rate, accessToken } = useContext(UserContext);
-
+  const { name, rate, accessToken, isAdmin } = useContext(UserContext);
+  
   const showModal = () => {
     setIsModalPlayBotOpen(true);
   };
@@ -132,9 +116,37 @@ const Navbar: React.FC = () => {
           <Menu
             onClick={onClickMenuDrawer}
             mode="inline"
-            items={items}
+            // items={items}
             className="bg-transparent text-white font-['Albula'] text-lg"
-          />
+          >
+            <SubMenu title={"Play"} icon={<ChessBoard />}>
+              <Menu.Item key="/human" icon={<Human />}>
+                <Link href="/"> Play vs Human </Link>
+              </Menu.Item>
+              <Menu.Item key="/computer" icon={<ChessBot />}>
+                <Link href="/"> Play vs Bot </Link>
+              </Menu.Item>
+            </SubMenu>
+            <SubMenu title={"Puzzle"} icon={<Puzzle />}>
+              <Menu.Item key="/puzzle" icon={<Puzzle />}>
+                <Link href="/puzzle"> Play Puzzle </Link>
+              </Menu.Item>
+              <Menu.Item key="/puzzle-duel" icon={<Duel />}>
+                <Link href="/puzzle-duel"> Puzzle Duel </Link>
+              </Menu.Item>
+            </SubMenu>
+            <SubMenu title={"Learn"} icon={<Learn />}>
+              <Menu.Item key="/videos" icon={<Video />}>
+                <Link href="/videos"> Videos </Link>
+              </Menu.Item>
+            </SubMenu>
+            {
+              isAdmin &&
+              <Menu.Item key="/admin" icon={<Admin/>}>
+                <Link href="/admin"> Admin </Link>
+              </Menu.Item>
+            }
+          </Menu>
         </div>
       </div>
       <ModalPlayBot
