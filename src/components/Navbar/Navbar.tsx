@@ -19,6 +19,7 @@ import { UserContext } from "@/context/UserContext";
 import ModalPlayHuman from "../Modal/ModalPlayHuman";
 import SubMenu from "antd/lib/menu/SubMenu";
 import Admin from "@/components/icons/Admin";
+import "./styles.css"
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -78,7 +79,7 @@ const Navbar: React.FC = () => {
         className="bg-[#477330] px-4 py-4 grow text-center"
         style={{ maxWidth: "272px", minWidth: "268px" }}
       >
-        <Link href="/">
+        <Link href="/" color={'#f1f3f9'}>
           <StockChess />
         </Link>
         <div className="object-cover p-6 w-full flex items-center justify-center">
@@ -91,7 +92,7 @@ const Navbar: React.FC = () => {
               />
             </button>
           </div>
-          <Link href={"/settings"}>
+          <Link href={"/settings"} >
             <SettingOutlined
               style={{ fontSize: "40px", color: "#f1f1f1" }}
               className="pl-5"
@@ -121,7 +122,7 @@ const Navbar: React.FC = () => {
           >
             <SubMenu title={"Play"} icon={<ChessBoard />}>
               <Menu.Item key="/human" icon={<Human />}>
-                <Link href="/"> Play vs Human </Link>
+                <Link href="/" color={'#f1f3f9'}> Play vs Human </Link>
               </Menu.Item>
               <Menu.Item key="/computer" icon={<ChessBot />}>
                 <Link href="/"> Play vs Bot </Link>
