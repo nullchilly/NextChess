@@ -265,9 +265,13 @@ const ProfilePage = () => {
             <div className="flex-grow text-slate-100 text-xl font-bold font-mono p-4">
               Your match
             </div>
-            <div className="bg-[#58943c] text-black p-4 rounded-lg grid grid-cols-4">
+            <div className="bg-[#58943c] text-black p-4 rounded-lg ">
               <List
                 itemLayout="horizontal"
+                pagination={{
+                  responsive: true,
+                  align: 'center'
+                }}
                 dataSource={gamesPlayed.map((game: any) => ({
                   title: "Game " + game.slug,
                   slug: game.slug,

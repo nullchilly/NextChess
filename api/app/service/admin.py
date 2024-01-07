@@ -42,11 +42,13 @@ class AdminService:
     def get_list_user(cls, user: User, db: Session):
         if user.is_admin is False:
             raise HTTPException(status_code=403, detail="Forbidden")
-        q = db.query(Profile)
+        q = db.query(Profile.user_id, Profile.name, Profile.date_of_birth, Profile.gender, Profile.email,
+                     User.user_name, User.id, User.is_admin, User.deleted_at)\
+            .join(User, User.id == Profile.user_id).filter(User.deleted_at == None)
         res = []
         for profile in q.all():
             res.append(UserInGetListUserResponse(user_id=profile.user_id, name=profile.name, date_of_birth=profile.date_of_birth,
-                                                 gender=profile.gender, email=profile.email, user_name=user.user_name, is_admin=user.is_admin))
+                                                 gender=profile.gender, email=profile.email, user_name=profile.user_name, is_admin=profile.is_admin))
         return GetListUserResponse(users=res)
 
 
