@@ -503,7 +503,7 @@ async def disconnect(sid):
 puzzle_list_per_game_id = dict()
 participant: Dict[int, Set[int]] = dict()
 puzzle_solved_by_user: Dict[int, Dict[int, Set[int]]] = dict()
-
+user_want_to_end: Dict[int, Set[int]] = dict()
 
 @sio.on("puzzle-duel")
 async def puzzle_duel(sid, msg):
@@ -518,6 +518,7 @@ async def puzzle_duel(sid, msg):
                 puzzle_list_per_game_id[game_id] = puzzle_list
             participant[game_id] = set()
             puzzle_solved_by_user[game_id] = dict()
+            user_want_to_end[game_id] = set()
         puzzle_list = puzzle_list_per_game_id[game_id]
         user_id = data["message"]["userId"]
         with next(db_session()) as db:
@@ -620,26 +621,28 @@ async def puzzle_duel(sid, msg):
         user_id_win = data["message"]["userId"]
         game_id = data["message"]["gameId"]
         max_puzzle_solved = 0
-        for user_id in participant[game_id]:
-            if len(puzzle_solved_by_user[game_id][user_id]) >= max_puzzle_solved:
-                user_id_win = user_id
-                max_puzzle_solved = len(
-                    puzzle_solved_by_user[game_id][user_id])
-        response = {
-            "status": "end_noti",
-            "message": {
-                "gameId": game_id,
-                "userId": user_id_win,
-                "content": f"User {user_id_win} won"
+        user_want_to_end[game_id].add(user_id_win)
+        if len(user_want_to_end[game_id]) == len(participant[game_id]):
+            for user_id in participant[game_id]:
+                if len(puzzle_solved_by_user[game_id][user_id]) >= max_puzzle_solved:
+                    user_id_win = user_id
+                    max_puzzle_solved = len(
+                        puzzle_solved_by_user[game_id][user_id])
+            response = {
+                "status": "end_noti",
+                "message": {
+                    "gameId": game_id,
+                    "userId": user_id_win,
+                    "content": f"User {user_id_win} won"
+                }
             }
-        }
-        with next(db_session()) as db:
-            game_user = db.query(GameUser).filter(GameUser.user_id == user_id_win,
-                                                  GameUser.game_id == game_id).first()
-            game_user.win = 1
-            db.commit()
-        await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
-        return
+            with next(db_session()) as db:
+                game_user = db.query(GameUser).filter(GameUser.user_id == user_id_win,
+                                                      GameUser.game_id == game_id).first()
+                game_user.win = 1
+                db.commit()
+            await sio.emit(event="puzzle-duel", room=game_id, data=json.dumps(response))
+            return
 
 app.mount("/", socketio.ASGIApp(sio))
 
