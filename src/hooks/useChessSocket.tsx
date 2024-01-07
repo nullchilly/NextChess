@@ -79,7 +79,7 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
 
     for (let i = 0; i < allMoves.length; i++) {
       let tempState: Chess = getChessPosisition(gameConfig?.variant);
-      console.log(`tempSate: ${i}`, tempState.fen());
+      console.log(`tempState: ${i}`, tempState.fen());
       for (let j = 0; j <= i; j++) {
         try {
           tempState.move(allMoves[j]);
@@ -398,7 +398,26 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
     // console.log("ALL: ", moveIndex, allGameStates);
     setMoveIndex(newMoveIndex);
     setGame(currentGame);
-    updateCustomSquares({ check: undefined }); // Reset style
+    let kingSquare = undefined;
+    if (currentGame.inCheck()) {
+      const kingPos = currentGame.board().reduce((acc, row, index) => {
+        const squareIndex = row.findIndex(
+          (square) =>
+            square && square.type === "k" && square.color === currentGame.turn()
+        );
+        return squareIndex >= 0
+          ? `${String.fromCharCode(squareIndex + 97)}${8 - index}`
+          : acc;
+      }, "");
+      kingSquare = {
+        [kingPos]: {
+          background:
+            "radial-gradient(red, rgba(255,0,0,.8), transparent 70%)",
+          borderRadius: "50%",
+        },
+      };
+    }
+    updateCustomSquares({ check: kingSquare }); // Reset style
   };
 
   const nextMove = () => {
@@ -406,7 +425,26 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
     const currentGame = allGameStates[newMoveIndex];
     setMoveIndex(newMoveIndex);
     setGame(currentGame);
-    updateCustomSquares({ check: undefined }); // Reset style
+    let kingSquare = undefined;
+    if (currentGame.inCheck()) {
+      const kingPos = currentGame.board().reduce((acc, row, index) => {
+        const squareIndex = row.findIndex(
+          (square) =>
+            square && square.type === "k" && square.color === currentGame.turn()
+        );
+        return squareIndex >= 0
+          ? `${String.fromCharCode(squareIndex + 97)}${8 - index}`
+          : acc;
+      }, "");
+      kingSquare = {
+        [kingPos]: {
+          background:
+            "radial-gradient(red, rgba(255,0,0,.8), transparent 70%)",
+          borderRadius: "50%",
+        },
+      };
+    }
+    updateCustomSquares({ check: kingSquare }); // Reset style
   };
 
   return {

@@ -9,6 +9,7 @@ import PlayerCard from "../Card/PlayerCard";
 import MoveList from "../MoveList/MoveList";
 import ModalEndGame from "../Modal/ModalEndGame";
 import { Button } from '../ui/button';
+import { CaretLeftFilled, CaretRightFilled } from "@ant-design/icons";
 
 type Props = {
   id: string;
@@ -41,6 +42,8 @@ const HumanChessGame = ({ id }: Props) => {
     gameFen,
     setGameFen,
     opponentName,
+    prevMove,
+    nextMove,
   } = useChessHumanSocket({ id, userId, name });
 
   function isDraggablePiece(args: { piece: Piece; sourceSquare: Square }) {
@@ -49,11 +52,11 @@ const HumanChessGame = ({ id }: Props) => {
 
   return (
     <>
-      <div className="p-4">
+      {/* <div className="p-4">
         {!playable
           ? `To invite someone to play, give this URL: ${gameUrl}`
           : `May the best man win`}
-      </div>
+      </div> */}
       <div className="flex p-4 mt-8">
         <div className="flex justify-center w-2/3">
           <div className="w-[500px]">
@@ -89,7 +92,7 @@ const HumanChessGame = ({ id }: Props) => {
                   moves={game.history({ verbose: true }).reverse()}
                   bot={{ id: "0", name: "shark" }}
                 />
-                {/* {winner !== "unknown" ? (
+                {winner !== "unknown" ? (
                   <div className="flex justify-center">
                     <CaretLeftFilled
                       style={{ fontSize: "32px" }}
@@ -100,7 +103,7 @@ const HumanChessGame = ({ id }: Props) => {
                       onClick={nextMove}
                     />
                   </div>
-                ) : null} */}
+                ) : null}
                 {/* Cannot make HumanControls work??? */}
                 <div className="flex gap-4 mt-4">
                   <Button className="w-full" onClick={() => forfeitGame()}>
