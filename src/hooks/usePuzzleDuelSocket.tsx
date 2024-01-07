@@ -162,6 +162,7 @@ const usePuzzleDuelSocket = () => {
 						setCurrent(0);
 						setResultR(Array(10).fill(0));
 						setResultL(Array(10).fill(0));
+						// disconnectSocket()
 					} else if (response["status"] === "error") {
 					
 					}

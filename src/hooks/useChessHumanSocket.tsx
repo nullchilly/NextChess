@@ -29,6 +29,7 @@ const useChessHumanSocket = ({ id, userId, name }: Props) => {
 
   function handleGameEnd(winner: WINNER) {
     setWinner(winner);
+    disconnectSocket();
   }
 
   const disconnectSocket = useCallback(() => {
