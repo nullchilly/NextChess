@@ -46,7 +46,7 @@ class AdminService:
         res = []
         for profile in q.all():
             res.append(UserInGetListUserResponse(user_id=profile.user_id, name=profile.name, date_of_birth=profile.date_of_birth,
-                                                 gender=profile.gender, email=profile.email))
+                                                 gender=profile.gender, email=profile.email, user_name=user.user_name, is_admin=user.is_admin))
         return GetListUserResponse(users=res)
 
 

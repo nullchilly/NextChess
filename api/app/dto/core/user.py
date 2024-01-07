@@ -86,6 +86,8 @@ class UserInGetListUserResponse(CamelBaseModel):
     date_of_birth: Optional[date]
     gender: Optional[UserGender]
     email: str
+    user_name: str
+    is_admin: bool
 
 class GetListUserResponse(CamelBaseModel):
     users: List[UserInGetListUserResponse]
