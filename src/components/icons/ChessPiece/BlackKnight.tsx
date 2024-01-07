@@ -2,7 +2,7 @@ import * as React from "react"
 import {ChessProps} from "@/helpers/types";
 
 const BlackKnight: React.FC<ChessProps> = (props) => (
-	<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" {...props}>
+	<svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" {...props}>
 		<g
 			style={{
 				opacity: 1,
