@@ -56,6 +56,7 @@ function Login() {
         if (checkLogin) {
           await checkLogin();
         }
+        router.push('/profile');
       } else {
         console.error('Login failed:', response.statusText);
         setcheck(false);
@@ -63,7 +64,7 @@ function Login() {
     } catch (error) {
       console.error('An unexpected error occurred:', error);
     }
-    router.push('/profile');
+    
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
