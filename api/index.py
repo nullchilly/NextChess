@@ -442,6 +442,19 @@ async def human_play_chess(sid, msg):
                 winner_color = outcome.winner
                 winner = 0 if winner_color is None else 1 if winner_color is True else 2
                 print(reason, winner_color, winner)
+                with next(db_session()) as db:
+                    game = db.query(Game).filter(Game.slug == gameID).first()
+                    for key, value in game_states[gameID]["color"].items():
+                        game_user = db.query(GameUser).filter(GameUser.user_id == key, GameUser.game_id == game.id).first()
+                        if (value == "w" and winner == 1 or value == "b" and winner == 2):
+                            game_user.win = 1
+                            game_user.rating_change = 15
+                        else:
+                            game_user.win = -1
+                            game_user.rating_change = -15
+                    
+                    db.commit()
+                    pass
                 message = {
                     "ok": True,
                     "result": {
