@@ -1,7 +1,8 @@
-:where(.css-dev-only-do-not-override-1adbn6x).ant-menu-light .ant-menu-item-selected, :where(.css-dev-only-do-not-override-1adbn6x).ant-menu-light>.ant-menu .ant-menu-item-selected {
-    color: darkslategray;
+.ant-menu-item-selected {
+    background-color: #F1F5F9 !important;
+    color: #385c26 !important;
 }
 
-:where(.css-dev-only-do-not-override-1adbn6x).ant-menu-light .ant-menu-submenu-selected >.ant-menu-submenu-title, :where(.css-dev-only-do-not-override-1adbn6x).ant-menu-light>.ant-menu .ant-menu-submenu-selected >.ant-menu-submenu-title {
-    color: white;
+.ant-menu-submenu-title {
+    color: white !important;
 }
