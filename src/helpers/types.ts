@@ -117,3 +117,8 @@ export type GameConfig = {
 }
 
 export type WINNER = "black" | "white" | "draw" | "unknown";
+
+export type AnalysisScore = {
+  type: "Cp" | "Mate",
+  score: number,
+}

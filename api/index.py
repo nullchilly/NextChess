@@ -112,6 +112,15 @@ async def play_chess(sid, msg):
 
     # Insert user's move
     game_states[gameID]['board'].push(chess.Move.from_uci(move))
+    engine = game_states[gameID]['engine']
+    info = engine.analyse(game_states[gameID]['board'], game_states[gameID]['limit'])
+    print("INFO SCR: ", info["score"].white());
+    if (info["score"].white().is_mate()):
+        analyse_score = {"type": "Mate", "score": info["score"].white().mate()}
+        game_states[gameID]["analysis"].append(analyse_score)
+    else:
+        analyse_score = {"type": "Cp", "score": info["score"].white().score()}
+        game_states[gameID]["analysis"].append(analyse_score)
 
     # Winner check
     winner = 3  # Unknown
@@ -157,6 +166,15 @@ async def play_chess(sid, msg):
         game_states[gameID]['board'], game_states[gameID]['limit'])
     # TODO: Check whether game state is over
     game_states[gameID]['board'].push(result.move)
+    engine = game_states[gameID]['engine']
+    info = engine.analyse(game_states[gameID]['board'], game_states[gameID]['limit'])
+    print("INFO SCR 2: ", info["score"].black());
+    if (info["score"].black().is_mate()):
+        analyse_score = {"type": "Mate", "score": info["score"].black().mate()}
+        game_states[gameID]["analysis"].append(analyse_score)
+    else:
+        analyse_score = {"type": "Cp", "score": info["score"].black().score()}
+        game_states[gameID]["analysis"].append(analyse_score)
     move = result.move
 
     # NOTE: When checkmated, there's no available move, hence no `from_square`, please hanlde it.
@@ -207,6 +225,17 @@ async def play_chess(sid, msg):
     game_states[gameID]['time']['bPlayer'].pause_time()
     await sio.emit("play-chess", json.dumps(message), room=sid)
 
+@sio.on("fetch-analysis")
+async def fetch_analysis(sid, msg):
+    data = json.loads(msg)
+    gameID = data["id"]
+    if (gameID in game_states):
+        message = {"ok": True, "scores": game_states[gameID]["analysis"]}
+        print("ALAL: ", game_states[gameID]["analysis"]);
+        await sio.emit("fetch-analysis", json.dumps(message), room=sid)
+        pass
+    else:
+        pass
 
 # Clean up after game is ended, TODO: Check auth-user?
 @sio.on("end-game")
@@ -268,7 +297,7 @@ async def start_game(sid, msg):
         all_game_ids.add(gameID)
         engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
         engine.configure({"Skill Level": 1})  # Parameterize this
-        limit = chess.engine.Limit(time=1.2)
+        limit = chess.engine.Limit(time=0.8)
         board = chess.Board()
 
         if (variant == 2):
@@ -286,6 +315,7 @@ async def start_game(sid, msg):
         current_state['status'] = False  # Unfinished game
         current_state['result'] = 3  # Unknown result
         current_state['userID'] = userID
+        current_state['analysis'] = []
 
         timer_dict = dict()
         timer_dict['wPlayer'] = wTimer
