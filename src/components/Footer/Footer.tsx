@@ -5,7 +5,7 @@ import {FacebookOutlined, InstagramOutlined, TwitterOutlined, YoutubeOutlined} f
 const Footer = () => {
 	return (
 		<div
-			className="bg-[#477330] py-4 px-24 flex-col items-center"
+			className="bg-[#477330] py-3 px-24 flex-col items-center"
 			style={{
 				position: "fixed",
 				bottom: "0",
@@ -23,7 +23,7 @@ const Footer = () => {
 				<Link href={"https://www.facebook.com/sonfam03"} className="text-white"> FAQs </Link>
 				<span className="text-white ml-10">Copyright 2024 @ UET-VNU</span>
 			</div>
-			<div>
+			{/* <div>
 				<Link href={"https://www.facebook.com/sonfam03"} className="text-white">
 					<FacebookOutlined className={'m-1 text-2xl'} />
 				</Link>
@@ -36,7 +36,7 @@ const Footer = () => {
 				<Link href={"https://www.instagram.com/sonfam03"} className="text-white">
 					<InstagramOutlined className={'m-1 text-2xl'} />
 				</Link>
-			</div>
+			</div> */}
 		</div>
 	);
 }

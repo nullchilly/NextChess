@@ -177,7 +177,7 @@ async def play_chess(sid, msg):
         game_states[gameID]["analysis"].append(analyse_score)
     move = result.move
 
-    # NOTE: When checkmated, there's no available move, hence no `from_square`, please hanlde it.
+    # NOTE: When checkmated, there's no available move, hence no `from_square`, please handle it.
     from_square = chess.square_name(move.from_square)
     to_square = chess.square_name(move.to_square)
     outcome = game_states[gameID]['board'].outcome()
