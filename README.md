@@ -2,6 +2,11 @@
 
 This project was bootstrapped frontend with [React](https://www.typescriptlang.org/docs/handbook/react.html), backend with [Python](https://www.python.org/doc/) and database with SQL.
 
+![](demo/DUEL_PUZZLE.png)
+
+> [!NOTE]
+> For more previews see the [demo folder](./demo/)
+
 ## Features/packages/framework included
 
 - [TypeScript](https://www.typescriptlang.org/) - Type checker.
@@ -98,6 +103,11 @@ Define all shared context and context provider used in application
 ### src/hooks
 
 Define all shared hook used in application
+
+## Thanks to
+
+- [chesskid.com](https://www.chesskid.com/) for UI inspiration
+- [lichess.org](https://lichess.org/) for being the best
 
 ## Copyright
 
