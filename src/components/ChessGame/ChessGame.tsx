@@ -57,6 +57,8 @@ const ChessGame = ({ id, type }: ChessGameType) => {
 
     prevMove,
     nextMove,
+
+    analysisMoves,
   } = useChessSocket({ type, id, userId, gameConfig });
 
   const [botList, setBotList] = useState<BotProps[]>([]);
@@ -128,6 +130,7 @@ const ChessGame = ({ id, type }: ChessGameType) => {
               <MoveList
                 moves={game.history({ verbose: true }).reverse()}
                 bot={bot ? bot : { id: "0", name: "shark" }}
+                scores={analysisMoves}
               />
               {winner !== "unknown" ? (
                 <div className="flex justify-center">

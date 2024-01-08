@@ -87,18 +87,6 @@ const Home = () => {
           </Row>
         </div>
       </div>
-      <div
-        className="bg-[#477330] py-4 px-24"
-        style={{
-          position: "fixed",
-          bottom: "0",
-          display: "flex",
-          left: "50%",
-          borderRadius: "8px",
-        }}
-      >
-        <span className="text-white">Insprised by ChessKid</span>
-      </div>
     </>
   );
 };

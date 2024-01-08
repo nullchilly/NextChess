@@ -5,7 +5,7 @@ import { io, Socket } from "socket.io-client";
 import { CustomSquares, ShortMove } from "@/types";
 import { useLocalStorage } from "./useLocalStorage";
 import { httpGetPlayerTimeLeft } from "@/modules/backend-client/httpGetPlayerTimeLeft";
-import { GameConfig, WINNER } from "@/helpers/types";
+import { AnalysisScore, GameConfig, WINNER } from "@/helpers/types";
 
 export type ChessType = "random" | "computer" | "minimax";
 
@@ -58,6 +58,7 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
   // Handle prev-next move button in game review
   const [moveIndex, setMoveIndex] = React.useState(0);
   const [allGameStates, setAllGameStates] = React.useState<Chess[]>([]);
+  const [analysisMoves, setAnalysisMoves] = React.useState<AnalysisScore[]>([]);
 
   const disconnectSocket = React.useCallback(() => {
     socket?.close();
@@ -90,9 +91,9 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
       }
       allStates.push(tempState);
     }
+    socket?.emit("fetch-analysis", JSON.stringify({ id }));
     setAllGameStates(allStates);
     setMoveIndex(allStates.length - 1);
-    disconnectSocket();
   }
 
   React.useEffect(() => {
@@ -186,6 +187,20 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
           console.error("[!!!] Can't fetch saved game data");
         }
       });
+
+      socket.on("fetch-analysis", (msg) => {
+        try {
+          const response = JSON.parse(msg);
+          console.log("[RES]: ", response);
+          if (Array.isArray(response["scores"])) {
+            setAnalysisMoves(response["scores"]);
+            // God bless us
+            disconnectSocket();
+          }
+        } catch(error) {
+          console.error("[!!!] Can't fetch analysis", error);
+        }
+      })
     }
   }, [disconnectSocket, setConnectionStatus, socket]);
 
@@ -411,8 +426,7 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
       }, "");
       kingSquare = {
         [kingPos]: {
-          background:
-            "radial-gradient(red, rgba(255,0,0,.8), transparent 70%)",
+          background: "radial-gradient(red, rgba(255,0,0,.8), transparent 70%)",
           borderRadius: "50%",
         },
       };
@@ -438,8 +452,7 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
       }, "");
       kingSquare = {
         [kingPos]: {
-          background:
-            "radial-gradient(red, rgba(255,0,0,.8), transparent 70%)",
+          background: "radial-gradient(red, rgba(255,0,0,.8), transparent 70%)",
           borderRadius: "50%",
         },
       };
@@ -474,6 +487,8 @@ const useChessSocket = ({ type, id, userId, gameConfig }: Props) => {
 
     prevMove,
     nextMove,
+
+    analysisMoves,
 
     socket,
   };

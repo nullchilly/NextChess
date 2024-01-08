@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Navbar from "@/components/Navbar/Navbar";
 import {UserProvider} from "@/context/UserContext";
+import Footer from "@/components/Footer/Footer";
 
 export const metadata: Metadata = {
   title: "Next-Chess",
@@ -24,6 +25,7 @@ const Layout = ({ children }: LayoutType) => {
               <Navbar />
               <div style={{flexGrow: 9, backgroundColor: '#57903C'}}>
                 {children}
+                <Footer/>
               </div>
             </div>
           </ThemeProvider>
