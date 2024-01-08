@@ -1,8 +1,9 @@
 import { CustomSquares, ShortMove } from "@/types";
-import { Chess, Square } from "chess.js";
+import { Chess, Move, Square } from "chess.js";
 import { useCallback, useEffect, useReducer, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { GameConfig, WINNER } from "@/helpers/types";
+import { useLocalStorage } from "./useLocalStorage";
 
 type Props = {
   id: string;
@@ -26,9 +27,38 @@ const useChessHumanSocket = ({ id, userId, name }: Props) => {
     check: {},
   });
   const [winner, setWinner] = useState<WINNER>("unknown");
+  // Handle prev-next move button in game review
+  const [moveIndex, setMoveIndex] = useState(0);
+  const [allGameStates, setAllGameStates] = useState<Chess[]>([]);
+
+  function getChessPosisition() {
+    return new Chess()
+  }
 
   function handleGameEnd(winner: WINNER) {
     setWinner(winner);
+    // Save all moves for review
+    const allMoves = game.history({ verbose: true });
+    console.log(allMoves)
+    let allStates: Chess[] = [getChessPosisition()];
+    console.log("handle state: ", allGameStates);
+
+    for (let i = 0; i < allMoves.length; i++) {
+      let tempState: Chess = getChessPosisition();
+      // console.log(`tempState: ${i}`, tempState.fen());
+      for (let j = 0; j <= i; j++) {
+        try {
+          tempState.move(allMoves[j]);
+        } catch (error) {
+          // console.log("[ERR]: ", i, j, allMoves[j], tempState.fen(), error);
+          console.log("[ERR]: ", error);
+        }
+      }
+      console.log("TEMPSTATE", tempState.fen())
+      allStates.push(tempState);
+    }
+    setAllGameStates(allStates);
+    setMoveIndex(allStates.length - 1);
     disconnectSocket();
   }
 
@@ -120,12 +150,18 @@ const useChessHumanSocket = ({ id, userId, name }: Props) => {
     socket.emit("human-new-player-join", JSON.stringify(newPlayerData));
   };
 
+  const [moves, setMoves] = useLocalStorage<Move[]>({
+    name: `${id}-moves`,
+    defaultValue: [],
+  });
+
   const makeMove = (move: string | ShortMove) => {
     console.log(move);
     const gameCopy = game;
     const result = gameCopy.move(move);
 
     if (result) {
+      // setMoves(gameCopy.history({ verbose: true }));
       setGameFen(gameCopy.fen());
       setGame(gameCopy);
       let kingSquare = undefined;
@@ -187,6 +223,63 @@ const useChessHumanSocket = ({ id, userId, name }: Props) => {
     handleGameEnd("black");
   };
 
+  const prevMove = () => {
+    const newMoveIndex = Math.max(moveIndex - 1, 0);
+    const currentGame = allGameStates[newMoveIndex];
+    setGameFen(currentGame.fen())
+    console.log("ALL: ", moveIndex, allGameStates);
+    setMoveIndex(newMoveIndex);
+    setGame(currentGame);
+    let kingSquare = undefined;
+    if (currentGame.inCheck()) {
+      const kingPos = currentGame.board().reduce((acc, row, index) => {
+        const squareIndex = row.findIndex(
+          (square) =>
+            square && square.type === "k" && square.color === currentGame.turn()
+        );
+        return squareIndex >= 0
+          ? `${String.fromCharCode(squareIndex + 97)}${8 - index}`
+          : acc;
+      }, "");
+      kingSquare = {
+        [kingPos]: {
+          background:
+            "radial-gradient(red, rgba(255,0,0,.8), transparent 70%)",
+          borderRadius: "50%",
+        },
+      };
+    }
+    updateCustomSquares({ check: kingSquare }); // Reset style
+  };
+
+  const nextMove = () => {
+    const newMoveIndex = Math.min(moveIndex + 1, allGameStates.length - 1);
+    const currentGame = allGameStates[newMoveIndex];
+    setGameFen(currentGame.fen())
+    setMoveIndex(newMoveIndex);
+    setGame(currentGame);
+    let kingSquare = undefined;
+    if (currentGame.inCheck()) {
+      const kingPos = currentGame.board().reduce((acc, row, index) => {
+        const squareIndex = row.findIndex(
+          (square) =>
+            square && square.type === "k" && square.color === currentGame.turn()
+        );
+        return squareIndex >= 0
+          ? `${String.fromCharCode(squareIndex + 97)}${8 - index}`
+          : acc;
+      }, "");
+      kingSquare = {
+        [kingPos]: {
+          background:
+            "radial-gradient(red, rgba(255,0,0,.8), transparent 70%)",
+          borderRadius: "50%",
+        },
+      };
+    }
+    updateCustomSquares({ check: kingSquare }); // Reset style
+  };
+
   return {
     socket,
     winner,
@@ -199,6 +292,8 @@ const useChessHumanSocket = ({ id, userId, name }: Props) => {
     gameFen,
     setGameFen,
     opponentName,
+    prevMove,
+    nextMove,
   };
 };
 
