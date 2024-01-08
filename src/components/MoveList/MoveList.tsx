@@ -3,13 +3,15 @@ import MoveItem from "./MoveItem";
 import { BotProps } from "@/types";
 import React from "react";
 import PlayerInfoCard from "@/components/Card/PlayerInfoCard";
+import { AnalysisScore } from "@/helpers/types";
 
 type MoveListType = {
   moves: Move[];
   bot: BotProps;
+  scores?: AnalysisScore[];
 };
 
-const MoveList: React.FC<MoveListType> = ({ moves, bot }) => {
+const MoveList: React.FC<MoveListType> = ({ moves, bot, scores }) => {
   return (
     <div>
       <div className="flex pt-4 pb-4">
@@ -19,7 +21,7 @@ const MoveList: React.FC<MoveListType> = ({ moves, bot }) => {
           </li>
           <div>
             {moves?.map((move, index) => (
-              <MoveItem move={move} key={index} />
+              <MoveItem move={move} key={index} score={scores ? scores[moves.length - 1 - index] : undefined}/>
             ))}
           </div>
         </ul>
